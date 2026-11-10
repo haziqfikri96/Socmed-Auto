@@ -87,12 +87,12 @@ Return JSON only:
 }}"""
 
     resp = client.messages.create(
-        model="claude-haiku-5-5",
+        model="claude-3-haiku-20240307",
         max_tokens=512,
         messages=[{"role": "user", "content": prompt}],
     )
 
-    raw = resp.content[0].text.strip()
+    raw = next(b.text for b in resp.content if hasattr(b, "text")).strip()
     # Strip markdown fences if present
     if raw.startswith("```"):
         raw = raw.split("```")[1]
