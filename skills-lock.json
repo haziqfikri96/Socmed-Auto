@@ -1,0 +1,1205 @@
+{
+  "version": 1,
+  "skills": {
+    "3d-asset-generation": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/3d-asset-generation/SKILL.md",
+      "computedHash": "53120b7de2071a566f77041f64485c40f589e751cac0e06492c5ce2311c7f82f"
+    },
+    "3dviz-pro-max": {
+      "source": "viettranx/3dviz-pro-max",
+      "sourceType": "github",
+      "skillPath": "skills/3dviz-pro-max/SKILL.md",
+      "computedHash": "2d322ab3eb281952224f617b70ebccebe28ad7c5b20696ac4b01ed5b7ca338e9"
+    },
+    "acestep": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/acestep/SKILL.md",
+      "computedHash": "3722bae84ece4743d0c3106ec6bb8c2196fe5d69dd802f0f69c16aac8381f27e"
+    },
+    "agents": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/agents/SKILL.md",
+      "computedHash": "18ddb1893c48233e73674aa00a28c62f75b55901ac7d24190575e72397a2b27a"
+    },
+    "ai-video-gen": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/ai-video-gen/SKILL.md",
+      "computedHash": "6f6dbc5227ff62a3412ddbf22cc0566466395bcb98bcc49e9d354650046aa18a"
+    },
+    "analog-found-footage-horror": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/analog-found-footage-horror/SKILL.md",
+      "computedHash": "c5543639069ed238700e34769d4187912df1d46d462f99859a9e469c6c9b7fa6"
+    },
+    "anatomy": {
+      "source": "wheresryan22/anatomy",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "37fe1f16683eddee1b3723a3fe8e4a5b92bb653a6991128a372d3268730cdc90"
+    },
+    "animation": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/animation/SKILL.md",
+      "computedHash": "e7c9dbd78b4cec074150ade74b587c07c81f1a53ca2bd1abb673329e921abd44"
+    },
+    "anime-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/anime-style/SKILL.md",
+      "computedHash": "27e50fe2fc5921f265bd2e4c0c7907af9721c93aa40ab3caeadb5118a926108b"
+    },
+    "apocalypse-worlds": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/apocalypse-worlds/SKILL.md",
+      "computedHash": "794701aa1be5c58e6dd4ac3d8c75dbf7523fee8fa74ba8d69d2049d6d1becbd1"
+    },
+    "archviz": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/archviz/SKILL.md",
+      "computedHash": "82d7ed9c40392fb869c0f4b2fef6a97da08fb646be4cf627a8c9ff055574a5eb"
+    },
+    "asset-optimization": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/asset-optimization/SKILL.md",
+      "computedHash": "88551188889a78d344ff6bb97843f4a9d9338b9086d2cb6346f5c80c99bc1601"
+    },
+    "atlas-cloud": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/atlas-cloud/SKILL.md",
+      "computedHash": "68474b9ef61eeff2429699d03d9e3bb2b10142d165463f0f4ee4501b488c9647"
+    },
+    "avatar-video": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/avatar-video/SKILL.md",
+      "computedHash": "66a49290a0412d7bad634aac7e9cc24c5722ea6f508d6427e19ac2241bce8740"
+    },
+    "azure-speech-to-text": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/azure-speech-to-text/SKILL.md",
+      "computedHash": "bcbf029701e198414f138cd84841f8476dce9e18354b8dcb6e19bbac37c6eb36"
+    },
+    "azure-text-to-speech": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/azure-text-to-speech/SKILL.md",
+      "computedHash": "b57baf0ae959ef8f0882c1e10c3a8bb64cec93cde88e0dddd9dfc6700539c559"
+    },
+    "beautiful-mermaid": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/beautiful-mermaid/SKILL.md",
+      "computedHash": "0bbbe0bb6d026f50ba64b18bca28fbf646b2602456da9c1ce0f8f3d27bf80b03"
+    },
+    "bfl-api": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/bfl-api/SKILL.md",
+      "computedHash": "2c695760ec4be9342a55b7580113189bb9010255a2d8d7738dabbbfcb7f3fcd4"
+    },
+    "biome-worlds": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/biome-worlds/SKILL.md",
+      "computedHash": "dc2af0d82d85e84dece6ed4dcf28ca77ded12ed0785fe894ebe0cc29a30fa309"
+    },
+    "blender-modeler": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/blender-modeler/SKILL.md",
+      "computedHash": "4acafa9ce6d73d513d55af552d33f48617a15f16fd58eb64d74921d7f51b4377"
+    },
+    "body-horror-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/body-horror-style/SKILL.md",
+      "computedHash": "e8f9798d78b3b24a673cc4edecf0574c1ce0e463d889ddc507be464071ea2ca9"
+    },
+    "brutalist-mood": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/brutalist-mood/SKILL.md",
+      "computedHash": "668dc6073b280ba11fa63ffa2f70a1f96e76969431eba091cea34e0f2a6c7b8b"
+    },
+    "camera-cinematography": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/camera-cinematography/SKILL.md",
+      "computedHash": "f43876aed1803212727c0c2d83dfd3c92cf407f3ceaafe972e8d604d51fb63dc"
+    },
+    "cartoon-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/cartoon-style/SKILL.md",
+      "computedHash": "f7549ff0f65ade09015860b1652bada7d367b11c79bf83fb645837e62e1a596d"
+    },
+    "character-animation-qa": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/character-animation-qa/SKILL.md",
+      "computedHash": "727ca3217c8d69cce95452c3d843db8c78536feaf8c61d0006bb2a62618ef9c7"
+    },
+    "character-archetypes": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/character-archetypes/SKILL.md",
+      "computedHash": "d7d0db8c8e5050c8a0600a636d8663ea8248fcb1fcb3057cfb3d5d46550f02c6"
+    },
+    "character-artist": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/character-artist/SKILL.md",
+      "computedHash": "01e68871ec4c7a22670f36c3a47fee2dd917778304ebf36dc7e5138675d80752"
+    },
+    "chibi-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/chibi-style/SKILL.md",
+      "computedHash": "c20e04f1bf50996a0d3e3f10f9e310a2a99cb8bb7385897f99f92d6f444a5b3a"
+    },
+    "cloth-sim": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/cloth-sim/SKILL.md",
+      "computedHash": "5bf944ed8ab239cf8481e08014d2ef349fbaacfe67e8ac3873d1fea2549156f7"
+    },
+    "collision-proxy": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/collision-proxy/SKILL.md",
+      "computedHash": "c34e7e5355b535a5faf1f1c46bcbfdd17f51bb2dd4f1abc6bcb661814a1e376d"
+    },
+    "comfyui": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/comfyui/SKILL.md",
+      "computedHash": "92977dd30c179c3017890cd91cdee3d209c001bbb061f623e2bbadb47367fc77"
+    },
+    "comic-book-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/comic-book-style/SKILL.md",
+      "computedHash": "acb48339d9861c90c923f201268ebdc0382ab353223c4126a2569d79e15f6e51"
+    },
+    "compositing": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/compositing/SKILL.md",
+      "computedHash": "a1a3e8b565126656f8607922b26a4c5b85556a1e7e6d874bd872ac08d9215d3e"
+    },
+    "cosmic-eldritch-horror": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/cosmic-eldritch-horror/SKILL.md",
+      "computedHash": "a30ae8e5102e07efc81ba935af4105ac507355abc2bd2d3b05eab8baf0704023"
+    },
+    "cozy-wholesome-mood": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/cozy-wholesome-mood/SKILL.md",
+      "computedHash": "ddb1ab473d61d6a6a34bd49e8f3503826e4ef71c7aa1546b8490772ef0ae7d16"
+    },
+    "create-video": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/create-video/SKILL.md",
+      "computedHash": "cc85de7d334304112e35863409f0ea0c0bb66b80223f21583fd3c5158930db8d"
+    },
+    "creature-artist": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/creature-artist/SKILL.md",
+      "computedHash": "951057be5343fce0326446d267cf178fd605d605c8b01e4364414040a63596f9"
+    },
+    "d3-viz": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/d3-viz/SKILL.md",
+      "computedHash": "f9db9de6d2fcc5719e3d230ca100d3414536e0f35168888e560792c6dacb3329"
+    },
+    "dark-gritty-mood": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/dark-gritty-mood/SKILL.md",
+      "computedHash": "cc1c354cf18db73fc4d14ebc58e0d3313b92b7efcfefc7dfff1f905267669624"
+    },
+    "dashscope": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/dashscope/SKILL.md",
+      "computedHash": "e92b06f97fda41c2e1acb3a39170d5c400e9b08db3c751e144972be928995691"
+    },
+    "doubao-tts": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/doubao-tts/SKILL.md",
+      "computedHash": "b842727fcc27863c0cc8df9445b4086189aa95b223ad995dcc2c79112b6fe010"
+    },
+    "dream-loop": {
+      "source": "achimala/dream-loop",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "a570baa1effd0c25035af0d2e83b80e794711bd8cf364c99f8373fc11d030c92"
+    },
+    "dream-surreal-mood": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/dream-surreal-mood/SKILL.md",
+      "computedHash": "8eb195d413810a09feebe819c12ae6cc7b769c36424f76085fd61c778aa55c7e"
+    },
+    "dream-weirdcore-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/dream-weirdcore-style/SKILL.md",
+      "computedHash": "8160ef1bac39d5cc0585f1424284bc79ae260a0ba93257c9b6b9754a8ba3d346"
+    },
+    "elevenlabs": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/elevenlabs/SKILL.md",
+      "computedHash": "9acc5f1cecc0181b9358204cbbf0838bea14a54af6699a1031a94aa31b832f2b"
+    },
+    "environment-artist": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/environment-artist/SKILL.md",
+      "computedHash": "b3d88d1374d27d70c4068e3dec104a51668cd2c8e099e7ad8cdd9b7e1f9b2a8f"
+    },
+    "export-pipeline": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/export-pipeline/SKILL.md",
+      "computedHash": "61d3d79704d1ad75b14eaf147f2834355d28233876b9d6bb21775fb1b65367e3"
+    },
+    "faceswap": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/faceswap/SKILL.md",
+      "computedHash": "caefcda181d6dddc2c30841238ebabdd7583c0a2fec2e17b521454d015168f28"
+    },
+    "fantasy-worlds": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/fantasy-worlds/SKILL.md",
+      "computedHash": "a7d76c1709c7b93f322e0aacc50d0e9779667469678ed605b1f3f891e300dc27"
+    },
+    "ffmpeg": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/ffmpeg/SKILL.md",
+      "computedHash": "51fa05bc18bb2691e622aefd1d8ec6d4d96a9e9c44cdf599003c9d6003d11a07"
+    },
+    "figma": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/figma/SKILL.md",
+      "computedHash": "c7593153c627ecb96d93c65d6908475cc3f7faefc398c0b9176b15063e917e2e"
+    },
+    "fish-audio-tts": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/fish-audio-tts/SKILL.md",
+      "computedHash": "eca4d290761773eb398cdf55e564df6726a83d20b62dbd7ee36b9e0863f55995"
+    },
+    "flux-best-practices": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/flux-best-practices/SKILL.md",
+      "computedHash": "a5a348cb8c94264b302b4af24b77c27f6f4332e430fbd6f767caf13c55403d93"
+    },
+    "folk-horror-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/folk-horror-style/SKILL.md",
+      "computedHash": "86c7775a9facfc68750aa904eb74808b8aac35c7c79ba04c7640a5422cf38697"
+    },
+    "framer-motion": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/framer-motion/SKILL.md",
+      "computedHash": "562bde7d5264b63f4e8402dc20b199118e97d652d501dc58af3fdf3a29f9a1dd"
+    },
+    "frutiger-aero-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/frutiger-aero-style/SKILL.md",
+      "computedHash": "ee4bfdd458ad21dfaeb3684d4bbe0fb4b02fd6fc660a75906c6c70c3d563f66c"
+    },
+    "gemini-omni": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gemini-omni/SKILL.md",
+      "computedHash": "eb37343b5d315434c3fb6eb59080c278769ad088cddfc501f344f6796eb20c6e"
+    },
+    "genre-action-combat": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-action-combat/SKILL.md",
+      "computedHash": "8e7a4778f060666b3a731dc85a7d891215a045485a91bee58f6e6d86d7900a98"
+    },
+    "genre-card-party-idle": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-card-party-idle/SKILL.md",
+      "computedHash": "bfee9bd9c99b9e277fd03af0f0b99cf5062cf20250b4412de0623998a07f81ae"
+    },
+    "genre-metroidvania-roguelike": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-metroidvania-roguelike/SKILL.md",
+      "computedHash": "1d7635f839f6fd4522e74d29d9774f423ee4d52b145ed08b9c92030cc128f407"
+    },
+    "genre-narrative-vn": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-narrative-vn/SKILL.md",
+      "computedHash": "3fc23e4d6a905034acb1e3ad109a549fc5ad52972cafaf88291ebda2ddea2942"
+    },
+    "genre-open-world-sandbox": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-open-world-sandbox/SKILL.md",
+      "computedHash": "5d632d421b8c8bfc0d642d70b59cfb5ff839c09c6fa86920613b38edef92cd80"
+    },
+    "genre-puzzle-platformer": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-puzzle-platformer/SKILL.md",
+      "computedHash": "54c1698b2180f3b45b5f1c0538609e07bf9ada0d2ab48d325a7b2d8e0776c66d"
+    },
+    "genre-racing-sports": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-racing-sports/SKILL.md",
+      "computedHash": "3d9fd35aef5e7bd6068150edf6cc73bf195fc356d5fca2a5ac653b6a09bbc58d"
+    },
+    "genre-rpg": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-rpg/SKILL.md",
+      "computedHash": "f7f857b83487bb3ecd4b5626c9b403ec07fd14acaf54137bab5c01e9224c7b89"
+    },
+    "genre-shooter": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-shooter/SKILL.md",
+      "computedHash": "5edc0c44dcee72ace4f6413f9db10b68f970e9a89cb133f17d02dc350f12773e"
+    },
+    "genre-soulslike": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-soulslike/SKILL.md",
+      "computedHash": "3c5588f9f0dd4ae69346f69c83523c1da1b86fd77a0b95acc8312622bb82ae8c"
+    },
+    "genre-stealth": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-stealth/SKILL.md",
+      "computedHash": "85273fa3bdc1672ba284c7b6908affee9d4d0704384be2da5f9e75d77af9efe5"
+    },
+    "genre-strategy-sim": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-strategy-sim/SKILL.md",
+      "computedHash": "ddc31c0fac3c164638b990140f8ef0a50951dec185a631ca8d4afeceb50f6829"
+    },
+    "genre-survival": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/genre-survival/SKILL.md",
+      "computedHash": "b385e9203094f7420650366ac5fbda386b2121c2ec7add6472236b640da0fff6"
+    },
+    "geometry-nodes": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/geometry-nodes/SKILL.md",
+      "computedHash": "c1a7fd4a3667a7b773d8a847a419a7bd9b21d48375e3fc02dd477d61d8c07543"
+    },
+    "godot-export": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/godot-export/SKILL.md",
+      "computedHash": "611d4b313e90df5935681514b934dec1001307754a4aa66cf597df2859818692"
+    },
+    "grok-media": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/grok-media/SKILL.md",
+      "computedHash": "36cba6db9e7fc2955aecb2cda890b5d602f071538fb2e15e97d9127b8e5ef3ea"
+    },
+    "gsap-core": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-core/SKILL.md",
+      "computedHash": "c4a01101d9e1aafbf4b49f75d74f9349790d8741981ba0237c990093863035a6"
+    },
+    "gsap-frameworks": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-frameworks/SKILL.md",
+      "computedHash": "151f82c17668f8568be9ee77a7b6faadc295118fe5ee77e44c6971f59c66c857"
+    },
+    "gsap-performance": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-performance/SKILL.md",
+      "computedHash": "863842ac2d7aee53fd4f0025c960173d7ad3e658a5715b89b2211fa280213c1f"
+    },
+    "gsap-plugins": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-plugins/SKILL.md",
+      "computedHash": "83f5517521ddb74264d5227a2f11e58425edd10d20e8c0f1264e10cbcc00e712"
+    },
+    "gsap-react": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-react/SKILL.md",
+      "computedHash": "7d3b52822681a4158e371f895c58fb7030ecaf33f585a534b7162f9e92c5d893"
+    },
+    "gsap-scrolltrigger": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-scrolltrigger/SKILL.md",
+      "computedHash": "1cdc5647693783cb7a662d84a5de434c88a051ed56b4d33597c9b5782b5973e6"
+    },
+    "gsap-timeline": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-timeline/SKILL.md",
+      "computedHash": "54981c2feec5a9c0d57988aeb32315af32bdeadd261550d5e9db7a7b1f08b487"
+    },
+    "gsap-utils": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/gsap-utils/SKILL.md",
+      "computedHash": "1ab2387f6e694718a4f1b5acf2a4ab16e1b884c3428adf5f6b26d830f00826cf"
+    },
+    "hair-groom": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/hair-groom/SKILL.md",
+      "computedHash": "73b68e492f4ed61c8b16f1fe792682f6e489d17869839f0905b91a94147365ba"
+    },
+    "hand-painted-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/hand-painted-style/SKILL.md",
+      "computedHash": "7c48d495201af77181104603880e44694d70c822c196ede66a4bacd9656895e8"
+    },
+    "hard-surface": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/hard-surface/SKILL.md",
+      "computedHash": "b34d8d17de306d52aa89c5a8ab710f59994d5b3a8ce539b18b4163024a1c4e3d"
+    },
+    "hd-2d-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/hd-2d-style/SKILL.md",
+      "computedHash": "7e1367ac2a8c3d3750525ba274f1448486cd70da557f31f3255163b9bdfd0aac"
+    },
+    "heygen": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/heygen/SKILL.md",
+      "computedHash": "e2c5db9c36904294497fcd18ee4f003cdf0f79746d46a57f1cc352d83957018f"
+    },
+    "historical-worlds": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/historical-worlds/SKILL.md",
+      "computedHash": "f08c0a8b919876ceff4746a1735d6a161650d7aee04ccc244f042837d2196fe6"
+    },
+    "horror-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/horror-style/SKILL.md",
+      "computedHash": "d41e76f3a72d82428fc2b961a432ffeaf1739b2ac6e87c0b7fccd74ec0455334"
+    },
+    "hyperframes": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes/SKILL.md",
+      "computedHash": "f87d883272f449560b94d0b97891cabda4d12873922149dad4e218dbfc2fea16"
+    },
+    "hyperframes-animation": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes-animation/SKILL.md",
+      "computedHash": "7605eed32c9ea3e30cb88ada9ac02c1e9ea2c7fac393427ae96004e5d32445d8"
+    },
+    "hyperframes-cli": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes-cli/SKILL.md",
+      "computedHash": "f1c3aa4d21cefa63d988032d4d2b8038445c6ee36f3b47b00ce774f7405c6be9"
+    },
+    "hyperframes-core": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes-core/SKILL.md",
+      "computedHash": "7610a4f082bce99eb1aef8bca00dc94930faa8b8248d97ee6b9100d0a5ac9c44"
+    },
+    "hyperframes-creative": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes-creative/SKILL.md",
+      "computedHash": "50a929377c5a7d9b71fdcced4f917f3d6a1808403678f2b619bd0918f7d66339"
+    },
+    "hyperframes-media": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes-media/SKILL.md",
+      "computedHash": "e76b045065acd78bc2451a8feafe1dd69d64e62fc385e7352d0f5097357246a0"
+    },
+    "hyperframes-registry": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hyperframes-registry/SKILL.md",
+      "computedHash": "a65dd053db01700a8c52ee2dd005807bb48962808b6dc32b59699561dea3eabd"
+    },
+    "indie-horror-aesthetics": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/indie-horror-aesthetics/SKILL.md",
+      "computedHash": "088a4ffe36b789a476ffd0227009565d62ccd534310e5e606516af30625c818d"
+    },
+    "isometric-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/isometric-style/SKILL.md",
+      "computedHash": "f1dfb98050dc2238f0cc10eaa51b0d7ab3eff06348733e87826be8fb085bb0d9"
+    },
+    "kling-official": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/kling-official/SKILL.md",
+      "computedHash": "5d5fe7e34c1bc06110acf0708084e8b36601117bea97c0a15e92fb1daee3efc7"
+    },
+    "lighting": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/lighting/SKILL.md",
+      "computedHash": "07e869ee40acb71beaf703899937103a8cb258e9e48bd6f3b278c893e15deb51"
+    },
+    "liminal-space-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/liminal-space-style/SKILL.md",
+      "computedHash": "69c21b355020394b4fb9535fcb6af31119789dce65b768034ce7c459018fadd1"
+    },
+    "lod-pipeline": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/lod-pipeline/SKILL.md",
+      "computedHash": "3fe90fabd167767acc86f8aa5059d27557ce1d08d15d57f5684c895866ffb935"
+    },
+    "lookdev": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/lookdev/SKILL.md",
+      "computedHash": "3c1676844cb1912a13c70bf947d6a11dbb8cf5f23dc11e34e0409277b5f20761"
+    },
+    "lottie-bodymovin": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/lottie-bodymovin/SKILL.md",
+      "computedHash": "0eece518ff73d47a172e8fed4c5e3b5e0113afd573124659021b3209f17289c9"
+    },
+    "lowpoly-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/lowpoly-style/SKILL.md",
+      "computedHash": "64bed7db33bd8b767b6d1a9813b3c29c05d5bac4a97ccc856f8aaefd52c553ad"
+    },
+    "ltx2": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/ltx2/SKILL.md",
+      "computedHash": "a3e77d57b2f7ffa9f501d1034ac3119739af1fb7012481f74d650ba3da4b874e"
+    },
+    "lyria": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/lyria/SKILL.md",
+      "computedHash": "fd5416eff1e0d10830e3fa8cb628c389400fcadd3a359aa58591365be2628896"
+    },
+    "manga-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/manga-style/SKILL.md",
+      "computedHash": "85b2bdb9dbf5fd358fb4be8eac25d63708932368babf31efe044cc311e456ff4"
+    },
+    "manim-composer": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/manim-composer/SKILL.md",
+      "computedHash": "6cd978db31ce962c847783a3c76c099185ed31cad6a37efae591e2a87c50b758"
+    },
+    "manimce-best-practices": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/manimce-best-practices/SKILL.md",
+      "computedHash": "b39acc1024b23c39cfdb187659c2d046277fb030767bbca3a0a3b22bbcf780fb"
+    },
+    "manimgl-best-practices": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/manimgl-best-practices/SKILL.md",
+      "computedHash": "ca058bcb180e7f506396c4e382595713ddceb6eaff3999c6075d14a82ce8da39"
+    },
+    "mascot-puppet-horror": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/mascot-puppet-horror/SKILL.md",
+      "computedHash": "941078789e47ed471dee6595884f51a5e596be9d9dd4c580b289e0b855de623e"
+    },
+    "materials": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/materials/SKILL.md",
+      "computedHash": "ae66ef6400a8451a3606a846b54f33f7a504c51e73ee30b5fef7b0dfa747e578"
+    },
+    "media-use": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/media-use/SKILL.md",
+      "computedHash": "df639864404f45c9a5175deb190492bcc19eda53b84f4be1eb8d545dcf3a608e"
+    },
+    "minimalist-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/minimalist-style/SKILL.md",
+      "computedHash": "5ec882d6f787dd5e8e895f001c158e4fccfa294442d2324687b447a450397a34"
+    },
+    "minimax-h3": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/minimax-h3/SKILL.md",
+      "computedHash": "09dcc91fc408e67e1c6ae7397ea3b3d607e08fc329991b5e950b0a86d8c5ceaa"
+    },
+    "motion-graphics": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/motion-graphics/SKILL.md",
+      "computedHash": "177cb8fbba96a246124827a03894af9d29d020eb879058f3d4104206e11f0a06"
+    },
+    "motionmaxxing": {
+      "source": "Tejashmakwana/motionmaxxing",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "973e5632e448e19d221a4f65e3d2ab2fd977df872500e7ad53a81f33bc2798e3"
+    },
+    "music": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/music/SKILL.md",
+      "computedHash": "8de187c5fe68aba221193d827406c832fa5ed0cc1d7a82fc3b91d8a5fafeaefc"
+    },
+    "music-to-video": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/music-to-video/SKILL.md",
+      "computedHash": "e892ec28eeb3f2c4a9416cf3ba8eef9d2d6c2bf9e5fd8825d0dc4a3498be9f1a"
+    },
+    "neon-retrofuturism": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/neon-retrofuturism/SKILL.md",
+      "computedHash": "c84ca77119935e7f6028597b8cdd719ded6f2506921b050728a57f66d7d98acf"
+    },
+    "noir-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/noir-style/SKILL.md",
+      "computedHash": "b158d43a413f051aaeb06b526999a37b5631aefd05206036b72009cf0dce766e"
+    },
+    "painterly-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/painterly-style/SKILL.md",
+      "computedHash": "06df436cf625f7c141cfeabdf17d65eb8efe332a1b239100a1814c3312c8dca4"
+    },
+    "physics-sim": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/physics-sim/SKILL.md",
+      "computedHash": "82dd2021b7c5b192e101d0dd195f3f11fe83a5d1c8af76fdc3d15e34e5b91e0c"
+    },
+    "pika-h3-flex": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/pika-h3-flex/SKILL.md",
+      "computedHash": "bda4f7fa520df72b848488bf67b697ec422a9a995bb2e159e1078d28070c724b"
+    },
+    "pixel-art-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/pixel-art-style/SKILL.md",
+      "computedHash": "8025afa22b37608b4ffc9528d73e6495f1e1f8c2cf5331880fafbf50b150c98d"
+    },
+    "playwright-recording": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/playwright-recording/SKILL.md",
+      "computedHash": "65dd7d4d2097a5ee137ee9a9ab9ced260d98d8728611fa70c6d8ba7d3c21f1e1"
+    },
+    "pose-library-design": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/pose-library-design/SKILL.md",
+      "computedHash": "4fca9f6c9774fcdd4a71293d2745cc5492cce960d8e0947679702aaea9dc6030"
+    },
+    "procedural-modeling": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/procedural-modeling/SKILL.md",
+      "computedHash": "47318779ef928391232e90a4036eeaa9afb1a4b6c1428f0078eb8cb59cf59d81"
+    },
+    "prop-artist": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/prop-artist/SKILL.md",
+      "computedHash": "0279a56b70e2e92c588ec6d45bc457e2194ff63dcf57ffcfecc8ab8ae7027aa3"
+    },
+    "provider-model-refresh": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/provider-model-refresh/SKILL.md",
+      "computedHash": "09cc4f8e8cd55372f398077ef013b60588c04496872d3b3443f54e28c18bddd4"
+    },
+    "provider-refresh-oct23": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/provider-refresh-oct23/SKILL.md",
+      "computedHash": "d8e194e564f55d9d95832f3053623b33c7ef7cbc7f9edbfc30f931616faa4586"
+    },
+    "psx-horror-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/psx-horror-style/SKILL.md",
+      "computedHash": "f09573dbce4e0babf1515f23757113f46d1c5ab89a107ec0252d2093d197b4c9"
+    },
+    "qa-review": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/qa-review/SKILL.md",
+      "computedHash": "c1f64e024fd8fff74bde944fe9ab5c05675196fb1846e098240a7f219c4022e9"
+    },
+    "realistic-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/realistic-style/SKILL.md",
+      "computedHash": "06c0cf513d15b0d601788516d320651e2bcc8b7fed082dd18a0b04e78723953a"
+    },
+    "remotion": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/remotion/SKILL.md",
+      "computedHash": "cf7d8bfb94ebe7f8bd1ac0ea312acf3096aa94f5ad34bb426360c34da0c9d33b"
+    },
+    "remotion-best-practices": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/remotion-best-practices/SKILL.md",
+      "computedHash": "481639f4695f5c20b1dedda87ba1ed80bcf153b415adbd0a7b1fb22d0f27d409"
+    },
+    "remotion-to-hyperframes": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/remotion-to-hyperframes/SKILL.md",
+      "computedHash": "3f5441e7d3b935d61e98d185c96555b51f9c5229b3a77b940765bd852aa0629f"
+    },
+    "rendering": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/rendering/SKILL.md",
+      "computedHash": "56513b142a8a3fde71bff33866b1b9989b0cb7728bd720f9c51cf19680612e00"
+    },
+    "retopology": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/retopology/SKILL.md",
+      "computedHash": "f0efb51c1695574ba7b3f4e8f8c990326a21f1b8753ea1226723d33fab2a87da"
+    },
+    "retro-16bit-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/retro-16bit-style/SKILL.md",
+      "computedHash": "4c24d89949d89671b9700ba3cd15435ba96b2527c4f5b12bec214b268ef8ffd0"
+    },
+    "retro-8bit-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/retro-8bit-style/SKILL.md",
+      "computedHash": "e2cc8b71cd42683274882f6f32a6f93c332935c04a0af6bf9f42ef031faeedb0"
+    },
+    "reverse-any-video": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/reverse-any-video/SKILL.md",
+      "computedHash": "0ec91433d444ac6d123ba97a33d44e4530812132aa306b996d6dcee6491816ac"
+    },
+    "rigging": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/rigging/SKILL.md",
+      "computedHash": "7d56f08b40c4d2a65e7ba8b495a13d6e4d521e1c65e79c038ccd5344744f4e11"
+    },
+    "scene-assembly": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/scene-assembly/SKILL.md",
+      "computedHash": "627af9b84a0b332e5b5c1a971571b75602501b908a35fa09722b4c3a8c67f1f7"
+    },
+    "sci-fi-punk-worlds": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/sci-fi-punk-worlds/SKILL.md",
+      "computedHash": "7f78754a4e17b4a86dc75164fbc0e0d96d630eb945d9af9b96a8268ef24894bf"
+    },
+    "sculpting": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/sculpting/SKILL.md",
+      "computedHash": "0d93f084b0190c49329dc29bc5d5a7143166845377366c1d81e7d94a6c0a0303"
+    },
+    "seedance-2-0": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/seedance-2-0/SKILL.md",
+      "computedHash": "9b201d96aabb8bab6ff7a04fdcac2c8ee0580528728584cee48c7a19f1471ccd"
+    },
+    "seedance-2-5": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/seedance-2-5/SKILL.md",
+      "computedHash": "841c2e7ecef6f8bbec99758f5980da891e35118259f0b7493e1723373d1bd6c1"
+    },
+    "set-dressing": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/set-dressing/SKILL.md",
+      "computedHash": "b1fefc479d85435b23c8762de2d303ef3a1c5b0707a51642e2d0f5c5861c3a0a"
+    },
+    "setup-api-key": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/setup-api-key/SKILL.md",
+      "computedHash": "45e680b4a199bb031472fc28e752abc29bc2a38334cf5c80e1428c3f9fa33083"
+    },
+    "slideshow": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/slideshow/SKILL.md",
+      "computedHash": "14d0bf700a7bcb264b60e7c8b786f8883d75d038c2ce93e7fc29ccddd7002744"
+    },
+    "sound-effects": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/sound-effects/SKILL.md",
+      "computedHash": "54ec05122413cbc956b28fbd81c676e44eb0fdbbf6459ee3b367b2c7a1350b02"
+    },
+    "speech-to-text": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/speech-to-text/SKILL.md",
+      "computedHash": "bcb005567f41385e5dcba25d84de8d8ae10b65930a154146750c7004d103762b"
+    },
+    "stop-motion-craft-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/stop-motion-craft-style/SKILL.md",
+      "computedHash": "45eefb15cf2793b1af0b29b1411e9074a60b0f67e39795eb9e8b3d203970e068"
+    },
+    "style-sampling": {
+      "source": "heygen-com/hyperframes",
+      "sourceType": "github",
+      "skillPath": "skills/style-sampling/SKILL.md",
+      "computedHash": "180d138feee6d9f20ba3115bccd43abaa74e1258d7b9f90b814c8908ce1505b6"
+    },
+    "stylized-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/stylized-style/SKILL.md",
+      "computedHash": "39c8c90b3816402630e4c153c1946a1628ccf83dcff15ad27b917e2d96cd7b5c"
+    },
+    "svg-character-animation": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/svg-character-animation/SKILL.md",
+      "computedHash": "65a17b9ab121f1fb11af63ff1cc8ab36accf96a36ce8decb82660fe26df6fbf0"
+    },
+    "synthetic-screen-recording": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/synthetic-screen-recording/SKILL.md",
+      "computedHash": "e344a8555be7eb30839645a2af0d7bda71bbd61c2aff6e7be0dcf2f8a16ea7f8"
+    },
+    "tailwind-design-system": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/tailwind-design-system/SKILL.md",
+      "computedHash": "7ff2f4650597e98ca4cd8f01231fb432ab4d187d6b12e641485aa871a04448cc"
+    },
+    "text-to-speech": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/text-to-speech/SKILL.md",
+      "computedHash": "0691f5e84eeb8f5c5e152d304b6ef667efd4794eb11603ddc78b5e80b40bc993"
+    },
+    "texture-workflow": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/texture-workflow/SKILL.md",
+      "computedHash": "145a71d05fb377a742817e55f1fcc7b913eedc37ab5d10b0c56487a196b42290"
+    },
+    "threejs-3d-generator": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-3d-generator/SKILL.md",
+      "computedHash": "bb86884aa4edc44a91ddeed75a11d7123a40a12b295fe50c75299c944b688ce3"
+    },
+    "threejs-aaa-graphics-builder": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-aaa-graphics-builder/SKILL.md",
+      "computedHash": "8dfe7d9712858d02568f3280ff62135078d6678ada9860b2aa7eec09b40aca5c"
+    },
+    "threejs-animation": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-animation/SKILL.md",
+      "computedHash": "8c50b1493812bd88f3ed0637c0c3c5d846afdb322157b67b2ffba4ce8e552835"
+    },
+    "threejs-audio-generator": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-audio-generator/SKILL.md",
+      "computedHash": "9511b5e10bc232847c0ced8c63a97e3b31c466fef982e9bfddcd0db051b7aae8"
+    },
+    "threejs-debug-profiler": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-debug-profiler/SKILL.md",
+      "computedHash": "a0e559560d74f2647278e18b18a809ade6faed80781c355f6bbc62dbe7e83066"
+    },
+    "threejs-fundamentals": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-fundamentals/SKILL.md",
+      "computedHash": "e08d49571071f0f54ef2a76fdfcb96c16673e4fda478067727def4659feb80ca"
+    },
+    "threejs-game-director": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-game-director/SKILL.md",
+      "computedHash": "f190a80ae1365064e7b3d6e33be2d6a8d04d18eb5a3805f651905a200d7c82fb"
+    },
+    "threejs-game-ui-designer": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-game-ui-designer/SKILL.md",
+      "computedHash": "22b93927ab7ff180bc1b0f830168a50023266766a43bf6310f2164ea5a6c454e"
+    },
+    "threejs-gameplay-systems": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-gameplay-systems/SKILL.md",
+      "computedHash": "2cb076146a8e006254d769dd978fb484e6231e2918cb85bdf285c65bc6b412b1"
+    },
+    "threejs-geometry": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-geometry/SKILL.md",
+      "computedHash": "4e5757bf80a329810545c237e557e362fa14fd3a3e6a567ec1d75435be6b2dda"
+    },
+    "threejs-image-generator": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-image-generator/SKILL.md",
+      "computedHash": "6e65acb7d552f1b1fb8a550fbfc38b3e11b0a187a759241bf20f6511e7eac405"
+    },
+    "threejs-interaction": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-interaction/SKILL.md",
+      "computedHash": "988d235b7ebd85276a584c6f81ce7c801280ebc45b401017b334136dc8a7ec82"
+    },
+    "threejs-lighting": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-lighting/SKILL.md",
+      "computedHash": "9303d1b8a9704e88415e5a98c98ad7b6e0f654f8029a3606af7947c0efcb86cc"
+    },
+    "threejs-loaders": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-loaders/SKILL.md",
+      "computedHash": "f2cceed635fd7a2119acf6e5b1a2fcba63a0e52cf2514c1830a69e4744554fcc"
+    },
+    "threejs-materials": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-materials/SKILL.md",
+      "computedHash": "201cf0f3720c0ea9e415e6376b8ad389aa86b483875e87ca0e51aa2770c856aa"
+    },
+    "threejs-postprocessing": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-postprocessing/SKILL.md",
+      "computedHash": "48e04ff507582a18e0d509c2738b9d9466881b00e8ca2600727910a0d52abf75"
+    },
+    "threejs-qa-release": {
+      "source": "majidmanzarpour/threejs-game-skills",
+      "sourceType": "github",
+      "skillPath": "skills/threejs-qa-release/SKILL.md",
+      "computedHash": "30fc188c909eb6a09bc8dd121481267cd2b5605d8b24935f338e7a07121c9872"
+    },
+    "threejs-shaders": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-shaders/SKILL.md",
+      "computedHash": "649ceb058edfb5cfd51e80fb3a6c57aca9bab4a9d3a03f6077aa9502be0c0771"
+    },
+    "threejs-textures": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-textures/SKILL.md",
+      "computedHash": "772a0bfc1d64cfcbc5347d206584a8fa412983201ad7a2cfb8766097b4936db9"
+    },
+    "threejs-world-generation": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/threejs-world-generation/SKILL.md",
+      "computedHash": "4827d89db49f7b473c6c1d49ec02e3649a690ec9a08cfa15c1356b5555c1e6da"
+    },
+    "unity-export": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/unity-export/SKILL.md",
+      "computedHash": "6d7ae4de85ee9c3fb0a6fe696d9037d2f5cb6966b73197d5f6976f9406d9e5e5"
+    },
+    "unreal-export": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/unreal-export/SKILL.md",
+      "computedHash": "34587327ad9a452489754ff702568aeae5bf08b23ddbef8ae866a3681a6fc8d6"
+    },
+    "uv-workflow": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/uv-workflow/SKILL.md",
+      "computedHash": "5fd60921e4a09933634525f9e77c59d371cb7ce91f964afbe29b63ae0c6001bd"
+    },
+    "vector-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/vector-style/SKILL.md",
+      "computedHash": "8825f5fc3a173fba47eb909a1b218efbe82f6deb751b7e143d2687420d8027f8"
+    },
+    "vegetation-artist": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/vegetation-artist/SKILL.md",
+      "computedHash": "4cc31545687af440042b48c4d8b9f0e8809613d1152db5268beb0cc21cf788d9"
+    },
+    "vehicle-artist": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/vehicle-artist/SKILL.md",
+      "computedHash": "c78e55c4a5630f4a7c23690d55f73f3cb9c705f8e79773d067dca5bcf98a867d"
+    },
+    "vercel-composition-patterns": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/vercel-composition-patterns/SKILL.md",
+      "computedHash": "3b8c552707368c0c7b6bebda998776390b5a349961cdff9fdf0af6c1655ce6c1"
+    },
+    "vercel-react-best-practices": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/vercel-react-best-practices/SKILL.md",
+      "computedHash": "98cb0a546a53fe77a8a95592a6cc3f05b7e64a5db90ba47617817c831a7be887"
+    },
+    "vfx-fx": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/vfx-fx/SKILL.md",
+      "computedHash": "64e4a80290a48ff82a884581a90da434b70b5b4e8342881db3a1bb02e452e04c"
+    },
+    "video-download": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/video-download/SKILL.md",
+      "computedHash": "07ec3543f6bfeb4a0dce4086c018fbee3ab747ac68b8ba475c87050d3212d31b"
+    },
+    "video-edit": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/video-edit/SKILL.md",
+      "computedHash": "c392bc176158a9d0deed541752fc0fe5bcccd910aa3568beca5741ec2b2827e0"
+    },
+    "video-toolkit": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/video-toolkit/SKILL.md",
+      "computedHash": "72aa61abd26a02e952f58162c6c20cc43f11aaa4640363dc049cb83529771195"
+    },
+    "video-translate": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/video-translate/SKILL.md",
+      "computedHash": "97b045355d672aec6a2831bd0fb56dbfec67101d238ec5cd3b4ccb9e505a2d09"
+    },
+    "video-understand": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/video-understand/SKILL.md",
+      "computedHash": "098f2e869473b0e03c75fbf85009b0f46e75a2870ab52885faaae16578a211b8"
+    },
+    "visual-console-eras": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/visual-console-eras/SKILL.md",
+      "computedHash": "ce46a5b935b354e691dcdd2859bb1ab53b3932e841e0eca040672ccd52f97a71"
+    },
+    "visual-style": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/visual-style/SKILL.md",
+      "computedHash": "9b6545b4467ad420a311582abb4070850e24643b15e5856d907190ff5247ae7e"
+    },
+    "voxel-style": {
+      "source": "arjun988/blender-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/voxel-style/SKILL.md",
+      "computedHash": "af6e4cf252334be43a2c4b47586da9739614d070680c36de37639c0c1d54982e"
+    },
+    "web-design-guidelines": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/web-design-guidelines/SKILL.md",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    },
+    "website-to-video": {
+      "source": "OpenMontageInc/OpenMontage",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/website-to-video/SKILL.md",
+      "computedHash": "cea7dc230a4cb9de0be42af6f7d8a634d2265245f6405b85bc1e076b4a113a1e"
+    }
+  }
+}
