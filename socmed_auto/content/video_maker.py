@@ -4,7 +4,9 @@ Light gray bg, 2-tone kinetic text (accent verb + dark noun), floating app-UI pa
 Matches the reference: clean minimal, Apple product-promo aesthetic.
 """
 import math
+import os
 import subprocess
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +27,51 @@ PALETTES = [
     ("#E8E8E8", "#0F0F0F", "#DC2626"),
     ("#E8E8E8", "#0F0F0F", "#0891B2"),
 ]
+
+
+# Absolute path to the HyperFrames hook project (sibling of this repo root)
+HOOK_PROJECT_DIR = Path(__file__).resolve().parents[2] / "hook-effect"
+
+
+def _render_hook(hook_text: str, accent_hex: str, out_path: str) -> bool:
+    """
+    Render the HyperFrames hook-effect composition to `out_path`.
+    Patches the hook copy + accent color in index.html, renders, restores.
+    Returns True on success, False if the render fails (caller skips the concat).
+    """
+    if not HOOK_PROJECT_DIR.exists():
+        return False
+
+    html_path = HOOK_PROJECT_DIR / "index.html"
+    original  = html_path.read_text(encoding="utf-8")
+
+    words = hook_text.split()
+    accent_word = words[0].upper() if words else "YOUR"
+    noun_parts  = " ".join(words[1:]).upper() if len(words) > 1 else ""
+    # split noun into two lines at word midpoint for readability
+    noun_words  = noun_parts.split()
+    mid         = max(1, len(noun_words) // 2)
+    noun_line1  = " ".join(noun_words[:mid]) if noun_words else "JOB IS"
+    noun_line2  = " ".join(noun_words[mid:]) if len(noun_words) > mid else "CHANGING"
+
+    patched = (original
+               .replace("--accent: #2563EB;", f"--accent: {accent_hex};")
+               .replace(">YOUR<", f">{accent_word}<")
+               .replace(">JOB IS<", f">{noun_line1}<")
+               .replace(">CHANGING<", f">{noun_line2}<"))
+
+    html_path.write_text(patched, encoding="utf-8")
+    try:
+        result = subprocess.run(
+            ["npx", f"hyperframes@0.9.30", "render", "--quality", "high", "--output", out_path],
+            cwd=str(HOOK_PROJECT_DIR),
+            capture_output=True, timeout=120,
+        )
+        return result.returncode == 0 and Path(out_path).stat().st_size > 0
+    except Exception:
+        return False
+    finally:
+        html_path.write_text(original, encoding="utf-8")
 
 
 def _hex(c):
@@ -599,7 +646,8 @@ def create_video(content, output_path, palette_idx=0, duration_secs=None):
 
         frame.save(frames_dir / f"frame_{fi:05d}.png")
 
-    # ── FFmpeg ────────────────────────────────────────────────────────────
+    # ── FFmpeg: render main body ──────────────────────────────────────────
+    main_path = str(frames_dir / "main_body.mp4")
     subprocess.run(
         ["ffmpeg", "-y",
          "-framerate", str(FPS),
@@ -608,14 +656,44 @@ def create_video(content, output_path, palette_idx=0, duration_secs=None):
          "-c:v", "libx264", "-preset", "fast", "-crf", "22",
          "-c:a", "aac", "-b:a", "128k",
          "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-shortest",
-         output_path],
+         main_path],
         check=True, capture_output=True,
     )
+
+    # ── HyperFrames hook: render + prepend ───────────────────────────────
+    hook_text = content.get("hook", "")
+    hook_path = str(frames_dir / "hook.mp4")
+    hook_ok   = bool(hook_text) and _render_hook(hook_text, accent_hex, hook_path)
+
+    if hook_ok:
+        concat_list = frames_dir / "concat.txt"
+        concat_list.write_text(
+            f"file '{hook_path}'\nfile '{main_path}'\n", encoding="utf-8"
+        )
+        subprocess.run(
+            ["ffmpeg", "-y",
+             "-f", "concat", "-safe", "0",
+             "-i", str(concat_list),
+             "-c", "copy", "-movflags", "+faststart",
+             output_path],
+            check=True, capture_output=True,
+        )
+    else:
+        # no hook — just move the main body to the final path
+        import shutil
+        shutil.move(main_path, output_path)
 
     for f in frames_dir.glob("*.png"):
         f.unlink()
     for f in frames_dir.glob("*.mp3"):
         f.unlink()
-    frames_dir.rmdir()
+    for f in frames_dir.glob("*.mp4"):
+        f.unlink()
+    for f in frames_dir.glob("*.txt"):
+        f.unlink()
+    try:
+        frames_dir.rmdir()
+    except OSError:
+        pass
 
     return output_path
