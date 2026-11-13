@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-SR, DUR = 48000, 17.5
+SR, DUR = 48000, 22.0
 KIT = Path.home() / ".claude/skills/editor-v1/sfx/ev1kit"
 N = int(SR * DUR)
 mix = np.zeros((N, 2))
@@ -53,7 +53,7 @@ CHORDS = [(220, 261.63, 329.63), (220, 261.63, 329.63), (174.61, 220, 261.63), (
 for b in range(int(DUR / BEAT)):
     t0 = b * BEAT
     bar = (b // 4) % 4
-    full = 3.0 <= t0 < 14.0
+    full = 3.0 <= t0 < 19.5
     if full:
         add(kick(), t0, 0.85)
         add(hat(), t0 + BEAT / 2, 0.12)
@@ -62,7 +62,7 @@ for b in range(int(DUR / BEAT)):
         for f in CHORDS[bar]:
             add(tone(f, 2.0, 0.9, (1.0, 0.2)), t0, 0.05 if full else 0.035)
 
-CUTS = [3.0, 7.5, 10.5, 14.0]
+CUTS = [3.0, 8.5, 14.0, 19.5]
 sfx("impact_1", 0.06, 0.8)
 sfx("click_1", 0.26, 0.6)
 sfx("click_2", 0.38, 0.6)
@@ -70,12 +70,14 @@ sfx("riser_1", 3.0 - 0.98, 0.5)
 for c in CUTS:
     sfx("swish_1", c - 0.2, 0.6)
     sfx("subboom_1", c, 0.55)
-for i, t in enumerate([4.6, 5.0, 5.4, 8.6]):
-    sfx(f"click_{i % 4 + 1}", t, 0.55)
-for i in range(6):
-    sfx(f"click_{i % 4 + 1}", 11.0 + i * 0.3, 0.55)
-sfx("impact_2", 14.12, 0.7)
-sfx("outro_1", 15.8, 0.6)
+sfx("click_1", 4.6, 0.55)
+sfx("click_2", 5.2, 0.55)
+sfx("riser_2", 9.4, 0.3)
+sfx("impact_2", 12.9, 0.5)
+sfx("riser_3", 14.9, 0.3)
+sfx("impact_2", 17.0, 0.5)
+sfx("impact_2", 19.62, 0.7)
+sfx("outro_1", 20.3, 0.6)
 
 fade = int(0.4 * SR)
 mix[-fade:] *= np.linspace(1, 0, fade)[:, None]

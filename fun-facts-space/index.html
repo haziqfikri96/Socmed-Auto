@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #0B0F1A;
+        --ink: #FFFFFF;
+        --accent: #3B82F6;
+        --muted: #A5B0C5;
+        --card: #1A2133;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Montserrat', Arial, sans-serif;
+        color: var(--ink);
+      }
+      #bg { position: absolute; inset: 0; background: var(--bg); }
+      #stars { position: absolute; left: 0; top: 0; width: 2px; height: 2px; border-radius: 1px; background: transparent; }
+      .scene { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+      .abs { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+      .display { font-weight: 900; text-transform: uppercase; letter-spacing: -0.04em; line-height: 1; }
+      .accent { color: var(--accent); }
+      .tag {
+        position: absolute; left: 390px; top: 170px; width: 300px; height: 72px; border-radius: 36px;
+        background: var(--accent); color: #fff;
+        font-size: 32px; font-weight: 900; letter-spacing: 0.1em; line-height: 72px; text-align: center;
+      }
+      .h1 { top: 280px; font-size: 100px; }
+      .h2 { top: 390px; font-size: 100px; }
+      .note { top: 1640px; font-size: 38px; font-weight: 700; color: var(--muted); }
+      .src { top: 1740px; font-size: 30px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; }
+      .label { position: absolute; width: 200px; text-align: center; font-size: 30px; font-weight: 900; letter-spacing: 0.1em; color: var(--muted); }
+      .big { top: 1370px; font-size: 220px; }
+
+      #three-layer { position: absolute; left: 0; top: 470px; width: 1080px; height: 1080px; display: block; }
+
+      /* scene 1 — hook */
+      #s1-bar { position: absolute; left: 0; width: 1080px; top: 640px; height: 260px; background: var(--accent); }
+      #s1-word { top: 665px; font-size: 210px; color: #fff; }
+      #s1-l1 { top: 935px; font-size: 150px; }
+      #s1-l2 { top: 1095px; font-size: 128px; }
+      #s1-sub { top: 1280px; font-size: 40px; font-weight: 900; letter-spacing: 0.08em; }
+
+      /* scene 2 — Venus */
+      .row-label { position: absolute; left: 90px; width: 250px; font-size: 44px; font-weight: 900; line-height: 72px; }
+      .bar {
+        position: absolute; left: 350px; height: 72px; border-radius: 36px; transform-origin: left center;
+        font-size: 32px; font-weight: 900; line-height: 72px; text-align: right; padding-right: 32px; white-space: nowrap;
+      }
+      #v-l1 { top: 1400px; } #v-l2 { top: 1510px; }
+      #v-b1 { top: 1400px; width: 640px; background: var(--accent); color: #fff; }
+      #v-b2 { top: 1510px; width: 593px; background: #E5E7EB; color: #0B0F1A; }
+
+      /* scene 5 — CTA */
+      #s5-l1 { top: 720px; font-size: 210px; }
+      #s5-l2 { top: 950px; font-size: 96px; color: var(--accent); }
+      #s5-chip {
+        position: absolute; left: 130px; top: 1150px; width: 820px; height: 120px; border-radius: 60px; white-space: nowrap;
+        background: var(--accent); color: #fff;
+        font-size: 38px; font-weight: 900; letter-spacing: 0.06em; line-height: 120px; text-align: center;
+      }
+      #s5-n1 { top: 1340px; font-size: 32px; font-weight: 700; color: var(--muted); }
+      #s5-n2 { top: 1395px; font-size: 32px; font-weight: 700; color: var(--muted); }
+
+      #wipe { position: absolute; inset: 0; background: var(--accent); }
+      #progress { position: absolute; left: 0; bottom: 0; width: 1080px; height: 12px; background: var(--accent); transform-origin: left center; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="fun-facts-space"
+      data-start="0"
+      data-duration="22"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg"></div>
+      <div id="stars"></div>
+
+      <canvas id="three-layer" class="clip" width="1080" height="1080" data-start="3" data-duration="16.5" data-track-index="0" data-layout-allow-overflow></canvas>
+
+      <div id="s1" class="scene clip" data-start="0" data-duration="3" data-track-index="1">
+        <div id="s1-bar"></div>
+        <div id="s1-word" class="abs display" data-layout-allow-overlap>3 SPACE</div>
+        <div id="s1-l1" class="abs display">FACTS THAT</div>
+        <div id="s1-l2" class="abs display">SOUND FAKE.</div>
+        <div id="s1-sub" class="abs">ALL TRUE · SOURCE: NASA</div>
+      </div>
+
+      <div id="s2" class="scene clip" data-start="3" data-duration="5.5" data-track-index="1">
+        <div class="tag">FACT 1 OF 3</div>
+        <div class="abs display h1 accent">ONE VENUS SPIN</div>
+        <div class="abs display h2" style="font-size: 90px">OUTLASTS ITS YEAR</div>
+        <div id="v-l1" class="row-label">1 SPIN</div>
+        <div id="v-b1" class="bar">243 Earth days</div>
+        <div id="v-l2" class="row-label">1 ORBIT</div>
+        <div id="v-b2" class="bar">225 Earth days</div>
+        <div id="v-note" class="abs note">It turns once slower than it circles the Sun.</div>
+        <div class="abs src">SOURCE: NASA</div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="8.5" data-duration="5.5" data-track-index="1">
+        <div class="tag">FACT 2 OF 3</div>
+        <div class="abs display h1 accent">SUNLIGHT IS</div>
+        <div class="abs display h2">8 MINUTES OLD</div>
+        <div class="label" style="left: 20px; top: 1235px">SUN</div>
+        <div class="label" style="left: 839px; top: 1105px">EARTH</div>
+        <div id="t-num" class="abs display big">0:00</div>
+        <div id="t-note" class="abs note">About 8 min 20 s to cross 150 million km.</div>
+        <div class="abs src">SOURCE: NASA</div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="14" data-duration="5.5" data-track-index="1">
+        <div class="tag">FACT 3 OF 3</div>
+        <div class="abs display h1 accent">JUPITER HOLDS</div>
+        <div class="abs display h2">1,000 EARTHS</div>
+        <div class="label" style="left: 877px; top: 1075px">EARTH</div>
+        <div id="j-num" class="abs display big">0</div>
+        <div id="j-note" class="abs note">If it were hollow. It is 11 times wider than Earth.</div>
+        <div class="abs src">SOURCE: NASA</div>
+      </div>
+
+      <div id="s5" class="scene clip" data-start="19.5" data-duration="2.5" data-track-index="1">
+        <div id="s5-l1" class="abs display">FOLLOW</div>
+        <div id="s5-l2" class="abs display">FOR MORE FACTS</div>
+        <div id="s5-chip">WHICH ONE SURPRISED YOU?</div>
+        <div id="s5-n1" class="abs">Visuals are illustrations, not real photos.</div>
+        <div id="s5-n2" class="abs">Made with AI. Facts checked against NASA.</div>
+      </div>
+
+      <div id="progress" class="clip" data-start="0" data-duration="22" data-track-index="2"></div>
+      <div id="wipe" class="clip" data-start="0" data-duration="22" data-track-index="3"></div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="22" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      /* seeded star field */
+      (() => {
+        let seed = 42;
+        const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+        const shadows = [];
+        for (let i = 0; i < 160; i++) {
+          const a = (0.25 + rnd() * 0.6).toFixed(2);
+          shadows.push(`${Math.round(rnd() * 1080)}px ${Math.round(rnd() * 1920)}px 0 ${rnd() < 0.2 ? 1 : 0}px rgba(255,255,255,${a})`);
+        }
+        document.getElementById("stars").style.boxShadow = shadows.join(",");
+      })();
+
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 22, ease: "none" }, 0);
+
+      tl.set("#wipe", { yPercent: 100 }, 0);
+      [3, 8.5, 14, 19.5].forEach((cut) => {
+        tl.fromTo("#wipe", { yPercent: 100 }, { yPercent: 0, duration: 0.2, ease: "power3.in" }, cut - 0.2);
+        tl.to("#wipe", { yPercent: -100, duration: 0.25, ease: "power3.out" }, cut);
+      });
+
+      const head = (scene, at) => {
+        tl.fromTo(`${scene} .tag`, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.8)" }, at + 0.2);
+        tl.fromTo(`${scene} .h1`, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, at + 0.3);
+        tl.fromTo(`${scene} .h2`, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, at + 0.42);
+        tl.fromTo(`${scene} .src`, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, at + 0.6);
+      };
+
+      /* scene 1 */
+      tl.fromTo("#s1-bar", { scaleY: 0.6 }, { scaleY: 1, duration: 0.2, ease: "power4.out" }, 0);
+      tl.fromTo("#s1-word", { scale: 0.7 }, { scale: 1, duration: 0.25, ease: "back.out(2)" }, 0);
+      tl.fromTo("#s1-l1", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.26);
+      tl.fromTo("#s1-l2", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.38);
+      tl.fromTo("#s1-sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 0.55);
+      tl.to("#s1-word", { scale: 1.06, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.0);
+      tl.to("#s1", { scale: 1.04, duration: 2.2, ease: "none" }, 0.6);
+
+      /* scene 2 — Venus */
+      head("#s2", 3);
+      tl.fromTo("#v-l1", { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 4.5);
+      tl.fromTo("#v-b1", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 4.6);
+      tl.fromTo("#v-l2", { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 5.1);
+      tl.fromTo("#v-b2", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 5.2);
+      tl.fromTo("#v-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 5.6);
+
+      /* scene 3 — sunlight */
+      head("#s3", 8.5);
+      const clock = { s: 0 };
+      const tNum = document.getElementById("t-num");
+      tl.fromTo("#t-num", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 9.1);
+      tl.to(clock, {
+        s: 500, duration: 3.5, ease: "none",
+        onUpdate: () => {
+          const s = Math.round(clock.s);
+          tNum.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+        },
+      }, 9.4);
+      tl.to("#t-num", { scale: 1.12, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 12.9);
+      tl.fromTo("#t-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 10.6);
+
+      /* scene 4 — Jupiter */
+      head("#s4", 14);
+      const earths = { n: 0 };
+      const jNum = document.getElementById("j-num");
+      tl.fromTo("#j-num", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 14.6);
+      tl.to(earths, {
+        n: 1000, duration: 2.1, ease: "power2.out",
+        onUpdate: () => {
+          const n = Math.round(earths.n);
+          jNum.textContent = n >= 1000 ? "1,000" : String(n);
+        },
+      }, 14.9);
+      tl.to("#j-num", { scale: 1.12, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 17.0);
+      tl.fromTo("#j-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 15.6);
+
+      /* scene 5 */
+      tl.fromTo("#s5-l1", { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 19.62);
+      tl.fromTo("#s5-l2", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "back.out(1.2)" }, 19.75);
+      tl.fromTo("#s5-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 19.85);
+      tl.fromTo(["#s5-n1", "#s5-n2"], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 19.9);
+      tl.to("#s5-chip", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 20.6);
+
+      window.__timelines["fun-facts-space"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
+
+      const canvas = document.getElementById("three-layer");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(1080, 1080, false);
+      renderer.setPixelRatio(1);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+      camera.position.set(0, 0, 9);
+      camera.lookAt(0, 0, 0);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+      const sunLight = new THREE.DirectionalLight(0xffffff, 3.0);
+      sunLight.position.set(-5, 2, 4);
+      scene.add(sunLight);
+
+      function makeTexture(colors, seed, blobs) {
+        let s = seed;
+        const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+        const c = document.createElement("canvas");
+        c.width = 1024;
+        c.height = 512;
+        const g = c.getContext("2d");
+        let y = 0;
+        while (y < 512) {
+          const h = 14 + rnd() * 46;
+          g.fillStyle = colors[Math.floor(rnd() * colors.length)];
+          g.fillRect(0, y, 1024, h + 1);
+          y += h;
+        }
+        blobs.forEach(({ color, count, rx, ry, alpha }) => {
+          g.fillStyle = color;
+          for (let i = 0; i < count; i++) {
+            g.globalAlpha = alpha;
+            g.beginPath();
+            g.ellipse(rnd() * 1024, 60 + rnd() * 392, rx * (0.5 + rnd()), ry * (0.5 + rnd()), 0, 0, Math.PI * 2);
+            g.fill();
+          }
+        });
+        g.globalAlpha = 1;
+        const tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      }
+
+      const ball = (radius, map, basic) =>
+        new THREE.Mesh(
+          new THREE.SphereGeometry(radius, 96, 64),
+          basic ? new THREE.MeshBasicMaterial({ map }) : new THREE.MeshStandardMaterial({ map, roughness: 0.85 }),
+        );
+
+      /* Venus */
+      const venus = ball(1.6, makeTexture(["#D9B36C", "#E6C98A", "#C99A55", "#EAD7A4"], 11, [
+        { color: "#F3E3B8", count: 26, rx: 90, ry: 14, alpha: 0.35 },
+        { color: "#B98A4A", count: 14, rx: 70, ry: 12, alpha: 0.3 },
+      ]));
+      venus.rotation.z = 0.05;
+      scene.add(venus);
+
+      /* Sun and Earth */
+      const lightGroup = new THREE.Group();
+      const sunTex = makeTexture(["#FFC53D", "#FFB020", "#FFD76A"], 5, [
+        { color: "#FFE9A8", count: 30, rx: 50, ry: 30, alpha: 0.25 },
+      ]);
+      const sun = ball(1.0, sunTex, true);
+      sun.position.x = -2.3;
+      const halo = new THREE.Mesh(
+        new THREE.SphereGeometry(1.25, 48, 32),
+        new THREE.MeshBasicMaterial({ color: 0xffc53d, transparent: true, opacity: 0.18 }),
+      );
+      halo.position.x = -2.3;
+      const earthTex = () => makeTexture(["#1D5FD0", "#2468DB", "#1A56BF"], 23, [
+        { color: "#2E9E4F", count: 16, rx: 80, ry: 50, alpha: 0.9 },
+        { color: "#FFFFFF", count: 22, rx: 90, ry: 10, alpha: 0.55 },
+      ]);
+      const earth = ball(0.32, earthTex());
+      earth.position.x = 2.1;
+      const beam = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.035, 1, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffe9a8, transparent: true, opacity: 0.7 }),
+      );
+      beam.rotation.z = Math.PI / 2;
+      const photon = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 24, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffffff }),
+      );
+      lightGroup.add(sun, halo, earth, beam, photon);
+      scene.add(lightGroup);
+
+      /* Jupiter and Earth to scale (11 : 1) */
+      const jupiterGroup = new THREE.Group();
+      const jupiter = ball(1.9, makeTexture(["#C9A37A", "#E3CDA8", "#B07D52", "#E8D9BC", "#A56B46", "#D9B48A"], 31, [
+        { color: "#F1E4CC", count: 30, rx: 70, ry: 8, alpha: 0.3 },
+        { color: "#B4512E", count: 1, rx: 60, ry: 30, alpha: 0.9 },
+      ]));
+      jupiter.position.x = -0.5;
+      jupiter.rotation.z = 0.05;
+      const smallEarth = ball(1.9 / 11, earthTex());
+      smallEarth.position.x = 2.3;
+      jupiterGroup.add(jupiter, smallEarth);
+      scene.add(jupiterGroup);
+
+      const easeOutBack = (x) => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      };
+      const intro = (time, start) => Math.max(0.001, easeOutBack(Math.min(1, Math.max(0, time - start - 0.15) / 0.6)));
+
+      const BEAM_FROM = -1.3, BEAM_TO = 2.1 - 0.32;
+
+      function renderAt(time) {
+        venus.visible = time < 8.5;
+        lightGroup.visible = time >= 8.5 && time < 14;
+        jupiterGroup.visible = time >= 14;
+
+        if (venus.visible) {
+          venus.scale.setScalar(intro(time, 3));
+          venus.rotation.y = -(time - 3) * 0.12;
+        } else if (lightGroup.visible) {
+          const s = intro(time, 8.5);
+          lightGroup.scale.setScalar(s);
+          sun.rotation.y = (time - 8.5) * 0.15;
+          halo.scale.setScalar(1 + Math.sin((time - 8.5) * 3) * 0.03);
+          earth.rotation.y = (time - 8.5) * 0.6;
+          const p = Math.min(1, Math.max(0, (time - 9.4) / 3.5));
+          const x = BEAM_FROM + (BEAM_TO - BEAM_FROM) * p;
+          beam.visible = photon.visible = time >= 9.4;
+          photon.position.x = x;
+          beam.scale.y = Math.max(0.001, x - BEAM_FROM);
+          beam.position.x = (BEAM_FROM + x) / 2;
+        } else {
+          jupiterGroup.scale.setScalar(intro(time, 14));
+          jupiter.rotation.y = (time - 14) * 0.25;
+          smallEarth.rotation.y = (time - 14) * 0.6;
+        }
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", (event) => renderAt(event.detail.time));
+      const root = window.__timelines["fun-facts-space"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+  </body>
+</html>
