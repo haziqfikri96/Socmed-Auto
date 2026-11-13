@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #04111F;
+        --ink: #FFFFFF;
+        --accent: #22D3EE;
+        --muted: #9FB3C8;
+        --card: #0C2238;
+        --track: #16324A;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Montserrat', Arial, sans-serif;
+        color: var(--ink);
+      }
+      #bg { position: absolute; inset: 0; background: linear-gradient(#071A2E, #04111F 60%, #020A14); }
+      .bubble { position: absolute; border-radius: 50%; border: 2px solid rgba(186, 230, 253, 0.22); background: rgba(186, 230, 253, 0.05); }
+      .scene { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+      .abs { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+      .pos { position: absolute; white-space: nowrap; }
+      .display { font-weight: 900; text-transform: uppercase; letter-spacing: -0.04em; line-height: 1; }
+      .accent { color: var(--accent); }
+      .tag {
+        position: absolute; left: 390px; top: 170px; width: 300px; height: 72px; border-radius: 36px;
+        background: var(--accent); color: #04111F;
+        font-size: 32px; font-weight: 900; letter-spacing: 0.1em; line-height: 72px; text-align: center;
+      }
+      .h1 { top: 280px; font-size: 100px; }
+      .h2 { top: 390px; font-size: 100px; }
+      .note { top: 1640px; font-size: 32px; font-weight: 700; color: var(--muted); }
+      .src { top: 1740px; font-size: 28px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; }
+      .chip {
+        position: absolute; height: 96px; border-radius: 48px; background: var(--card); color: var(--accent);
+        border: 2px solid rgba(34, 211, 238, 0.45);
+        font-size: 32px; font-weight: 900; letter-spacing: 0.06em; line-height: 92px; text-align: center; white-space: nowrap;
+      }
+
+      /* hook */
+      #s1-bar { position: absolute; left: 0; width: 1080px; top: 640px; height: 260px; background: var(--accent); }
+      #s1-word { top: 665px; font-size: 210px; color: #04111F; }
+      #s1-l1 { top: 940px; font-size: 112px; }
+      #s1-l2 { top: 1075px; font-size: 112px; }
+      #s1-sub { top: 1280px; font-size: 40px; font-weight: 900; letter-spacing: 0.08em; }
+
+      /* fact 1 — water */
+      #ring-wrap { position: absolute; left: 270px; top: 560px; width: 540px; height: 540px; }
+      #ring {
+        position: absolute; inset: 0; border-radius: 50%; --p: 0;
+        background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--track) 0);
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 64px), #000 calc(100% - 63px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 64px), #000 calc(100% - 63px));
+      }
+      #ring-num { position: absolute; left: 0; width: 540px; top: 170px; text-align: center; font-size: 170px; font-weight: 900; letter-spacing: -0.04em; line-height: 200px; }
+      #ring-cap { top: 1150px; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #ring-chip { left: 150px; top: 1270px; width: 780px; }
+
+      /* fact 2 — average depth */
+      #gauge { position: absolute; left: 250px; top: 560px; width: 120px; height: 920px; border-radius: 28px; background: linear-gradient(#7DD3FC, #0EA5E9 22%, #0C4A6E 55%, #020617); }
+      .tick-l { position: absolute; left: 20px; width: 210px; text-align: right; font-size: 30px; font-weight: 700; color: var(--muted); line-height: 34px; white-space: nowrap; }
+      .tick-m { position: absolute; left: 376px; width: 28px; height: 3px; background: var(--muted); }
+      #marker { position: absolute; left: 220px; top: 556px; width: 180px; height: 8px; border-radius: 4px; background: #fff; box-shadow: 0 0 24px rgba(255, 255, 255, 0.6); }
+      #d-num { left: 460px; top: 880px; width: 580px; text-align: left; font-size: 170px; font-weight: 900; letter-spacing: -0.04em; line-height: 180px; }
+      #d-unit { left: 460px; top: 1070px; font-size: 34px; font-weight: 700; color: var(--muted); }
+      #d-chip { left: 460px; top: 1170px; width: 520px; }
+
+      /* fact 3 — Challenger Deep */
+      #water { position: absolute; left: 120px; top: 560px; width: 840px; height: 820px; transform-origin: top center; background: linear-gradient(#0E7490, #0C4A6E 50%, #020617); }
+      #surface { position: absolute; left: 100px; top: 556px; width: 880px; height: 8px; border-radius: 4px; background: #E0F2FE; }
+      #floor { position: absolute; left: 120px; top: 1380px; width: 840px; height: 24px; background: #475569; }
+      #ever { position: absolute; left: 280px; top: 716px; width: 520px; height: 664px; background: linear-gradient(#F1F5F9 0 22%, #64748B 22%); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+      #gap-line { position: absolute; left: 538px; top: 564px; width: 0; height: 152px; border-left: 4px dashed #E0F2FE; transform-origin: top center; }
+      .lbl-w { font-size: 32px; font-weight: 900; line-height: 38px; color: #E0F2FE; text-align: left; }
+      #sea-lbl { left: 136px; top: 576px; font-size: 28px; font-weight: 700; color: #E0F2FE; }
+      #gap-l1 { left: 566px; top: 590px; }
+      #gap-l2 { left: 566px; top: 628px; }
+      #ev-l1 { left: 596px; top: 776px; }
+      #ev-l2 { left: 596px; top: 814px; }
+      #cd-label { top: 1418px; font-size: 34px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; }
+      #cd-num { top: 1458px; font-size: 96px; font-weight: 900; letter-spacing: -0.03em; line-height: 100px; }
+
+      /* fact 4 — light */
+      #col { position: absolute; left: 250px; top: 600px; width: 120px; height: 880px; border-radius: 28px; background: linear-gradient(#E0F2FE, #38BDF8 8%, #0C4A6E 30%, #020617 72%); box-shadow: 0 0 0 2px rgba(159, 179, 200, 0.35); }
+      #sun { position: absolute; left: 260px; top: 498px; width: 100px; height: 100px; border-radius: 50%; background: #FDE047; box-shadow: 0 0 60px rgba(253, 224, 71, 0.7); }
+      .zline { position: absolute; left: 200px; width: 820px; height: 0; border-top: 4px dashed #E0F2FE; transform-origin: left center; }
+      #zl1 { top: 745px; }
+      #zl2 { top: 1331px; }
+      .zbig { position: absolute; left: 420px; width: 620px; font-size: 72px; font-weight: 900; line-height: 76px; text-align: left; white-space: nowrap; }
+      .zsub { position: absolute; left: 420px; width: 620px; font-size: 32px; font-weight: 700; color: var(--muted); line-height: 40px; text-align: left; white-space: nowrap; }
+      #zb1 { top: 661px; } #zs1 { top: 761px; }
+      #zb2 { top: 1247px; } #zs2 { top: 1347px; }
+
+      /* fact 5 — mapping */
+      .cell { position: absolute; width: 72px; height: 72px; border-radius: 14px; background: var(--track); overflow: hidden; }
+      .fill { position: absolute; left: 0; top: 0; height: 100%; width: 70%; background: var(--accent); transform-origin: left center; }
+      #m-num { top: 1400px; font-size: 150px; }
+      #m-cap { top: 1565px; font-size: 34px; font-weight: 700; color: var(--muted); }
+
+      /* outro */
+      #s7-l1 { top: 720px; font-size: 210px; }
+      #s7-l2 { top: 950px; font-size: 96px; color: var(--accent); }
+      #s7-chip {
+        position: absolute; left: 130px; top: 1150px; width: 820px; height: 120px; border-radius: 60px; white-space: nowrap;
+        background: var(--accent); color: #04111F;
+        font-size: 38px; font-weight: 900; letter-spacing: 0.06em; line-height: 120px; text-align: center;
+      }
+      #s7-n1 { top: 1340px; font-size: 32px; font-weight: 700; color: var(--muted); }
+      #s7-n2 { top: 1395px; font-size: 32px; font-weight: 700; color: var(--muted); }
+
+      #wipe { position: absolute; inset: 0; background: var(--accent); }
+      #progress { position: absolute; left: 0; bottom: 0; width: 1080px; height: 12px; background: var(--accent); transform-origin: left center; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="fun-facts-ocean"
+      data-start="0"
+      data-duration="60"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg"></div>
+      <div id="bubbles"></div>
+
+      <div id="s1" class="scene clip" data-start="0" data-duration="4.5" data-track-index="1">
+        <div id="s1-bar"></div>
+        <div id="s1-word" class="abs display" data-layout-allow-overlap>5 OCEAN</div>
+        <div id="s1-l1" class="abs display">FACTS TO MAKE</div>
+        <div id="s1-l2" class="abs display">YOU FEEL SMALL.</div>
+        <div id="s1-sub" class="abs">ALL TRUE · SOURCE: NOAA</div>
+      </div>
+
+      <div id="f1" class="scene clip" data-start="4.5" data-duration="10" data-track-index="1">
+        <div class="tag">FACT 1 OF 5</div>
+        <div class="abs display h1 accent">THE OCEAN HOLDS</div>
+        <div class="abs display h2">97% OF THE WATER</div>
+        <div id="ring-wrap">
+          <div id="ring"></div>
+          <div id="ring-num">0%</div>
+        </div>
+        <div id="ring-cap" class="abs">of all the water on Earth is in the ocean</div>
+        <div id="ring-chip" class="chip">OVER 70% OF THE SURFACE</div>
+        <div class="abs src">SOURCE: NOAA</div>
+      </div>
+
+      <div id="f2" class="scene clip" data-start="14.5" data-duration="10" data-track-index="1">
+        <div class="tag">FACT 2 OF 5</div>
+        <div class="abs display h1 accent">AVERAGE DEPTH</div>
+        <div class="abs display h2">3,682 METERS</div>
+        <div id="gauge"></div>
+        <div class="tick-l" style="top: 543px">0 m</div>
+        <div class="tick-l" style="top: 773px">1,000 m</div>
+        <div class="tick-l" style="top: 1003px">2,000 m</div>
+        <div class="tick-l" style="top: 1233px">3,000 m</div>
+        <div class="tick-l" style="top: 1463px">4,000 m</div>
+        <div class="tick-m" style="top: 558px"></div>
+        <div class="tick-m" style="top: 788px"></div>
+        <div class="tick-m" style="top: 1018px"></div>
+        <div class="tick-m" style="top: 1248px"></div>
+        <div class="tick-m" style="top: 1478px"></div>
+        <div id="marker"></div>
+        <div id="d-num" class="pos">0</div>
+        <div id="d-unit" class="pos">METERS DEEP, ON AVERAGE</div>
+        <div id="d-chip" class="chip">OVER 3.5 KM OF WATER</div>
+        <div class="abs src">SOURCE: NOAA</div>
+      </div>
+
+      <div id="f3" class="scene clip" data-start="24.5" data-duration="10" data-track-index="1">
+        <div class="tag">FACT 3 OF 5</div>
+        <div class="abs display h1 accent">THE DEEPEST SPOT</div>
+        <div class="abs display h2" style="font-size: 90px">SWALLOWS EVEREST</div>
+        <div id="water"></div>
+        <div id="surface"></div>
+        <div id="floor"></div>
+        <div id="ever"></div>
+        <div id="gap-line"></div>
+        <div id="sea-lbl" class="pos">SEA LEVEL</div>
+        <div id="gap-l1" class="pos lbl-w">ABOUT 2 KM OF</div>
+        <div id="gap-l2" class="pos lbl-w">WATER ABOVE</div>
+        <div id="ev-l1" class="pos lbl-w">EVEREST</div>
+        <div id="ev-l2" class="pos lbl-w">8,849 m</div>
+        <div id="cd-label" class="abs">CHALLENGER DEEP</div>
+        <div id="cd-num" class="abs">0 m</div>
+        <div class="abs note">Everest: 8,848.86 m, China–Nepal survey 2020</div>
+        <div class="abs src">SOURCE: NOAA · GAP = DEPTH − HEIGHT</div>
+      </div>
+
+      <div id="f4" class="scene clip" data-start="34.5" data-duration="10" data-track-index="1">
+        <div class="tag">FACT 4 OF 5</div>
+        <div class="abs display h1 accent">SUNLIGHT FADES</div>
+        <div class="abs display h2">AFTER 200 METERS</div>
+        <div id="col"></div>
+        <div id="sun"></div>
+        <div id="zl1" class="zline"></div>
+        <div id="zb1" class="zbig">200 m</div>
+        <div id="zs1" class="zsub">rarely any significant sunlight</div>
+        <div id="zl2" class="zline"></div>
+        <div id="zb2" class="zbig">1,000 m</div>
+        <div id="zs2" class="zsub">no sunlight below this depth</div>
+        <div class="abs src">SOURCE: NOAA</div>
+      </div>
+
+      <div id="f5" class="scene clip" data-start="44.5" data-duration="10" data-track-index="1">
+        <div class="tag">FACT 5 OF 5</div>
+        <div class="abs display h1 accent">THE SEAFLOOR IS</div>
+        <div class="abs display h2">MOSTLY UNMAPPED</div>
+        <div id="grid"></div>
+        <div id="m-num" class="abs display">0.0%</div>
+        <div id="m-cap" class="abs">of the seafloor mapped in high resolution</div>
+        <div id="m-note" class="abs note">Seen by explorers: under 0.001% of the deep seafloor</div>
+        <div class="abs src">SOURCE: NOAA · AS OF APRIL 2026</div>
+      </div>
+
+      <div id="s7" class="scene clip" data-start="54.5" data-duration="5.5" data-track-index="1">
+        <div id="s7-l1" class="abs display">FOLLOW</div>
+        <div id="s7-l2" class="abs display">FOR MORE FACTS</div>
+        <div id="s7-chip">WHICH ONE SURPRISED YOU?</div>
+        <div id="s7-n1" class="abs">Visuals are illustrations, not real photos.</div>
+        <div id="s7-n2" class="abs">Made with AI. Facts checked against NOAA.</div>
+      </div>
+
+      <div id="progress" class="clip" data-start="0" data-duration="60" data-track-index="2"></div>
+      <div id="wipe" class="clip" data-start="0" data-duration="60" data-track-index="3"></div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="60" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      let seed = 7;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const fmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+      /* 100-cell mapping grid: 28 full cells + one 70% cell = 28.7% */
+      const grid = document.getElementById("grid");
+      for (let i = 0; i < 100; i++) {
+        const c = document.createElement("div");
+        c.className = "cell" + (i < 28 ? " on" : "") + (i === 28 ? " part" : "");
+        c.style.left = 132 + (i % 10) * 84 + "px";
+        c.style.top = 540 + Math.floor(i / 10) * 84 + "px";
+        if (i === 28) {
+          const f = document.createElement("div");
+          f.className = "fill";
+          c.appendChild(f);
+        }
+        grid.appendChild(c);
+      }
+
+      /* rising bubbles */
+      const bubbleHost = document.getElementById("bubbles");
+      const bubbles = [];
+      for (let i = 0; i < 16; i++) {
+        const b = document.createElement("div");
+        const s = 10 + Math.round(rnd() * 28);
+        b.className = "bubble";
+        b.style.width = b.style.height = s + "px";
+        b.style.left = 30 + Math.round(rnd() * 1000) + "px";
+        b.style.top = "1960px";
+        bubbleHost.appendChild(b);
+        bubbles.push(b);
+      }
+
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const pop = { duration: 0.3, ease: "back.out(1.6)" };
+      const fade = { duration: 0.3, ease: "power2.out" };
+
+      bubbles.forEach((b) => {
+        let t = rnd() * 6;
+        while (t < 58) {
+          const d = Math.min(14 + rnd() * 10, 60 - t);
+          tl.fromTo(b, { y: 0 }, { y: -2150 * (d / 20), duration: d, ease: "none" }, t);
+          t += d + rnd() * 2;
+        }
+      });
+
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 60, ease: "none" }, 0);
+
+      const CUTS = [4.5, 14.5, 24.5, 34.5, 44.5, 54.5];
+      tl.set("#wipe", { yPercent: 100 }, 0);
+      CUTS.forEach((cut) => {
+        tl.fromTo("#wipe", { yPercent: 100 }, { yPercent: 0, duration: 0.2, ease: "power3.in" }, cut - 0.2);
+        tl.to("#wipe", { yPercent: -100, duration: 0.25, ease: "power3.out" }, cut);
+      });
+
+      const head = (id, b) => {
+        tl.fromTo(`${id} .tag`, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.8)" }, b + 0.2);
+        tl.fromTo(`${id} .h1`, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, b + 0.3);
+        tl.fromTo(`${id} .h2`, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, b + 0.42);
+        tl.fromTo(`${id} .src`, { opacity: 0 }, { opacity: 1, ...fade }, b + 0.6);
+      };
+
+      /* hook */
+      tl.fromTo("#s1-bar", { scaleY: 0.6 }, { scaleY: 1, duration: 0.2, ease: "power4.out" }, 0);
+      tl.fromTo("#s1-word", { scale: 0.7 }, { scale: 1, duration: 0.25, ease: "back.out(2)" }, 0);
+      tl.fromTo("#s1-l1", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.26);
+      tl.fromTo("#s1-l2", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.38);
+      tl.fromTo("#s1-sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 0.55);
+      tl.to("#s1-word", { scale: 1.06, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.0);
+      tl.to("#s1", { scale: 1.04, duration: 4, ease: "none" }, 0.6);
+
+      /* fact 1 — water */
+      head("#f1", 4.5);
+      const ring = document.getElementById("ring");
+      const ringNum = document.getElementById("ring-num");
+      const water = { p: 0 };
+      tl.fromTo("#ring-wrap", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.4)" }, 5.2);
+      tl.to(water, {
+        p: 97, duration: 2.4, ease: "power2.out",
+        onUpdate: () => {
+          ring.style.setProperty("--p", water.p);
+          ringNum.textContent = Math.round(water.p) + "%";
+        },
+      }, 5.5);
+      tl.to("#ring-num", { scale: 1.1, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 7.9);
+      tl.fromTo("#ring-cap", { opacity: 0 }, { opacity: 1, ...fade }, 8.0);
+      tl.fromTo("#ring-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, ...pop }, 8.8);
+
+      /* fact 2 — average depth */
+      head("#f2", 14.5);
+      const marker = document.getElementById("marker");
+      const dNum = document.getElementById("d-num");
+      const depth = { d: 0 };
+      tl.fromTo("#gauge", { opacity: 0 }, { opacity: 1, ...fade }, 15.0);
+      tl.fromTo(["#marker", "#d-num", "#d-unit"], { opacity: 0 }, { opacity: 1, ...fade }, 15.3);
+      tl.to(depth, {
+        d: 3682, duration: 3.2, ease: "power2.inOut",
+        onUpdate: () => {
+          marker.style.transform = `translateY(${(depth.d / 4000) * 920}px)`;
+          dNum.textContent = fmt(depth.d);
+        },
+      }, 15.5);
+      tl.to("#d-num", { scale: 1.08, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1, transformOrigin: "left center" }, 18.7);
+      tl.fromTo("#d-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, ...pop }, 19.5);
+
+      /* fact 3 — Challenger Deep and Everest */
+      head("#f3", 24.5);
+      const cdNum = document.getElementById("cd-num");
+      const trench = { d: 0 };
+      tl.fromTo("#water", { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: "power2.out" }, 25.2);
+      tl.fromTo(["#surface", "#sea-lbl"], { opacity: 0 }, { opacity: 1, ...fade }, 25.2);
+      tl.fromTo("#floor", { opacity: 0 }, { opacity: 1, ...fade }, 25.8);
+      tl.fromTo(["#cd-label", "#cd-num"], { opacity: 0 }, { opacity: 1, ...fade }, 25.5);
+      tl.to(trench, {
+        d: 10935, duration: 2.6, ease: "power2.out",
+        onUpdate: () => { cdNum.textContent = fmt(trench.d) + " m"; },
+      }, 25.5);
+      tl.fromTo("#ever", { y: -520, opacity: 0 }, { y: 0, opacity: 1, duration: 1.0, ease: "power3.in" }, 29.8);
+      tl.fromTo(["#ev-l1", "#ev-l2"], { opacity: 0 }, { opacity: 1, ...fade }, 30.8);
+      tl.fromTo("#gap-line", { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power2.out" }, 31.3);
+      tl.fromTo(["#gap-l1", "#gap-l2"], { opacity: 0 }, { opacity: 1, ...fade }, 31.5);
+
+      /* fact 4 — light */
+      head("#f4", 34.5);
+      tl.fromTo("#col", { opacity: 0 }, { opacity: 1, ...fade }, 35.2);
+      tl.fromTo("#sun", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, ...pop }, 35.4);
+      tl.fromTo("#zl1", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 37.0);
+      tl.fromTo(["#zb1", "#zs1"], { x: 40, opacity: 0 }, { x: 0, opacity: 1, ...fade }, 37.2);
+      tl.fromTo("#zl2", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 39.1);
+      tl.fromTo(["#zb2", "#zs2"], { x: 40, opacity: 0 }, { x: 0, opacity: 1, ...fade }, 39.3);
+
+      /* fact 5 — mapping */
+      head("#f5", 44.5);
+      const mNum = document.getElementById("m-num");
+      const mapped = { v: 0 };
+      tl.fromTo(".cell", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out", stagger: 0.005 }, 45.0);
+      tl.to(".cell.on", { backgroundColor: "#22D3EE", duration: 0.25, ease: "power2.out", stagger: 0.06 }, 46.0);
+      tl.fromTo(".fill", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.out" }, 47.8);
+      tl.fromTo(["#m-num", "#m-cap"], { opacity: 0 }, { opacity: 1, ...fade }, 46.0);
+      tl.to(mapped, {
+        v: 28.7, duration: 2.1, ease: "power1.out",
+        onUpdate: () => { mNum.textContent = mapped.v.toFixed(1) + "%"; },
+      }, 46.0);
+      tl.to("#m-num", { scale: 1.08, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 48.2);
+      tl.fromTo("#m-note", { opacity: 0 }, { opacity: 1, ...fade }, 49.9);
+
+      /* outro */
+      tl.fromTo("#s7-l1", { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 54.62);
+      tl.fromTo("#s7-l2", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "back.out(1.2)" }, 54.75);
+      tl.fromTo("#s7-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 54.85);
+      tl.fromTo(["#s7-n1", "#s7-n2"], { opacity: 0 }, { opacity: 1, ...fade }, 54.9);
+      tl.to("#s7-chip", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 56.0);
+
+      window.__timelines["fun-facts-ocean"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

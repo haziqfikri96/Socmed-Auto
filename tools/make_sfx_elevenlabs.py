@@ -22,6 +22,8 @@ KIT = {
     "ding": (1.5, "Single bright positive bell chime ding, clean with a short ring"),
     "counter": (3.5, "Fast digital counter rolling up, rapid soft ticking that speeds up slightly, clean, no music"),
     "space_ambience": (22.0, "Calm deep space ambient drone, dark low hum with a subtle airy shimmer, no melody, no drums"),
+    "ocean_ambience": (22.0, "Deep underwater ambience, muffled low ocean rumble with slow gentle swells and faint distant bubbles, no melody, no drums, no voices"),
+    "sonar_ping": (1.5, "Single clean submarine sonar ping with a soft echo tail"),
 }
 
 manifest = {}

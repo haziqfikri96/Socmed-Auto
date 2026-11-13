@@ -34,5 +34,13 @@
   "space_ambience": {
     "seconds": 22.0,
     "prompt": "Calm deep space ambient drone, dark low hum with a subtle airy shimmer, no melody, no drums"
+  },
+  "ocean_ambience": {
+    "seconds": 22.0,
+    "prompt": "Deep underwater ambience, muffled low ocean rumble with slow gentle swells and faint distant bubbles, no melody, no drums, no voices"
+  },
+  "sonar_ping": {
+    "seconds": 1.5,
+    "prompt": "Single clean submarine sonar ping with a soft echo tail"
   }
 }
