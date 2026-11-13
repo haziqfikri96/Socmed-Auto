@@ -1,11 +1,10 @@
-"""Builds assets/mix.wav: a synthesised 120 BPM bed plus the editor-v1 sound kit on the cuts."""
+"""Builds assets/mix.wav: a synthesised 120 BPM bed plus the ElevenLabs sound kit in sfx/elevenlabs."""
 import sys
 from pathlib import Path
 import numpy as np
 import soundfile as sf
 
 SR, DUR = 48000, 22.0
-KIT = Path.home() / ".claude/skills/editor-v1/sfx/ev1kit"
 N = int(SR * DUR)
 mix = np.zeros((N, 2))
 rng = np.random.default_rng(7)
@@ -21,10 +20,17 @@ def add(sig, at, gain=1.0):
     mix[i:j] += sig[: j - i] * gain
 
 
-def sfx(name, at, gain=1.0):
-    data, sr = sf.read(KIT / f"{name}.wav", always_2d=True)
+FX = Path(__file__).resolve().parents[1] / "sfx/elevenlabs"
+
+
+def fx(name, at, gain=1.0, length=None):
+    data, sr = sf.read(FX / f"{name}.wav", always_2d=True)
     assert sr == SR
-    add(data, at, gain)
+    if length:
+        data = data[: int(length * SR)].copy()
+        tail = int(0.05 * SR)
+        data[-tail:] *= np.linspace(1, 0, tail)[:, None]
+    add(data / max(1e-6, np.abs(data).max()), at, gain)
 
 
 def kick():
@@ -55,29 +61,29 @@ for b in range(int(DUR / BEAT)):
     bar = (b // 4) % 4
     full = 3.0 <= t0 < 19.5
     if full:
-        add(kick(), t0, 0.85)
+        add(kick(), t0, 0.6)
         add(hat(), t0 + BEAT / 2, 0.12)
         add(tone(BASS[bar], 0.42, 5.0), t0 + BEAT / 2, 0.30)
     if b % 4 == 0:
         for f in CHORDS[bar]:
             add(tone(f, 2.0, 0.9, (1.0, 0.2)), t0, 0.05 if full else 0.035)
 
-CUTS = [3.0, 8.5, 14.0, 19.5]
-sfx("impact_1", 0.06, 0.8)
-sfx("click_1", 0.26, 0.6)
-sfx("click_2", 0.38, 0.6)
-sfx("riser_1", 3.0 - 0.98, 0.5)
-for c in CUTS:
-    sfx("swish_1", c - 0.2, 0.6)
-    sfx("subboom_1", c, 0.55)
-sfx("click_1", 4.6, 0.55)
-sfx("click_2", 5.2, 0.55)
-sfx("riser_2", 9.4, 0.3)
-sfx("impact_2", 12.9, 0.5)
-sfx("riser_3", 14.9, 0.3)
-sfx("impact_2", 17.0, 0.5)
-sfx("impact_2", 19.62, 0.7)
-sfx("outro_1", 20.3, 0.6)
+fx("space_ambience", 0.0, 0.22)
+fx("impact_deep", 0.04, 0.75)
+fx("pop", 0.26, 0.4)
+fx("pop", 0.38, 0.4)
+fx("riser", 3.0 - 2.48, 0.3)
+for c in [3.0, 8.5, 14.0, 19.5]:
+    fx("whoosh_fast", c - 0.3, 0.5)
+    fx("whoosh_soft", c, 0.35)
+fx("pop", 4.6, 0.45)
+fx("pop", 5.2, 0.45)
+fx("counter", 9.4, 0.3, 3.5)
+fx("ding", 12.9, 0.5)
+fx("counter", 14.9, 0.3, 2.1)
+fx("impact_deep", 17.0, 0.6)
+fx("impact_deep", 19.62, 0.7)
+fx("ding", 19.9, 0.4)
 
 fade = int(0.4 * SR)
 mix[-fade:] *= np.linspace(1, 0, fade)[:, None]

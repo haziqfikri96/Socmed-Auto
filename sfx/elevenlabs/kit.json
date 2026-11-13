@@ -1,0 +1,38 @@
+{
+  "whoosh_soft": {
+    "seconds": 0.8,
+    "prompt": "Short soft cinematic whoosh, air swish passing left to right, clean, no reverb tail"
+  },
+  "whoosh_fast": {
+    "seconds": 0.6,
+    "prompt": "Very fast sharp whoosh transition swipe, tight and clean"
+  },
+  "impact_deep": {
+    "seconds": 2.0,
+    "prompt": "Deep cinematic sub bass impact hit, punchy, short dark tail"
+  },
+  "pop": {
+    "seconds": 0.5,
+    "prompt": "Single clean soft UI bubble pop, short and round"
+  },
+  "tick": {
+    "seconds": 0.5,
+    "prompt": "Single soft digital UI click tick, very short"
+  },
+  "riser": {
+    "seconds": 2.5,
+    "prompt": "Cinematic tension riser, synth sweep rising in pitch and volume, stops abruptly at the peak"
+  },
+  "ding": {
+    "seconds": 1.5,
+    "prompt": "Single bright positive bell chime ding, clean with a short ring"
+  },
+  "counter": {
+    "seconds": 3.5,
+    "prompt": "Fast digital counter rolling up, rapid soft ticking that speeds up slightly, clean, no music"
+  },
+  "space_ambience": {
+    "seconds": 22.0,
+    "prompt": "Calm deep space ambient drone, dark low hum with a subtle airy shimmer, no melody, no drums"
+  }
+}
