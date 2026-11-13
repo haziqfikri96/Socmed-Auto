@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #E8E8E8;
+        --ink: #0F0F0F;
+        --accent: #2563EB;
+        --muted: #6B7280;
+        --card: #FFFFFF;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Montserrat', Arial, sans-serif;
+        color: var(--ink);
+      }
+      #bg { position: absolute; inset: 0; background: var(--bg); }
+      .scene { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+      .abs { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+      .display { font-weight: 900; text-transform: uppercase; letter-spacing: -0.04em; line-height: 1; }
+      .accent { color: var(--accent); }
+
+      /* scene 1 — hook */
+      #s1-bar { position: absolute; left: 0; width: 1080px; top: 640px; height: 260px; background: var(--accent); }
+      #s1-word { top: 650px; font-size: 240px; color: #fff; }
+      #s1-l1 { top: 930px; font-size: 170px; }
+      #s1-l2 { top: 1110px; font-size: 128px; }
+      #s1-sub { top: 1300px; font-size: 44px; font-weight: 900; letter-spacing: 0.1em; }
+
+      /* scene 2 — 3D */
+      #s2-head { top: 220px; font-size: 150px; }
+      #s2-sub { top: 390px; font-size: 44px; font-weight: 700; color: var(--muted); letter-spacing: 0.02em; }
+      #three-layer { position: absolute; left: 0; top: 420px; width: 1080px; height: 1080px; display: block; }
+      #s2-chip {
+        position: absolute; left: 240px; top: 1560px; width: 600px; height: 100px;
+        border-radius: 50px; background: var(--ink); color: #fff;
+        font-size: 36px; font-weight: 700; letter-spacing: 0.08em; line-height: 100px; text-align: center;
+      }
+
+      /* scene 3 — stats card */
+      #s3-head { top: 230px; font-size: 128px; }
+      #s3-card {
+        position: absolute; left: 90px; top: 480px; width: 900px; height: 1040px;
+        background: var(--card); border-radius: 56px;
+        box-shadow: 0 40px 90px rgba(15, 15, 15, 0.14);
+      }
+      #s3-label { position: absolute; left: 64px; top: 60px; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #s3-num { position: absolute; left: 60px; top: 120px; width: 520px; font-size: 220px; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+      #s3-badge {
+        position: absolute; right: 64px; top: 190px; width: 250px; height: 76px; border-radius: 38px;
+        background: #DCFCE7; color: #15803D; font-size: 34px; font-weight: 700; line-height: 76px; text-align: center;
+      }
+      #s3-chart { position: absolute; left: 64px; top: 430px; width: 772px; height: 440px; }
+      .bar {
+        position: absolute; bottom: 0; width: 96px; border-radius: 20px 20px 0 0;
+        background: #D1D5DB; transform-origin: bottom center;
+      }
+      .bar.hi { background: var(--accent); }
+      #s3-axis { position: absolute; left: 64px; top: 870px; width: 772px; height: 4px; background: #E5E7EB; }
+      #s3-foot { position: absolute; left: 64px; top: 910px; width: 772px; font-size: 34px; font-weight: 500; color: var(--muted); }
+
+      /* scene 4 — pipeline */
+      #s4-head { top: 220px; font-size: 150px; }
+      .pill {
+        position: absolute; left: 140px; width: 800px; height: 190px; border-radius: 48px;
+        background: var(--card); box-shadow: 0 24px 60px rgba(15, 15, 15, 0.10);
+      }
+      .pill .n { position: absolute; left: 48px; top: 61px; font-size: 56px; font-weight: 900; color: var(--muted); line-height: 68px; }
+      .pill .t { position: absolute; left: 160px; top: 53px; font-size: 70px; font-weight: 900; letter-spacing: -0.02em; line-height: 84px; }
+      .pill .c {
+        position: absolute; right: 44px; top: 51px; width: 88px; height: 88px; border-radius: 44px;
+        background: var(--accent); color: #fff; font-size: 52px; font-weight: 900; line-height: 88px; text-align: center;
+      }
+      #p1 { top: 500px; } #p2 { top: 730px; } #p3 { top: 960px; } #p4 { top: 1190px; }
+
+      /* scene 5 — CTA */
+      #s5-fill { position: absolute; inset: 0; background: var(--accent); }
+      #s5-l1 { top: 720px; font-size: 210px; color: #fff; }
+      #s5-l2 { top: 950px; font-size: 104px; color: #fff; }
+      #s5-chip {
+        position: absolute; left: 190px; top: 1160px; width: 700px; height: 120px; border-radius: 60px;
+        background: #fff; color: var(--accent);
+        font-size: 42px; font-weight: 900; letter-spacing: 0.08em; line-height: 120px; text-align: center;
+      }
+
+      #wipe { position: absolute; inset: 0; background: var(--ink); }
+      #progress { position: absolute; left: 0; bottom: 0; width: 1080px; height: 12px; background: var(--accent); transform-origin: left center; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="showcase"
+      data-start="0"
+      data-duration="18"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg"></div>
+
+      <div id="s1" class="scene clip" data-start="0" data-duration="3" data-track-index="1">
+        <div id="s1-bar"></div>
+        <div id="s1-word" class="abs display" data-layout-allow-overlap>ONE</div>
+        <div id="s1-l1" class="abs display">PROMPT.</div>
+        <div id="s1-l2" class="abs display">FULL VIDEO.</div>
+        <div id="s1-sub" class="abs">NO CAMERA. NO CREW.</div>
+      </div>
+
+      <div id="s2" class="scene clip" data-start="3" data-duration="4.5" data-track-index="1">
+        <div id="s2-head" class="abs display"><span class="accent">BUILD</span> IN 3D</div>
+        <div id="s2-sub" class="abs">Rendered from code, frame by frame</div>
+        <canvas id="three-layer" width="1080" height="1080"></canvas>
+        <div id="s2-chip">THREE.JS + GSAP</div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="7.5" data-duration="4.5" data-track-index="1">
+        <div id="s3-head" class="abs display"><span class="accent">STACK</span> SKILLS</div>
+        <div id="s3-card">
+          <div id="s3-label">Skills installed</div>
+          <div id="s3-num">0</div>
+          <div id="s3-badge">+307 new</div>
+          <div id="s3-chart">
+            <div class="bar" style="left: 0; height: 120px"></div>
+            <div class="bar" style="left: 135px; height: 170px"></div>
+            <div class="bar" style="left: 270px; height: 150px"></div>
+            <div class="bar" style="left: 405px; height: 230px"></div>
+            <div class="bar" style="left: 540px; height: 290px"></div>
+            <div class="bar hi" style="left: 675px; height: 420px"></div>
+          </div>
+          <div id="s3-axis"></div>
+          <div id="s3-foot">Video, motion, 3D, code and more</div>
+        </div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="12" data-duration="3.5" data-track-index="1">
+        <div id="s4-head" class="abs display"><span class="accent">SHIP</span> DAILY</div>
+        <div id="p1" class="pill"><div class="n">01</div><div class="t">Script</div><div class="c">✓</div></div>
+        <div id="p2" class="pill"><div class="n">02</div><div class="t">Animate</div><div class="c">✓</div></div>
+        <div id="p3" class="pill"><div class="n">03</div><div class="t">Render</div><div class="c">✓</div></div>
+        <div id="p4" class="pill"><div class="n">04</div><div class="t">Post</div><div class="c">✓</div></div>
+      </div>
+
+      <div id="s5" class="scene clip" data-start="15.5" data-duration="2.5" data-track-index="1">
+        <div id="s5-fill"></div>
+        <div id="s5-l1" class="abs display" data-layout-allow-overlap>FOLLOW</div>
+        <div id="s5-l2" class="abs display" data-layout-allow-overlap>FOR THE BUILD</div>
+        <div id="s5-chip" data-layout-allow-overlap>NEW VIDEO EVERY DAY</div>
+      </div>
+
+      <div id="progress" class="clip" data-start="0" data-duration="18" data-track-index="2"></div>
+      <div id="wipe" class="clip" data-start="0" data-duration="18" data-track-index="3"></div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="18" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 18, ease: "none" }, 0);
+
+      /* black wipe covering every cut */
+      tl.set("#wipe", { yPercent: 100 }, 0);
+      [3, 7.5, 12, 15.5].forEach((cut) => {
+        tl.fromTo("#wipe", { yPercent: 100 }, { yPercent: 0, duration: 0.2, ease: "power3.in" }, cut - 0.2);
+        tl.to("#wipe", { yPercent: -100, duration: 0.25, ease: "power3.out" }, cut);
+      });
+
+      /* scene 1 */
+      tl.fromTo("#s1-bar", { scaleY: 0.6 }, { scaleY: 1, duration: 0.2, ease: "power4.out" }, 0);
+      tl.fromTo("#s1-word", { scale: 0.7 }, { scale: 1, duration: 0.25, ease: "back.out(2)" }, 0);
+      tl.fromTo("#s1-l1", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.26);
+      tl.fromTo("#s1-l2", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.38);
+      tl.fromTo("#s1-sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 0.55);
+      tl.to("#s1-word", { scale: 1.06, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.0);
+      tl.to("#s1", { scale: 1.04, duration: 2.2, ease: "none" }, 0.6);
+
+      /* scene 2 */
+      tl.fromTo("#s2-head", { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, 3.2);
+      tl.fromTo("#s2-sub", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" }, 3.45);
+      tl.fromTo("#s2-chip", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.4)" }, 4.0);
+
+      /* scene 3 */
+      const count = { v: 0 };
+      const num = document.getElementById("s3-num");
+      tl.fromTo("#s3-head", { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, 7.7);
+      tl.fromTo("#s3-card", { y: 160, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, 7.85);
+      tl.to(count, {
+        v: 520, duration: 1.5, ease: "power2.out",
+        onUpdate: () => { num.textContent = Math.round(count.v); },
+      }, 8.1);
+      tl.fromTo(".bar", { scaleY: 0 }, { scaleY: 1, duration: 0.5, ease: "back.out(1.3)", stagger: 0.15 }, 8.1);
+      tl.fromTo("#s3-badge", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 9.5);
+      tl.fromTo("#s3-foot", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 9.7);
+      tl.to("#s3-card", { y: -16, duration: 1.8, ease: "sine.inOut" }, 9.9);
+
+      /* scene 4 */
+      tl.fromTo("#s4-head", { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, 12.2);
+      ["#p1", "#p2", "#p3", "#p4"].forEach((id, i) => {
+        const at = 12.6 + i * 0.5;
+        tl.fromTo(id, { x: 500, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, at - 0.15);
+        tl.fromTo(id + " .c", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(2.5)" }, at + 0.12);
+      });
+
+      /* scene 5 */
+      tl.fromTo("#s5-l1", { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 15.62);
+      tl.fromTo("#s5-l2", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "back.out(1.2)" }, 15.75);
+      tl.fromTo("#s5-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 15.85);
+      tl.to("#s5-chip", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 16.6);
+
+      window.__timelines["showcase"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
+
+      const START = 3;
+      const canvas = document.getElementById("three-layer");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(1080, 1080, false);
+      renderer.setPixelRatio(1);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa3b5, 2.2));
+      const key = new THREE.DirectionalLight(0xffffff, 2.6);
+      key.position.set(3, 5, 4);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x93c5fd, 1.6);
+      rim.position.set(-4, 1, -3);
+      scene.add(rim);
+
+      const hero = new THREE.Mesh(
+        new THREE.TorusKnotGeometry(1.0, 0.36, 220, 32),
+        new THREE.MeshPhysicalMaterial({ color: 0x2563eb, roughness: 0.22, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.15 }),
+      );
+      scene.add(hero);
+
+      const palette = [0x16a34a, 0xd97706, 0x7c3aed, 0xdc2626, 0x0891b2, 0x0f0f0f];
+      const orbiters = palette.map((color, i) => {
+        const m = new THREE.Mesh(
+          new THREE.SphereGeometry(0.16 + (i % 3) * 0.05, 32, 32),
+          new THREE.MeshStandardMaterial({ color, roughness: 0.35 }),
+        );
+        scene.add(m);
+        return m;
+      });
+
+      const easeOutBack = (x) => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      };
+
+      function renderAt(time) {
+        const t = Math.max(0, time - START);
+        const intro = Math.min(1, t / 0.6);
+        const s = Math.max(0.001, easeOutBack(intro));
+        hero.scale.setScalar(s);
+        hero.rotation.set(0.4 + t * 0.35, t * 0.9, 0);
+        orbiters.forEach((m, i) => {
+          const a = t * (0.9 + i * 0.07) + (i * Math.PI * 2) / orbiters.length;
+          const r = 2.3 + (i % 2) * 0.35;
+          m.position.set(Math.cos(a) * r * s, Math.sin(a * 1.3 + i) * 0.9, Math.sin(a) * r * s);
+          m.scale.setScalar(s);
+        });
+        const dolly = 10.6 - Math.min(t, 4.5) * 0.3;
+        camera.position.set(Math.sin(t * 0.25) * 1.2, 0.6, dolly);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", (event) => renderAt(event.detail.time));
+      const root = window.__timelines["showcase"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+  </body>
+</html>
