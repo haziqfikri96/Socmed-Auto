@@ -89,14 +89,14 @@
       id="root"
       data-composition-id="fun-facts-space"
       data-start="0"
-      data-duration="22"
+      data-duration="23"
       data-width="1080"
       data-height="1920"
     >
       <div id="bg"></div>
       <div id="stars"></div>
 
-      <canvas id="three-layer" class="clip" width="1080" height="1080" data-start="3" data-duration="16.5" data-track-index="0" data-layout-allow-overflow></canvas>
+      <canvas id="three-layer" class="clip" width="1080" height="1080" data-start="3" data-duration="17.5" data-track-index="0" data-layout-allow-overflow></canvas>
 
       <div id="s1" class="scene clip" data-start="0" data-duration="3" data-track-index="1">
         <div id="s1-bar"></div>
@@ -106,7 +106,7 @@
         <div id="s1-sub" class="abs">ALL TRUE · SOURCE: NASA</div>
       </div>
 
-      <div id="s2" class="scene clip" data-start="3" data-duration="5.5" data-track-index="1">
+      <div id="s2" class="scene clip" data-start="3" data-duration="6.5" data-track-index="1">
         <div class="tag">FACT 1 OF 3</div>
         <div class="abs display h1 accent">ONE VENUS SPIN</div>
         <div class="abs display h2" style="font-size: 90px">OUTLASTS ITS YEAR</div>
@@ -118,7 +118,7 @@
         <div class="abs src">SOURCE: NASA</div>
       </div>
 
-      <div id="s3" class="scene clip" data-start="8.5" data-duration="5.5" data-track-index="1">
+      <div id="s3" class="scene clip" data-start="9.5" data-duration="5.5" data-track-index="1">
         <div class="tag">FACT 2 OF 3</div>
         <div class="abs display h1 accent">SUNLIGHT IS</div>
         <div class="abs display h2">8 MINUTES OLD</div>
@@ -129,7 +129,7 @@
         <div class="abs src">SOURCE: NASA</div>
       </div>
 
-      <div id="s4" class="scene clip" data-start="14" data-duration="5.5" data-track-index="1">
+      <div id="s4" class="scene clip" data-start="15" data-duration="5.5" data-track-index="1">
         <div class="tag">FACT 3 OF 3</div>
         <div class="abs display h1 accent">JUPITER HOLDS</div>
         <div class="abs display h2">1,000 EARTHS</div>
@@ -139,7 +139,7 @@
         <div class="abs src">SOURCE: NASA</div>
       </div>
 
-      <div id="s5" class="scene clip" data-start="19.5" data-duration="2.5" data-track-index="1">
+      <div id="s5" class="scene clip" data-start="20.5" data-duration="2.5" data-track-index="1">
         <div id="s5-l1" class="abs display">FOLLOW</div>
         <div id="s5-l2" class="abs display">FOR MORE FACTS</div>
         <div id="s5-chip">WHICH ONE SURPRISED YOU?</div>
@@ -147,10 +147,10 @@
         <div id="s5-n2" class="abs">Made with AI. Facts checked against NASA.</div>
       </div>
 
-      <div id="progress" class="clip" data-start="0" data-duration="22" data-track-index="2"></div>
-      <div id="wipe" class="clip" data-start="0" data-duration="22" data-track-index="3"></div>
+      <div id="progress" class="clip" data-start="0" data-duration="23" data-track-index="2"></div>
+      <div id="wipe" class="clip" data-start="0" data-duration="23" data-track-index="3"></div>
 
-      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="22" data-track-index="10" data-volume="1"></audio>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="23" data-track-index="10" data-volume="1"></audio>
     </div>
 
     <script>
@@ -169,10 +169,10 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 22, ease: "none" }, 0);
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 23, ease: "none" }, 0);
 
       tl.set("#wipe", { yPercent: 100 }, 0);
-      [3, 8.5, 14, 19.5].forEach((cut) => {
+      [3, 9.5, 15, 20.5].forEach((cut) => {
         tl.fromTo("#wipe", { yPercent: 100 }, { yPercent: 0, duration: 0.2, ease: "power3.in" }, cut - 0.2);
         tl.to("#wipe", { yPercent: -100, duration: 0.25, ease: "power3.out" }, cut);
       });
@@ -197,46 +197,46 @@
       head("#s2", 3);
       tl.fromTo("#v-l1", { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 4.5);
       tl.fromTo("#v-b1", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 4.6);
-      tl.fromTo("#v-l2", { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 5.1);
-      tl.fromTo("#v-b2", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 5.2);
+      tl.fromTo("#v-l2", { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 6.9);
+      tl.fromTo("#v-b2", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 7.0);
       tl.fromTo("#v-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 5.6);
 
       /* scene 3 — sunlight */
-      head("#s3", 8.5);
+      head("#s3", 9.5);
       const clock = { s: 0 };
       const tNum = document.getElementById("t-num");
-      tl.fromTo("#t-num", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 9.1);
+      tl.fromTo("#t-num", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 10.1);
       tl.to(clock, {
         s: 500, duration: 3.5, ease: "none",
         onUpdate: () => {
           const s = Math.round(clock.s);
           tNum.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
         },
-      }, 9.4);
-      tl.to("#t-num", { scale: 1.12, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 12.9);
-      tl.fromTo("#t-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 10.6);
+      }, 10.4);
+      tl.to("#t-num", { scale: 1.12, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 13.9);
+      tl.fromTo("#t-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 11.6);
 
       /* scene 4 — Jupiter */
-      head("#s4", 14);
+      head("#s4", 15);
       const earths = { n: 0 };
       const jNum = document.getElementById("j-num");
-      tl.fromTo("#j-num", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 14.6);
+      tl.fromTo("#j-num", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 15.6);
       tl.to(earths, {
         n: 1000, duration: 2.1, ease: "power2.out",
         onUpdate: () => {
           const n = Math.round(earths.n);
           jNum.textContent = n >= 1000 ? "1,000" : String(n);
         },
-      }, 14.9);
-      tl.to("#j-num", { scale: 1.12, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 17.0);
-      tl.fromTo("#j-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 15.6);
+      }, 15.9);
+      tl.to("#j-num", { scale: 1.12, duration: 0.12, ease: "power2.out", yoyo: true, repeat: 1 }, 18.0);
+      tl.fromTo("#j-note", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 16.6);
 
       /* scene 5 */
-      tl.fromTo("#s5-l1", { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 19.62);
-      tl.fromTo("#s5-l2", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "back.out(1.2)" }, 19.75);
-      tl.fromTo("#s5-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 19.85);
-      tl.fromTo(["#s5-n1", "#s5-n2"], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 19.9);
-      tl.to("#s5-chip", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 20.6);
+      tl.fromTo("#s5-l1", { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 20.62);
+      tl.fromTo("#s5-l2", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "back.out(1.2)" }, 20.75);
+      tl.fromTo("#s5-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 20.85);
+      tl.fromTo(["#s5-n1", "#s5-n2"], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 20.9);
+      tl.to("#s5-chip", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 21.6);
 
       window.__timelines["fun-facts-space"] = tl;
       tl.seek(0);
@@ -355,29 +355,29 @@
       const BEAM_FROM = -1.3, BEAM_TO = 2.1 - 0.32;
 
       function renderAt(time) {
-        venus.visible = time < 8.5;
-        lightGroup.visible = time >= 8.5 && time < 14;
-        jupiterGroup.visible = time >= 14;
+        venus.visible = time < 9.5;
+        lightGroup.visible = time >= 9.5 && time < 15;
+        jupiterGroup.visible = time >= 15;
 
         if (venus.visible) {
           venus.scale.setScalar(intro(time, 3));
           venus.rotation.y = -(time - 3) * 0.12;
         } else if (lightGroup.visible) {
-          const s = intro(time, 8.5);
+          const s = intro(time, 9.5);
           lightGroup.scale.setScalar(s);
-          sun.rotation.y = (time - 8.5) * 0.15;
-          halo.scale.setScalar(1 + Math.sin((time - 8.5) * 3) * 0.03);
-          earth.rotation.y = (time - 8.5) * 0.6;
-          const p = Math.min(1, Math.max(0, (time - 9.4) / 3.5));
+          sun.rotation.y = (time - 9.5) * 0.15;
+          halo.scale.setScalar(1 + Math.sin((time - 9.5) * 3) * 0.03);
+          earth.rotation.y = (time - 9.5) * 0.6;
+          const p = Math.min(1, Math.max(0, (time - 10.4) / 3.5));
           const x = BEAM_FROM + (BEAM_TO - BEAM_FROM) * p;
-          beam.visible = photon.visible = time >= 9.4;
+          beam.visible = photon.visible = time >= 10.4;
           photon.position.x = x;
           beam.scale.y = Math.max(0.001, x - BEAM_FROM);
           beam.position.x = (BEAM_FROM + x) / 2;
         } else {
-          jupiterGroup.scale.setScalar(intro(time, 14));
-          jupiter.rotation.y = (time - 14) * 0.25;
-          smallEarth.rotation.y = (time - 14) * 0.6;
+          jupiterGroup.scale.setScalar(intro(time, 15));
+          jupiter.rotation.y = (time - 15) * 0.25;
+          smallEarth.rotation.y = (time - 15) * 0.6;
         }
         renderer.render(scene, camera);
       }
