@@ -182,10 +182,13 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 - The API cannot set a caption on a draft, so always give the user the description text (with the sources) to paste.
 - The draft upload had not yet been tested against TikTok when this note was written.
 
-## Host avatar (3D character)
+## Host character (use the user's exact art)
 
-The user wants their own stylised 3D character used in videos from now on, instead of the generic dummy.
-- Master copy: `characters/avatar.js`, built from Three.js primitives with no model files. It follows the user's character sheet `characters/reference-sheet.jpg`: black hair with a side part on his right, swept over and back; large friendly brown eyes; an oversized black tee with a worn light-grey "Shichi.AI" chest print (`opts.print` changes the text); khaki chinos; navy sneakers with grey soles. No lanyard, backpack or watch.
-- Usage: `createAvatar(THREE, { emissiveLift })` → `{ group, rig, pose, blend }`. About 1.0 units tall, feet at y = 0, facing +z. Poses: idle, peace, wave, fall, crouch, jump, point. Joints in `rig` can also be animated directly.
-- HyperFrames serves only files inside the project folder, so copy `characters/avatar.js` into each project and import `./avatar.js`. After editing the master, re-copy it into the projects.
-- Preview: `character-preview/`, a 9s turnaround.
+The user wants their own character, exactly as in their art, in videos from now on, not a generic dummy and not a re-drawn version.
+- **Use `characters/puppet/`**: a 2D cut-out puppet made from the front view of `characters/reference-sheet.jpg` (the user's Gemini character sheet: black side-part hair, black "Shichi.AI" tee, khaki chinos, navy sneakers). The art is used pixel for pixel; only the joints move.
+  - Files: part PNGs, `rig.js` (generated joints and boxes), `puppet.js` (API), `full.png` (whole cut-out), `cut_parts.py` (re-slices the parts from `full.png`; needs numpy and pillow).
+  - API: `createPuppet(container, { base, height })` → `{ el, rig, pose, blend, face, place }`. Poses: idle, wave, waveL, point, pointL, armsUp, cheer, star, fall, handOnChest, handOnChestL. `face({ blink, talk })` (0..1) for blinking and lip flaps. `place({ x, y, scale, squash, rotate, flip })`, where x, y is the point between the feet. Angles are degrees, positive = clockwise. Pose field `front: ["R"]` puts that arm in front of the shirt.
+  - Parts are DOM `<img>` layers, so HyperFrames waits for them to load. Copy the puppet folder into each project (HyperFrames serves only the project folder); skip `full.png` and `cut_parts.py`.
+  - Limits: it faces the camera only (no turning or side views), and the hands keep their open shape (no peace sign).
+- `characters/avatar.js` is an older, simplified Three.js 3D model of the character. The user rejected it as not exact; use it only if they ask for a true 3D scene.
+- Preview: `character-preview/`, a 10s puppet demo (pop-in, wave with "Hi!", point, jump, hand on chest, cheer).
