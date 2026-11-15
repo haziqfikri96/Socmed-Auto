@@ -164,3 +164,20 @@ git push -u origin claude/lucid-ritchie-xvwgs7
 - **No sources on screen.** Never put source or citation text in a video (no "Source: NASA", study names, survey dates). Sources go in the TikTok description, which is supplied alongside each video.
 - **No affiliate or product promos.** Videos are fun facts with accurate, verified information.
 - Verify every figure against a primary source before building, and keep a note of the sources for the description.
+
+## Current work (November 2026) — fact videos and TikTok drafts
+
+Work lives on branch `claude/showcase-video` until it is merged into `main`.
+
+**Video projects** (each is a HyperFrames project; render with `npx hyperframes@0.9.30 render --quality high --output ../videos/<name>.mp4` from inside the folder; rendered MP4s are gitignored):
+- `fun-facts-space/` — 23s, three space facts
+- `fun-facts-ocean/` — 60s, five ocean facts
+- `earth-hole/` — 37.5s, one-question 3D short with word-by-word captions
+
+**Audio**: narration and sound effects come from ElevenLabs (key stored as a network secret for `api.elevenlabs.io`; send header `xi-api-key: proxy-injected`). Tools: `tools/make_voiceover_elevenlabs.py`, `tools/make_voiceover_timed.py`, `tools/make_sfx_elevenlabs.py`; reusable effects are in `sfx/elevenlabs/`. Each project's `make_audio.py` builds its `assets/mix.wav` (run with `~/.cache/editor-v1/venv/bin/python`, or any Python with numpy and soundfile).
+
+**Posting to TikTok — drafts only**:
+- The user reviews every video first. Only after they approve, send it with `python tiktok_draft.py videos/<file>.mp4`. This puts a draft in their TikTok inbox; they add the caption and post it in the app. Never use direct posting.
+- Credentials come from environment variables `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET` (sandbox app "auto-poster") and `TIKTOK_REFRESH_TOKEN`. Never print them.
+- The API cannot set a caption on a draft, so always give the user the description text (with the sources) to paste.
+- The draft upload had not yet been tested against TikTok when this note was written.
