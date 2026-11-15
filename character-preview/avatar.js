@@ -1,5 +1,7 @@
 /*
  * Stylised 3D avatar of the channel host, built from Three.js primitives (no model files).
+ * Design follows the host's own character sheet: side-part black hair, black "TDMK" tee,
+ * checkered lanyard, khaki pants, dark slip-on shoes.
  *
  *   import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
  *   import { createAvatar } from "./avatar.js";
@@ -11,17 +13,14 @@
  * Character sides: L = the avatar's own left = +x.
  */
 
-const SKIN = 0xc08a64;
+const SKIN = 0xc78c68;
 const HAIR = 0x141110;
 const TEE = 0x1b1b1d;
-const STITCH = 0xf2f2f2;
-const PANTS = 0xcdbb98;
-const BAG = 0xd9ccb2;
-const SHOE = 0xf4f4f2;
-const SOLE = 0xb9b9b9;
-const LIPS = 0x7c4636;
+const PANTS = 0xc4b08e;
+const SHOE = 0x2a2420;
+const SOLE = 0xd9d0c2;
+const LIPS = 0x8e5444;
 const EYE = 0x1c120d;
-const PHONE = 0x6e9fe6;
 
 export const POSES = {
   idle: {},
@@ -90,9 +89,7 @@ export function createAvatar(THREE, opts = {}) {
   };
   const skin = mat(SKIN, { roughness: 0.55 });
   const tee = mat(TEE, { roughness: 0.85 });
-  const stitch = mat(STITCH, { roughness: 0.7 });
   const pants = mat(PANTS, { roughness: 0.9 });
-  const bag = mat(BAG, { roughness: 0.9 });
 
   const mesh = (geo, material, parent, pos = [0, 0, 0], rot = [0, 0, 0], scale = [1, 1, 1]) => {
     const m = new THREE.Mesh(geo, material);
@@ -123,41 +120,41 @@ export function createAvatar(THREE, opts = {}) {
   rig.spine = pivot(rig.hips, [0, 0, 0]);
   const teeProfile = [[0.001, -0.035], [0.133, -0.035], [0.136, 0.04], [0.138, 0.16], [0.136, 0.23], [0.118, 0.27], [0.08, 0.293], [0.04, 0.3], [0.001, 0.3]];
   mesh(new THREE.LatheGeometry(teeProfile.map(([r, y]) => new THREE.Vector2(r, y)), 48), tee, rig.spine, [0, 0, 0], [0, 0, 0], [1, 1, 0.66]);
-  // hem stitch + shoulder seams (white contrast stitching)
-  mesh(new THREE.TorusGeometry(0.133, 0.0028, 6, 64), stitch, rig.spine, [0, -0.025, 0], [Math.PI / 2, 0, 0], [1, 0.66, 1]);
-  for (const s of [1, -1]) {
-    mesh(tube([[s * 0.045, 0.297, 0], [s * 0.09, 0.285, 0.004], [s * 0.12, 0.262, 0.003], [s * 0.14, 0.235, 0]], 0.0028), stitch, rig.spine);
-    mesh(tube([[s * 0.133, 0.15, 0.06], [s * 0.137, 0.2, 0.045], [s * 0.14, 0.24, 0.02]], 0.0026), stitch, rig.spine);
-  }
   // collar rib
   mesh(new THREE.TorusGeometry(0.046, 0.009, 10, 40), mat(0x262628), rig.spine, [0, 0.293, 0.004], [Math.PI / 2, 0, 0], [1, 0.9, 1]);
 
-  /* ---------- backpack + straps ---------- */
-  mesh(capsule(0.1, 0.1), bag, rig.spine, [0, 0.14, -0.13], [0, 0, 0], [1.05, 1, 0.46]);
-  mesh(capsule(0.065, 0.04), mat(0xcdbfa4, { roughness: 0.9 }), rig.spine, [0, 0.09, -0.178], [0, 0, 0], [1.1, 1, 0.35]);
-  for (const s of [1, -1]) {
-    mesh(tube([[s * 0.075, 0.25, -0.1], [s * 0.088, 0.3, -0.03], [s * 0.09, 0.285, 0.06], [s * 0.093, 0.22, 0.098], [s * 0.105, 0.13, 0.1], [s * 0.12, 0.06, 0.07], [s * 0.127, 0.04, 0.0]], 0.0105), bag, rig.spine);
-  }
+  /* chest print */
+  const pc = document.createElement("canvas");
+  pc.width = 512; pc.height = 160;
+  const px = pc.getContext("2d");
+  px.fillStyle = "#cfcfcf";
+  px.font = "bold 132px 'DejaVu Serif', 'Liberation Serif', Georgia, serif";
+  px.textAlign = "center"; px.textBaseline = "middle";
+  px.fillText("TDMK", 256, 86, 500);
+  const printTex = new THREE.CanvasTexture(pc);
+  printTex.colorSpace = THREE.SRGBColorSpace;
+  mesh(new THREE.CylinderGeometry(0.1405, 0.1405, 0.062, 40, 1, true, -0.62, 1.24),
+    new THREE.MeshStandardMaterial({ map: printTex, transparent: true, alphaTest: 0.3, roughness: 0.9, emissive: new THREE.Color(0xcfcfcf).multiplyScalar(lift * 0.3), emissiveMap: printTex }),
+    rig.spine, [0, 0.2, 0], [0, 0, 0], [1, 1, 0.66]);
 
-  /* ---------- lanyard + phone ---------- */
-  const ropeCanvas = document.createElement("canvas");
-  ropeCanvas.width = 64; ropeCanvas.height = 32;
-  const rc = ropeCanvas.getContext("2d");
-  rc.fillStyle = "#f4f2ee"; rc.fillRect(0, 0, 64, 32);
-  rc.fillStyle = "#151515";
-  for (let i = -2; i < 6; i++) { rc.beginPath(); rc.moveTo(i * 16, 0); rc.lineTo(i * 16 + 8, 0); rc.lineTo(i * 16 + 24, 32); rc.lineTo(i * 16 + 16, 32); rc.fill(); }
-  const ropeTex = new THREE.CanvasTexture(ropeCanvas);
-  ropeTex.colorSpace = THREE.SRGBColorSpace;
-  ropeTex.wrapS = ropeTex.wrapT = THREE.RepeatWrapping;
-  ropeTex.repeat.set(60, 1);
-  const rope = new THREE.MeshStandardMaterial({ map: ropeTex, roughness: 0.9, emissive: new THREE.Color(0xffffff).multiplyScalar(lift * 0.3) });
-  mesh(tube([[0, 0.305, -0.06], [0.05, 0.3, -0.035], [0.062, 0.29, 0.03], [0.05, 0.24, 0.088], [0.025, 0.17, 0.104], [0, 0.15, 0.106],
-    [-0.025, 0.17, 0.104], [-0.05, 0.24, 0.088], [-0.062, 0.29, 0.03], [-0.05, 0.3, -0.035]], 0.0085, true), rope, rig.spine);
-  mesh(tube([[0, 0.15, 0.106], [0.03, 0.08, 0.106], [0.06, 0.0, 0.098], [0.075, -0.045, 0.094]], 0.0065), rope, rig.spine);
-  const phone = pivot(rig.spine, [0.078, -0.105, 0.098]);
-  mesh(new THREE.BoxGeometry(0.052, 0.104, 0.01), mat(PHONE, { metalness: 0.5, roughness: 0.35 }), phone, [0, 0, 0], [0.1, -0.15, 0.08]);
-  mesh(new THREE.BoxGeometry(0.044, 0.094, 0.002), mat(0x0b0d12, { roughness: 0.2 }), phone, [0, 0, 0.0055], [0.1, -0.15, 0.08]);
-  rig.phone = phone;
+  /* ---------- checkered lanyard ---------- */
+  const lc = document.createElement("canvas");
+  lc.width = 64; lc.height = 16;
+  const lx = lc.getContext("2d");
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 2; j++) {
+    lx.fillStyle = (i + j) % 2 ? "#141414" : "#f2f2f2";
+    lx.fillRect(i * 8, j * 8, 8, 8);
+  }
+  const lanTex = new THREE.CanvasTexture(lc);
+  lanTex.colorSpace = THREE.SRGBColorSpace;
+  lanTex.magFilter = THREE.NearestFilter;
+  lanTex.wrapS = lanTex.wrapT = THREE.RepeatWrapping;
+  lanTex.repeat.set(10, 2);
+  const lanyard = new THREE.MeshStandardMaterial({ map: lanTex, roughness: 0.85, emissive: new THREE.Color(0xffffff).multiplyScalar(lift * 0.25), emissiveMap: lanTex });
+  mesh(tube([[0, 0.305, -0.058], [0.048, 0.3, -0.034], [0.06, 0.29, 0.03], [0.042, 0.23, 0.094], [0.015, 0.14, 0.106], [0, 0.112, 0.106],
+    [-0.015, 0.14, 0.106], [-0.042, 0.23, 0.094], [-0.06, 0.29, 0.03], [-0.048, 0.3, -0.034]], 0.0062, true), lanyard, rig.spine);
+  mesh(new THREE.TorusGeometry(0.006, 0.0018, 6, 16), mat(0x2b2b2b, { metalness: 0.6, roughness: 0.3 }), rig.spine, [0, 0.103, 0.107]);
+  mesh(new THREE.BoxGeometry(0.011, 0.026, 0.006), mat(0x161616, { roughness: 0.4 }), rig.spine, [0, 0.083, 0.107]);
 
   /* ---------- neck + head ---------- */
   rig.neck = pivot(rig.spine, [0, 0.29, 0]);
@@ -168,26 +165,30 @@ export function createAvatar(THREE, opts = {}) {
   for (let i = 0; i <= 32; i++) {
     const a = (i / 32) * Math.PI; // 0 = chin, PI = crown
     const y = -Math.cos(a) * 0.122;
-    const taper = y < 0 ? 1 - 0.2 * Math.pow(-y / 0.122, 2.2) : 1; // narrower jaw and chin
+    const taper = y < 0 ? 1 - 0.16 * Math.pow(-y / 0.122, 2.2) : 1; // narrower jaw and chin
     headProfile.push(new THREE.Vector2(Math.max(0.001, Math.sin(a) * 0.112 * taper), y));
   }
   mesh(new THREE.LatheGeometry(headProfile, 48), skin, H, [0, 0, 0], [0, 0, 0], [0.92, 1, 0.98]);
   for (const s of [1, -1]) {
-    mesh(sphere(0.026), skin, H, [s * 0.103, -0.005, -0.01], [0, 0, s * 0.15], [0.45, 1.05, 0.75]); // ears
-    // eyes
-    mesh(sphere(0.0125), mat(EYE, { roughness: 0.25 }), H, [s * 0.038, 0.008, 0.096], [0, s * 0.3, 0], [1.2, 0.78, 0.6]);
-    mesh(sphere(0.0034), mat(0xffffff, { roughness: 0.1, emissive: new THREE.Color(0xffffff).multiplyScalar(0.4) }), H, [s * 0.038 + 0.004, 0.012, 0.104]);
-    // brows: thick, nearly straight
-    mesh(capsule(0.0062, 0.026), mat(HAIR, { roughness: 0.7 }), H, [s * 0.04, 0.036, 0.1], [0, s * 0.38, Math.PI / 2 + s * 0.08]);
+    mesh(sphere(0.03), skin, H, [s * 0.103, -0.006, -0.008], [0, 0, s * 0.18], [0.45, 1.05, 0.75]); // ears
+    // eyes: white, brown iris, pupil, catch-light, lash line
+    const ex = s * 0.039, ey = 0.006;
+    mesh(sphere(0.019), mat(0xfafafa, { roughness: 0.2 }), H, [ex, ey, 0.09], [0, s * 0.32, 0], [1, 1.08, 0.6]);
+    mesh(sphere(0.0118), mat(0x5a3420, { roughness: 0.2 }), H, [ex + s * 0.001, ey - 0.001, 0.1], [0, s * 0.32, 0], [1, 1, 0.45]);
+    mesh(sphere(0.0062), mat(0x0c0806, { roughness: 0.15 }), H, [ex + s * 0.0015, ey - 0.001, 0.1045], [0, s * 0.32, 0], [1, 1, 0.45]);
+    mesh(sphere(0.0033), mat(0xffffff, { roughness: 0.1, emissive: new THREE.Color(0xffffff).multiplyScalar(0.5) }), H, [ex + 0.004, ey + 0.005, 0.107]);
+    mesh(new THREE.TorusGeometry(0.0185, 0.0022, 6, 24, Math.PI * 0.85), mat(0x1a120e), H, [ex, ey + 0.001, 0.094], [0.05, s * 0.32, Math.PI * 0.075], [1, 1.1, 0.6]);
+    // brows: thick, gently arched
+    mesh(new THREE.TorusGeometry(0.05, 0.0047, 8, 24, 0.55), mat(HAIR, { roughness: 0.7 }), H, [s * 0.04, -0.008, 0.098], [0, s * 0.32, Math.PI / 2 - 0.275 - s * 0.06], [1, 1, 0.8]);
     // nostril wings
-    mesh(sphere(0.0072), skin, H, [s * 0.012, -0.031, 0.097]);
+    mesh(sphere(0.0062), skin, H, [s * 0.011, -0.031, 0.096]);
   }
-  mesh(sphere(0.0145), skin, H, [0, -0.024, 0.104], [0.2, 0, 0], [1, 1.15, 1]); // nose
+  mesh(sphere(0.013), skin, H, [0, -0.024, 0.103], [0.2, 0, 0], [1, 1.15, 1]); // nose
   // closed-mouth smile
-  const arc = 0.5 * Math.PI;
-  mesh(new THREE.TorusGeometry(0.019, 0.0031, 8, 24, arc), mat(LIPS), H, [0, -0.047, 0.094], [-0.25, 0, -Math.PI / 2 - arc / 2]);
+  const arc = 0.55 * Math.PI;
+  mesh(new THREE.TorusGeometry(0.022, 0.003, 8, 24, arc), mat(LIPS), H, [0, -0.049, 0.093], [-0.25, 0, -Math.PI / 2 - arc / 2]);
 
-  /* hair: slick, swept back, glossy */
+  /* hair: side part on the character's right, fringe swept up and over to the left */
   const hair = mat(HAIR, { roughness: 0.55 });
   // hairline mask: high on the forehead, just above the ears at the sides, down to the nape at the back
   const hc = document.createElement("canvas");
@@ -208,7 +209,8 @@ export function createAvatar(THREE, opts = {}) {
     color: hair.color, roughness: 0.55, emissive: hair.emissive, alphaMap: hairMask, alphaTest: 0.5, side: THREE.DoubleSide,
   });
   mesh(new THREE.SphereGeometry(0.119, 64, 40), hairShell, H, [0, 0.005, -0.004], [0, 0, 0], [0.97, 1.06, 1.04]);
-  mesh(sphere(0.07), hair, H, [-0.006, 0.088, 0.0], [-0.35, 0.06, 0.04], [1.4, 0.5, 1.45]); // swept-back volume
+  mesh(sphere(0.08), hair, H, [0.012, 0.074, -0.006], [-0.1, 0, 0.12], [1.32, 0.62, 1.38]); // top volume, heavier on the left
+  mesh(sphere(0.075), hair, H, [0.014, 0.078, 0.022], [0.22, 0, 0.16], [1.22, 0.44, 1.05]); // fringe swept up and across
 
   /* ---------- arms ---------- */
   const hands = {};
@@ -216,14 +218,10 @@ export function createAvatar(THREE, opts = {}) {
     const s = side === "L" ? 1 : -1;
     const sh = (rig["shoulder" + side] = pivot(rig.spine, [s * 0.14, 0.245, 0]));
     mesh(capsule(0.032, 0.11), skin, sh, [0, -0.075, 0]);
-    mesh(new THREE.CylinderGeometry(0.05, 0.054, 0.1, 28), tee, sh, [0, -0.033, 0]);
-    mesh(new THREE.TorusGeometry(0.054, 0.0026, 6, 40), stitch, sh, [0, -0.08, 0], [Math.PI / 2, 0, 0]);
+    mesh(new THREE.CylinderGeometry(0.045, 0.052, 0.115, 28), tee, sh, [0, -0.04, 0]);
+    mesh(sphere(0.044), tee, sh, [-Math.sign(sh.position.x) * 0.006, 0.006, 0], [0, 0, 0], [1, 0.45, 1]); // rounded shoulder
     const el = (rig["elbow" + side] = pivot(sh, [0, -0.135, 0]));
     mesh(capsule(0.029, 0.095), skin, el, [0, -0.06, 0]);
-    if (side === "R") { // black sport watch
-      mesh(new THREE.CylinderGeometry(0.0315, 0.0315, 0.022, 28), mat(0x111111, { roughness: 0.4 }), el, [0, -0.1, 0]);
-      mesh(new THREE.BoxGeometry(0.03, 0.026, 0.012), mat(0x1e1e1e, { roughness: 0.2, metalness: 0.4 }), el, [0, -0.1, 0.029]);
-    }
     const wr = (rig["wrist" + side] = pivot(el, [0, -0.122, 0]));
     mesh(sphere(0.03), skin, wr, [0, -0.028, 0], [0, 0, 0], [1, 1.12, 0.55]);
     const fingers = [];
@@ -246,9 +244,10 @@ export function createAvatar(THREE, opts = {}) {
     mesh(capsule(0.054, 0.14), pants, hp, [0, -0.095, 0]);
     const kn = (rig["knee" + side] = pivot(hp, [0, -0.19, 0]));
     mesh(capsule(0.047, 0.12), pants, kn, [0, -0.085, 0]);
+    mesh(new THREE.CylinderGeometry(0.05, 0.051, 0.022, 24), pants, kn, [0, -0.152, 0]);
     const an = (rig["ankle" + side] = pivot(kn, [0, -0.17, 0]));
-    mesh(capsule(0.038, 0.07), mat(SHOE, { roughness: 0.6 }), an, [0, -0.012, 0.022], [Math.PI / 2, 0, 0], [1, 1, 0.75]);
-    mesh(capsule(0.04, 0.072), mat(SOLE, { roughness: 0.8 }), an, [0, -0.032, 0.022], [Math.PI / 2, 0, 0], [1.02, 1.02, 0.28]);
+    mesh(capsule(0.037, 0.085), mat(SHOE, { roughness: 0.7 }), an, [0, -0.014, 0.025], [Math.PI / 2, 0, 0], [1, 1, 0.68]);
+    mesh(capsule(0.039, 0.087), mat(SOLE, { roughness: 0.8 }), an, [0, -0.033, 0.025], [Math.PI / 2, 0, 0], [1.03, 1.03, 0.24]);
   }
 
   /* ---------- posing ---------- */
