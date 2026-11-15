@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="captions.js"></script>
+    <style>
+      :root {
+        --bg: #070B14;
+        --ink: #FFFFFF;
+        --hot: #FACC15;
+        --muted: #B6C2D6;
+        --card: rgba(10, 16, 30, 0.82);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Montserrat', Arial, sans-serif;
+        color: var(--ink);
+      }
+      #bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, #101A30, #070B14 70%); }
+      #stars { position: absolute; left: 0; top: 0; width: 2px; height: 2px; border-radius: 1px; background: transparent; }
+      #three-layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+      .abs { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+
+      #banner { top: 96px; font-size: 28px; font-weight: 900; letter-spacing: 0.14em; color: var(--muted); }
+      .card {
+        position: absolute; top: 160px; width: 470px; height: 170px; border-radius: 36px;
+        background: var(--card); border: 2px solid rgba(182, 194, 214, 0.25);
+      }
+      #speed-card { left: 50px; }
+      #time-card { left: 560px; }
+      .card .k { position: absolute; left: 0; top: 22px; width: 470px; text-align: center; font-size: 28px; font-weight: 900; letter-spacing: 0.14em; color: var(--muted); }
+      .card .v { position: absolute; left: 0; top: 62px; width: 470px; text-align: center; font-size: 60px; font-weight: 900; letter-spacing: -0.03em; line-height: 90px; white-space: nowrap; }
+
+      .stroke { -webkit-text-stroke: 14px #000; paint-order: stroke fill; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; }
+      #weightless { top: 470px; font-size: 104px; color: var(--hot); }
+      #caption { top: 1330px; font-size: 100px; line-height: 120px; }
+      #caption.hot { color: var(--hot); }
+
+      #hot-num { top: 220px; font-size: 120px; color: var(--hot); }
+      #hot-sub { top: 370px; font-size: 44px; font-weight: 900; -webkit-text-stroke: 9px #000; paint-order: stroke fill; }
+      #src2 { top: 1705px; font-size: 28px; font-weight: 700; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="earth-hole"
+      data-start="0"
+      data-duration="37.5"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg"></div>
+      <div id="stars"></div>
+
+      <canvas id="three-layer" class="clip" width="1080" height="1920" data-start="0" data-duration="37.5" data-track-index="0" data-layout-allow-overflow></canvas>
+
+      <div id="hud" class="clip" data-start="0" data-duration="37.5" data-track-index="1" data-layout-allow-overlap>
+        <div id="banner" class="abs">THOUGHT EXPERIMENT · NO AIR, NO HEAT</div>
+        <div id="speed-card" class="card"><div class="k">SPEED, APPROX.</div><div id="speed" class="v">0 km/h</div></div>
+        <div id="time-card" class="card"><div class="k">TIME FALLING</div><div id="time" class="v">0:00</div></div>
+        <div id="weightless" class="abs stroke">WEIGHTLESS</div>
+        <div id="hot-num" class="abs stroke">5,000–6,000 °C</div>
+        <div id="hot-sub" class="abs">About as hot as the Sun's surface</div>
+        <div id="src2" class="abs">Illustration, not to scale. Made with AI.</div>
+      </div>
+
+      <div id="caption" class="abs stroke clip" data-start="0" data-duration="37.5" data-track-index="2" data-layout-allow-overlap>WHAT WOULD</div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="37.5" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      const DUR = 37.5;
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const fmt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+      /* seeded star field */
+      (() => {
+        let seed = 42;
+        const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+        const shadows = [];
+        for (let i = 0; i < 170; i++) {
+          shadows.push(`${Math.round(rnd() * 1080)}px ${Math.round(rnd() * 1920)}px 0 ${rnd() < 0.2 ? 1 : 0}px rgba(255,255,255,${(0.25 + rnd() * 0.6).toFixed(2)})`);
+        }
+        document.getElementById("stars").style.boxShadow = shadows.join(",");
+      })();
+
+      /* where the falling figure is: u = 1 top surface, 0 centre, -1 far surface */
+      window.figureU = (t) => {
+        if (t < 3.3) return 1.08;
+        if (t < 3.7) { const p = (t - 3.3) / 0.4; return 1.08 + 0.08 * Math.sin(Math.PI * p) - 0.08 * p; }
+        if (t < 13.6) return Math.cos(((t - 3.7) / 9.9) * Math.PI / 2);
+        if (t < 19.8) return -0.05 * ((t - 13.6) / 6.2);
+        if (t < 25.0) return -0.05 - Math.sin(((t - 19.8) / 5.2) * Math.PI / 2);
+        if (t < 25.5) return -1.05 - 0.1 * Math.sin(Math.PI * (t - 25.0) / 0.5);
+        if (t < 28.9) return -1.05;
+        if (t < 33.5) return -1.05 * Math.cos(((t - 28.9) / 4.6) * Math.PI / 2);
+        return 0;
+      };
+
+      const speedEl = document.getElementById("speed");
+      const timeEl = document.getElementById("time");
+      const capEl = document.getElementById("caption");
+
+      function hud(t) {
+        const u = clamp(window.figureU(t), -1, 1);
+        const kmh = Math.round((28400 * Math.sqrt(1 - u * u)) / 100) * 100;
+        speedEl.textContent = fmt(kmh) + " km/h";
+        const secs = t < 3.7 ? 0 : Math.round((2291 * Math.acos(u)) / Math.PI);
+        timeEl.textContent = Math.floor(secs / 60) + ":" + String(secs % 60).padStart(2, "0");
+
+        let cue = null;
+        for (const c of window.CAPTIONS) if (t >= c.s && t < c.e) { cue = c; break; }
+        if (cue) {
+          capEl.textContent = cue.t;
+          capEl.style.fontSize = Math.min(100, Math.round(1320 / cue.t.length)) + "px";
+          capEl.className = "abs stroke clip" + (cue.hot ? " hot" : "");
+          const k = 1 + 0.22 * Math.max(0, 1 - (t - cue.s) / 0.12);
+          capEl.style.transform = `scale(${k.toFixed(3)})`;
+          capEl.style.opacity = 1;
+        } else {
+          capEl.style.opacity = 0;
+        }
+      }
+
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const clock = { t: 0 };
+      tl.to(clock, { t: DUR, duration: DUR, ease: "none", onUpdate: () => hud(clock.t) }, 0);
+
+      const show = (sel, at, dur = 0.3) => tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: dur, ease: "power2.out" }, at);
+      const hide = (sel, at) => tl.to(sel, { opacity: 0, duration: 0.25, ease: "power2.in" }, at);
+
+      show("#banner", 3.4);
+      show(["#speed-card", "#time-card"], 4.0);
+      hide("#speed-card", 25.6);
+      tl.to("#time", { scale: 1.15, color: "#FACC15", duration: 0.15, ease: "power2.out" }, 26.7);
+      hide(["#time-card", "#banner"], 30.4);
+
+      tl.fromTo("#weightless", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "power4.out" }, 18.5);
+      hide("#weightless", 19.8);
+
+      tl.fromTo("#hot-num", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.28, ease: "power4.out" }, 33.2);
+      show("#hot-sub", 33.6);
+      show("#src2", 34.2);
+
+      window.__timelines["earth-hole"] = tl;
+      tl.seek(0);
+      hud(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
+
+      const R = 2;
+      const canvas = document.getElementById("three-layer");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(1080, 1920, false);
+      renderer.setPixelRatio(1);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(40, 1080 / 1920, 0.1, 100);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+      const sun = new THREE.DirectionalLight(0xffffff, 2.6);
+      sun.position.set(-4, 5, 6);
+      scene.add(sun);
+
+      let seed = 23;
+      const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const tex = (c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
+
+      /* surface: ocean, land blobs, ice caps */
+      const surf = document.createElement("canvas");
+      surf.width = 2048; surf.height = 1024;
+      {
+        const g = surf.getContext("2d");
+        g.fillStyle = "#1D5FD0"; g.fillRect(0, 0, 2048, 1024);
+        g.fillStyle = "#2E9E4F";
+        for (let i = 0; i < 60; i++) {
+          g.globalAlpha = 0.9;
+          g.beginPath();
+          g.ellipse(rnd() * 2048, 160 + rnd() * 700, 40 + rnd() * 150, 25 + rnd() * 90, rnd() * 3, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.fillStyle = "#FFFFFF";
+        for (let i = 0; i < 50; i++) {
+          g.globalAlpha = 0.5;
+          g.beginPath();
+          g.ellipse(rnd() * 2048, 80 + rnd() * 860, 60 + rnd() * 120, 6 + rnd() * 12, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.globalAlpha = 1;
+        g.fillRect(0, 0, 2048, 60); g.fillRect(0, 964, 2048, 60);
+      }
+      const surfMat = new THREE.MeshStandardMaterial({ map: tex(surf), roughness: 0.8 });
+      const back = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 64, Math.PI, Math.PI), surfMat);
+      const front = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 64, 0, Math.PI), surfMat);
+      scene.add(back, front);
+
+      /* cut face with layers at true radius ratios: outer core 3,480 km, inner core 1,220 km of 6,371 km */
+      const cut = document.createElement("canvas");
+      cut.width = cut.height = 1024;
+      {
+        const g = cut.getContext("2d");
+        const ring = (r, inner, outer) => {
+          const grad = g.createRadialGradient(512, 512, 0, 512, 512, 512 * r);
+          grad.addColorStop(0, inner); grad.addColorStop(1, outer);
+          g.fillStyle = grad;
+          g.beginPath(); g.arc(512, 512, 512 * r, 0, Math.PI * 2); g.fill();
+          g.strokeStyle = "rgba(0,0,0,0.35)"; g.lineWidth = 3; g.stroke();
+        };
+        ring(1.0, "#6B4423", "#6B4423");
+        ring(0.985, "#F97316", "#B93A0E");
+        ring(0.546, "#FCD34D", "#F59E0B");
+        ring(0.191, "#FFFBEB", "#FDE68A");
+        for (let i = 0; i < 260; i++) {
+          const a = rnd() * Math.PI * 2, d = (0.56 + rnd() * 0.4) * 512;
+          g.fillStyle = rnd() < 0.5 ? "rgba(0,0,0,0.10)" : "rgba(255,220,160,0.12)";
+          g.beginPath();
+          g.ellipse(512 + Math.cos(a) * d, 512 + Math.sin(a) * d, 6 + rnd() * 26, 3 + rnd() * 9, a + Math.PI / 2, 0, Math.PI * 2);
+          g.fill();
+        }
+      }
+      const face = new THREE.Mesh(new THREE.CircleGeometry(R, 128), new THREE.MeshBasicMaterial({ map: tex(cut) }));
+      face.position.z = 0.002;
+      const tunnel = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 2 * R + 0.02), new THREE.MeshBasicMaterial({ color: 0x05070c }));
+      tunnel.position.z = 0.006;
+      const glow = new THREE.Mesh(
+        new THREE.CircleGeometry(R * 0.191, 64),
+        new THREE.MeshBasicMaterial({ color: 0xfff3b0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }),
+      );
+      glow.position.z = 0.01;
+      scene.add(face, tunnel, glow);
+
+      /* the jumper */
+      const suit = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.5, emissive: 0x7a2e05 });
+      const skin = new THREE.MeshStandardMaterial({ color: 0xf2c9a0, roughness: 0.6, emissive: 0x4a3420 });
+      const jumper = new THREE.Group();
+      const limb = (len, x, y) => {
+        const pivot = new THREE.Group();
+        const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.016, len, 6, 12), suit);
+        m.position.y = -len / 2 - 0.01;
+        pivot.add(m);
+        pivot.position.set(x, y, 0);
+        jumper.add(pivot);
+        return pivot;
+      };
+      const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.09, 8, 16), suit);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.038, 24, 16), skin);
+      head.position.y = 0.125;
+      jumper.add(torso, head);
+      const armL = limb(0.085, -0.05, 0.06), armR = limb(0.085, 0.05, 0.06);
+      const legL = limb(0.1, -0.022, -0.075), legR = limb(0.1, 0.022, -0.075);
+      jumper.position.z = 0.12;
+      scene.add(jumper);
+
+      /* gravity arrows at the centre */
+      const arrows = new THREE.Group();
+      const arrowMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc });
+      const arrowList = [];
+      for (let i = 0; i < 8; i++) {
+        const a = new THREE.Group();
+        const tip = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.12, 16), arrowMat);
+        tip.position.y = 0.11;
+        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.18, 12), arrowMat);
+        a.add(tip, shaft);
+        a.rotation.z = (i * Math.PI) / 4 + Math.PI / 2;
+        arrows.add(a);
+        arrowList.push(a);
+      }
+      arrows.position.z = 0.1;
+      scene.add(arrows);
+
+      const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+      /* camera keys: time, follow weight, distance, resting look-at height */
+      const KEYS = [
+        [0, 0, 13.5, -0.9], [3.4, 0, 13.5, -0.9], [5.2, 1, 6.5, -0.9], [13.0, 1, 6.5, -0.9],
+        [14.6, 1, 3.8, -0.9], [19.6, 1, 3.8, -0.9], [21.0, 1, 6.5, -0.9], [24.2, 1, 6.5, -0.9],
+        [26.2, 0, 13.5, -0.9], [32.4, 0, 13.5, -0.9], [34.4, 0, 5.4, -0.45], [37.5, 0, 4.9, -0.45],
+      ];
+      function cam(t) {
+        let i = 0;
+        while (i < KEYS.length - 2 && t >= KEYS[i + 1][0]) i++;
+        const a = KEYS[i], b = KEYS[i + 1];
+        const p = smooth((t - a[0]) / (b[0] - a[0]));
+        return [a[1] + (b[1] - a[1]) * p, a[2] + (b[2] - a[2]) * p, a[3] + (b[3] - a[3]) * p];
+      }
+
+      function renderAt(t) {
+        const y = window.figureU(t) * R;
+
+        /* slice the planet open */
+        const open = smooth((t - 1.2) / 1.0);
+        front.visible = open < 1;
+        front.position.set(open * 5.5, 0, open * 1.5);
+        front.rotation.y = open * 1.2;
+
+        /* jumper */
+        const appear = smooth((t - 2.3) / 0.3) * (1 - smooth((t - 32.8) / 0.5));
+        jumper.visible = appear > 0.001;
+        jumper.scale.setScalar(Math.max(0.001, appear) * 1.5);
+        jumper.position.y = y;
+        const falling = (t > 3.7 && t < 25.0) || (t > 28.9 && t < 33.5);
+        const slowmo = t >= 13.6 && t < 19.8;
+        const flail = falling ? Math.sin(t * (slowmo ? 2.5 : 14)) : 0;
+        jumper.rotation.z = (t >= 25.0 && t < 28.9 ? Math.PI : 0) + (falling ? Math.sin(t * (slowmo ? 0.8 : 3)) * 0.25 : 0);
+        const up = falling ? 2.5 : 0.25;
+        armL.rotation.z = -up - flail * 0.35; armR.rotation.z = up + flail * 0.35;
+        legL.rotation.z = falling ? -0.35 + flail * 0.3 : 0; legR.rotation.z = falling ? 0.35 - flail * 0.3 : 0;
+
+        /* gravity arrows */
+        const on = smooth((t - 15.4) / 0.4) * (1 - smooth((t - 19.5) / 0.3));
+        arrows.visible = on > 0.001;
+        arrows.position.y = y;
+        const pulse = 0.72 - 0.16 * ((t * 1.3) % 1);
+        arrowList.forEach((a, i) => {
+          const ang = (i * Math.PI) / 4;
+          a.position.set(Math.cos(ang) * pulse, Math.sin(ang) * pulse, 0);
+          a.scale.setScalar(Math.max(0.001, on));
+        });
+
+        /* hot core */
+        const heat = smooth((t - 33.0) / 1.0);
+        glow.material.opacity = heat * (0.4 + 0.12 * Math.sin(t * 5));
+        glow.scale.setScalar(1 + heat * (0.45 + 0.1 * Math.sin(t * 5)));
+
+        const [w, dist, rest] = cam(t);
+        const lookY = rest + (y - 0.35 - rest) * w;
+        camera.position.set(0, lookY, dist);
+        camera.lookAt(0, lookY, 0);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", (event) => renderAt(event.detail.time));
+      const root = window.__timelines["earth-hole"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #E8E8E8;
+        --ink: #0F0F0F;
+        --accent: #2563EB;
+        --muted: #6B7280;
+        --card: #FFFFFF;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        width: 1080px;
+        height: 1920px;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Montserrat', Arial, sans-serif;
+        color: var(--ink);
+      }
+      #bg { position: absolute; inset: 0; background: var(--bg); }
+      .scene { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+      .abs { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+      .display { font-weight: 900; text-transform: uppercase; letter-spacing: -0.04em; line-height: 1; }
+      .accent { color: var(--accent); }
+      .sub { font-size: 44px; font-weight: 700; color: var(--muted); letter-spacing: 0.02em; }
+
+      /* scene 1 — hook */
+      #s1-bar { position: absolute; left: 0; width: 1080px; top: 640px; height: 260px; background: var(--accent); }
+      #s1-word { top: 660px; font-size: 220px; color: #fff; }
+      #s1-l1 { top: 930px; font-size: 170px; }
+      #s1-l2 { top: 1110px; font-size: 118px; }
+      #s1-sub { top: 1290px; font-size: 44px; font-weight: 900; letter-spacing: 0.1em; }
+
+      /* scene 2 — chat */
+      #s2-head { top: 210px; font-size: 150px; }
+      #s2-sub { top: 380px; }
+      #s2-card {
+        position: absolute; left: 90px; top: 500px; width: 900px; height: 1010px;
+        background: var(--card); border-radius: 56px;
+        box-shadow: 0 40px 90px rgba(15, 15, 15, 0.14);
+      }
+      #s2-dot { position: absolute; left: 60px; top: 48px; width: 64px; height: 64px; border-radius: 32px; background: var(--ink); }
+      #s2-name { position: absolute; left: 148px; top: 44px; font-size: 40px; font-weight: 900; line-height: 40px; }
+      #s2-role { position: absolute; left: 148px; top: 90px; font-size: 28px; font-weight: 500; color: var(--muted); line-height: 30px; }
+      #s2-line { position: absolute; left: 0; top: 156px; width: 900px; height: 3px; background: #E5E7EB; }
+      #s2-user {
+        position: absolute; left: 244px; top: 210px; width: 600px; height: 200px;
+        border-radius: 44px 44px 12px 44px; background: var(--accent); color: #fff;
+        padding: 36px 44px; font-size: 42px; font-weight: 700; line-height: 64px;
+        transform-origin: bottom right;
+      }
+      #s2-reply {
+        position: absolute; left: 56px; top: 460px; width: 640px; height: 120px;
+        border-radius: 44px 44px 44px 12px; background: #F3F4F6;
+        padding: 0 40px; font-size: 34px; font-weight: 700; line-height: 120px; white-space: nowrap;
+        transform-origin: bottom left;
+      }
+      #s2-file {
+        position: absolute; left: 56px; top: 630px; width: 640px; height: 300px;
+        border-radius: 44px; background: #F3F4F6; transform-origin: bottom left;
+      }
+      #s2-thumb { position: absolute; left: 32px; top: 32px; width: 140px; height: 236px; border-radius: 24px; background: var(--ink); }
+      #s2-play {
+        position: absolute; left: 52px; top: 92px; width: 0; height: 0;
+        border-left: 44px solid #fff; border-top: 26px solid transparent; border-bottom: 26px solid transparent;
+      }
+      #s2-fname { position: absolute; left: 208px; top: 52px; font-size: 40px; font-weight: 900; line-height: 48px; }
+      #s2-fmeta { position: absolute; left: 208px; top: 112px; font-size: 30px; font-weight: 500; color: var(--muted); line-height: 36px; }
+      #s2-ready {
+        position: absolute; left: 208px; top: 184px; width: 220px; height: 68px; border-radius: 34px;
+        background: #DCFCE7; color: #15803D; font-size: 32px; font-weight: 700; line-height: 68px; text-align: center;
+      }
+
+      /* scene 3 — example product ad */
+      #s3-head { top: 210px; font-size: 150px; }
+      #s3-tag {
+        position: absolute; left: 190px; top: 380px; width: 700px; height: 76px; border-radius: 38px;
+        background: var(--ink); color: #fff;
+        font-size: 30px; font-weight: 700; letter-spacing: 0.06em; line-height: 76px; text-align: center;
+      }
+      #three-layer { position: absolute; left: 0; top: 440px; width: 1080px; height: 1080px; display: block; }
+      .chip {
+        position: absolute; top: 1500px; width: 290px; height: 96px; border-radius: 48px;
+        background: var(--card); box-shadow: 0 16px 40px rgba(15, 15, 15, 0.10);
+        font-size: 34px; font-weight: 900; line-height: 96px; text-align: center;
+      }
+      #c1 { left: 75px; } #c2 { left: 395px; } #c3 { left: 715px; }
+      #s3-cta {
+        position: absolute; left: 240px; top: 1640px; width: 600px; height: 104px; border-radius: 52px;
+        background: var(--accent); color: #fff;
+        font-size: 36px; font-weight: 900; letter-spacing: 0.06em; line-height: 104px; text-align: center;
+      }
+
+      /* scene 4 — rules */
+      #s4-head { top: 210px; font-size: 150px; }
+      #s4-sub { top: 380px; }
+      .pill {
+        position: absolute; left: 140px; width: 800px; height: 190px; border-radius: 48px;
+        background: var(--card); box-shadow: 0 24px 60px rgba(15, 15, 15, 0.10);
+      }
+      .pill .n { position: absolute; left: 48px; top: 61px; font-size: 56px; font-weight: 900; color: var(--muted); line-height: 68px; }
+      .pill .t { position: absolute; left: 160px; top: 59px; font-size: 58px; font-weight: 900; letter-spacing: -0.02em; line-height: 72px; }
+      .pill .c {
+        position: absolute; right: 44px; top: 51px; width: 88px; height: 88px; border-radius: 44px;
+        background: var(--accent); color: #fff; font-size: 52px; font-weight: 900; line-height: 88px; text-align: center;
+      }
+      #p1 { top: 520px; } #p2 { top: 750px; } #p3 { top: 980px; } #p4 { top: 1210px; }
+
+      /* scene 5 — CTA */
+      #s5-fill { position: absolute; inset: 0; background: var(--accent); }
+      #s5-l1 { top: 720px; font-size: 210px; color: #fff; }
+      #s5-l2 { top: 950px; font-size: 100px; color: #fff; }
+      #s5-chip {
+        position: absolute; left: 190px; top: 1160px; width: 700px; height: 120px; border-radius: 60px;
+        background: #fff; color: var(--accent);
+        font-size: 40px; font-weight: 900; letter-spacing: 0.08em; line-height: 120px; text-align: center;
+      }
+
+      #wipe { position: absolute; inset: 0; background: var(--ink); }
+      #progress { position: absolute; left: 0; bottom: 0; width: 1080px; height: 12px; background: var(--accent); transform-origin: left center; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="first-post"
+      data-start="0"
+      data-duration="19"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="bg"></div>
+
+      <div id="s1" class="scene clip" data-start="0" data-duration="3" data-track-index="1">
+        <div id="s1-bar"></div>
+        <div id="s1-word" class="abs display" data-layout-allow-overlap>ZERO</div>
+        <div id="s1-l1" class="abs display">EDITING.</div>
+        <div id="s1-l2" class="abs display">ZERO CAMERA.</div>
+        <div id="s1-sub" class="abs">MADE WITH CLAUDE AI</div>
+      </div>
+
+      <div id="s2" class="scene clip" data-start="3" data-duration="4" data-track-index="1">
+        <div id="s2-head" class="abs display"><span class="accent">JUST</span> TYPE</div>
+        <div id="s2-sub" class="abs sub">From a phone. No computer needed.</div>
+        <div id="s2-card">
+          <div id="s2-dot"></div>
+          <div id="s2-name">Claude</div>
+          <div id="s2-role">AI assistant</div>
+          <div id="s2-line"></div>
+          <div id="s2-user" data-layout-allow-overlap></div>
+          <div id="s2-reply">Writing, animating, rendering</div>
+          <div id="s2-file">
+            <div id="s2-thumb"><div id="s2-play"></div></div>
+            <div id="s2-fname">product_ad.mp4</div>
+            <div id="s2-fmeta">19s · 1080 × 1920</div>
+            <div id="s2-ready">✓ Ready</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="7" data-duration="5" data-track-index="1">
+        <div id="s3-head" class="abs display"><span class="accent">PROMOTE</span> IT</div>
+        <div id="s3-tag">EXAMPLE AD · NOT A REAL PRODUCT</div>
+        <canvas id="three-layer" width="1080" height="1080" data-layout-allow-overflow></canvas>
+        <div id="c1" class="chip">Cold 24h</div>
+        <div id="c2" class="chip">Leak-proof</div>
+        <div id="c3" class="chip">750 ml</div>
+        <div id="s3-cta">SHOP LINK IN BIO</div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="12" data-duration="4" data-track-index="1">
+        <div id="s4-head" class="abs display"><span class="accent">PLAY</span> FAIR</div>
+        <div id="s4-sub" class="abs sub">Selling on TikTok? Do this.</div>
+        <div id="p1" class="pill"><div class="n">01</div><div class="t">Label the ad</div><div class="c">✓</div></div>
+        <div id="p2" class="pill"><div class="n">02</div><div class="t">Mark AI-made</div><div class="c">✓</div></div>
+        <div id="p3" class="pill"><div class="n">03</div><div class="t">Honest claims</div><div class="c">✓</div></div>
+        <div id="p4" class="pill"><div class="n">04</div><div class="t">Real products</div><div class="c">✓</div></div>
+      </div>
+
+      <div id="s5" class="scene clip" data-start="16" data-duration="3" data-track-index="1">
+        <div id="s5-fill"></div>
+        <div id="s5-l1" class="abs display" data-layout-allow-overlap>FOLLOW</div>
+        <div id="s5-l2" class="abs display" data-layout-allow-overlap>TO LEARN HOW</div>
+        <div id="s5-chip" data-layout-allow-overlap>MADE WITH CLAUDE AI</div>
+      </div>
+
+      <div id="progress" class="clip" data-start="0" data-duration="19" data-track-index="2"></div>
+      <div id="wipe" class="clip" data-start="0" data-duration="19" data-track-index="3"></div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="19" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 19, ease: "none" }, 0);
+
+      tl.set("#wipe", { yPercent: 100 }, 0);
+      [3, 7, 12, 16].forEach((cut) => {
+        tl.fromTo("#wipe", { yPercent: 100 }, { yPercent: 0, duration: 0.2, ease: "power3.in" }, cut - 0.2);
+        tl.to("#wipe", { yPercent: -100, duration: 0.25, ease: "power3.out" }, cut);
+      });
+
+      /* scene 1 */
+      tl.fromTo("#s1-bar", { scaleY: 0.6 }, { scaleY: 1, duration: 0.2, ease: "power4.out" }, 0);
+      tl.fromTo("#s1-word", { scale: 0.7 }, { scale: 1, duration: 0.25, ease: "back.out(2)" }, 0);
+      tl.fromTo("#s1-l1", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.26);
+      tl.fromTo("#s1-l2", { y: 200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: "back.out(1.2)" }, 0.38);
+      tl.fromTo("#s1-sub", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 0.55);
+      tl.to("#s1-word", { scale: 1.06, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1 }, 1.0);
+      tl.to("#s1", { scale: 1.04, duration: 2.2, ease: "none" }, 0.6);
+
+      /* scene 2 */
+      const prompt = "Make a TikTok ad for my water bottle";
+      const typed = { n: 0 };
+      const user = document.getElementById("s2-user");
+      user.textContent = "";
+      tl.fromTo("#s2-head", { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, 3.2);
+      tl.fromTo("#s2-sub", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" }, 3.4);
+      tl.fromTo("#s2-card", { y: 160, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 3.25);
+      tl.fromTo("#s2-user", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.6)" }, 3.5);
+      tl.to(typed, {
+        n: prompt.length, duration: 1.2, ease: "none",
+        onUpdate: () => { user.textContent = prompt.slice(0, Math.round(typed.n)); },
+      }, 3.6);
+      tl.fromTo("#s2-reply", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.6)" }, 5.1);
+      tl.fromTo("#s2-file", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.6)" }, 5.8);
+      tl.fromTo("#s2-ready", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(2.5)" }, 6.15);
+
+      /* scene 3 */
+      tl.fromTo("#s3-head", { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, 7.2);
+      tl.fromTo("#s3-tag", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(1.6)" }, 7.4);
+      ["#c1", "#c2", "#c3"].forEach((id, i) => {
+        tl.fromTo(id, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.6)" }, 9.0 + i * 0.4);
+      });
+      tl.fromTo("#s3-cta", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 10.4);
+      tl.to("#s3-cta", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 10.8);
+
+      /* scene 4 */
+      tl.fromTo("#s4-head", { y: -120, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.2)" }, 12.2);
+      tl.fromTo("#s4-sub", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" }, 12.35);
+      ["#p1", "#p2", "#p3", "#p4"].forEach((id, i) => {
+        const at = 12.6 + i * 0.5;
+        tl.fromTo(id, { x: 500, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, at - 0.15);
+        tl.fromTo(id + " .c", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(2.5)" }, at + 0.12);
+      });
+
+      /* scene 5 */
+      tl.fromTo("#s5-l1", { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 16.12);
+      tl.fromTo("#s5-l2", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "back.out(1.2)" }, 16.3);
+      tl.fromTo("#s5-chip", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(1.4)" }, 16.45);
+      tl.to("#s5-chip", { scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 3 }, 17.3);
+
+      window.__timelines["first-post"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
+
+      const START = 7;
+      const canvas = document.getElementById("three-layer");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(1080, 1080, false);
+      renderer.setPixelRatio(1);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa3b5, 2.0));
+      const key = new THREE.DirectionalLight(0xffffff, 2.8);
+      key.position.set(3, 5, 4);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x93c5fd, 2.0);
+      rim.position.set(-4, 2, -3);
+      scene.add(rim);
+
+      const bottle = new THREE.Group();
+      const profile = [
+        [0.0, -1.5], [0.62, -1.5], [0.7, -1.42], [0.7, 0.55], [0.66, 0.75],
+        [0.42, 1.0], [0.34, 1.08], [0.34, 1.3], [0.0, 1.3],
+      ].map(([x, y]) => new THREE.Vector2(x, y));
+      const body = new THREE.Mesh(
+        new THREE.LatheGeometry(profile, 96),
+        new THREE.MeshPhysicalMaterial({ color: 0x2563eb, roughness: 0.28, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.2 }),
+      );
+      const cap = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.4, 0.4, 0.42, 64),
+        new THREE.MeshStandardMaterial({ color: 0x0f0f0f, roughness: 0.45 }),
+      );
+      cap.position.y = 1.5;
+      const loop = new THREE.Mesh(
+        new THREE.TorusGeometry(0.22, 0.05, 16, 48),
+        new THREE.MeshStandardMaterial({ color: 0x0f0f0f, roughness: 0.45 }),
+      );
+      loop.position.y = 1.86;
+      const band = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.712, 0.712, 0.5, 96, 1, true),
+        new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }),
+      );
+      band.position.y = -0.35;
+      bottle.add(body, cap, loop, band);
+      scene.add(bottle);
+
+      const shadow = new THREE.Mesh(
+        new THREE.CircleGeometry(1.25, 64),
+        new THREE.MeshBasicMaterial({ color: 0x0f0f0f, transparent: true, opacity: 0.12 }),
+      );
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.y = -1.9;
+      scene.add(shadow);
+
+      const easeOutBack = (x) => {
+        const c1 = 1.70158, c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      };
+
+      function renderAt(time) {
+        const t = Math.max(0, time - START);
+        const s = Math.max(0.001, easeOutBack(Math.min(1, t / 0.6)));
+        bottle.scale.setScalar(s);
+        bottle.rotation.set(0, t * 1.1, Math.sin(t * 0.9) * 0.12 + 0.12);
+        bottle.position.y = Math.sin(t * 1.4) * 0.08;
+        shadow.scale.setScalar(s * (1 - Math.sin(t * 1.4) * 0.04));
+        camera.position.set(Math.sin(t * 0.3) * 1.0, 0.9, 9.4 - Math.min(t, 5) * 0.2);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", (event) => renderAt(event.detail.time));
+      const root = window.__timelines["first-post"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+  </body>
+</html>
