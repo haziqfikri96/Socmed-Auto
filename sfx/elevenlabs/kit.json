@@ -42,5 +42,9 @@
   "sonar_ping": {
     "seconds": 1.5,
     "prompt": "Single clean submarine sonar ping with a soft echo tail"
+  },
+  "falling_wind": {
+    "seconds": 10.0,
+    "prompt": "Strong wind rushing past the ears while falling very fast through a tunnel, steady whooshing air, no music, no voices"
   }
 }

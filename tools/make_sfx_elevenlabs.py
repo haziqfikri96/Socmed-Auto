@@ -24,6 +24,7 @@ KIT = {
     "space_ambience": (22.0, "Calm deep space ambient drone, dark low hum with a subtle airy shimmer, no melody, no drums"),
     "ocean_ambience": (22.0, "Deep underwater ambience, muffled low ocean rumble with slow gentle swells and faint distant bubbles, no melody, no drums, no voices"),
     "sonar_ping": (1.5, "Single clean submarine sonar ping with a soft echo tail"),
+    "falling_wind": (10.0, "Strong wind rushing past the ears while falling very fast through a tunnel, steady whooshing air, no music, no voices"),
 }
 
 manifest = {}
