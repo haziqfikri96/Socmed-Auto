@@ -55,7 +55,6 @@
 
       #hot-num { top: 220px; font-size: 120px; color: var(--hot); }
       #hot-sub { top: 370px; font-size: 44px; font-weight: 900; -webkit-text-stroke: 9px #000; paint-order: stroke fill; }
-      #src1 { top: 1660px; font-size: 28px; font-weight: 700; color: var(--muted); }
       #src2 { top: 1705px; font-size: 28px; font-weight: 700; color: var(--muted); }
     </style>
   </head>
@@ -80,7 +79,6 @@
         <div id="weightless" class="abs stroke">WEIGHTLESS</div>
         <div id="hot-num" class="abs stroke">5,000–6,000 °C</div>
         <div id="hot-sub" class="abs">About as hot as the Sun's surface</div>
-        <div id="src1" class="abs">Sources: Klotz, Am. J. Phys. (2015) · Science (2013)</div>
         <div id="src2" class="abs">Illustration, not to scale. Made with AI.</div>
       </div>
 
@@ -162,7 +160,7 @@
 
       tl.fromTo("#hot-num", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.28, ease: "power4.out" }, 33.2);
       show("#hot-sub", 33.6);
-      show(["#src1", "#src2"], 34.2);
+      show("#src2", 34.2);
 
       window.__timelines["earth-hole"] = tl;
       tl.seek(0);

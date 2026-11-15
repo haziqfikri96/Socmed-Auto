@@ -158,3 +158,9 @@ git push -u origin claude/lucid-ritchie-xvwgs7
    - FFmpeg-concatenated before main body → ~21s total video
 
 3. **editor-v1 skill** — installed from Google Drive, all deps set up, preview rendered successfully
+
+## Video content rules (set by the user)
+
+- **No sources on screen.** Never put source or citation text in a video (no "Source: NASA", study names, survey dates). Sources go in the TikTok description, which is supplied alongside each video.
+- **No affiliate or product promos.** Videos are fun facts with accurate, verified information.
+- Verify every figure against a primary source before building, and keep a note of the sources for the description.
