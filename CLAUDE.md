@@ -185,7 +185,7 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 ## Host avatar (3D character)
 
 The user wants their own stylised 3D character used in videos from now on, instead of the generic dummy.
-- Master copy: `characters/avatar.js`, built from Three.js primitives with no model files. It follows the user's own Gemini character sheet: black hair with a side part on his right and the fringe swept up and across, large friendly brown eyes, black tee with a grey "TDMK" chest print, black-and-white checkered lanyard with a black clip, khaki pants with turned-up hems, and dark slip-on shoes with light soles. No backpack and no watch.
+- Master copy: `characters/avatar.js`, built from Three.js primitives with no model files. It follows the user's character sheet `characters/reference-sheet.jpg`: black hair with a side part on his right, swept over and back; large friendly brown eyes; an oversized black tee with a worn light-grey "Shichi.AI" chest print (`opts.print` changes the text); khaki chinos; navy sneakers with grey soles. No lanyard, backpack or watch.
 - Usage: `createAvatar(THREE, { emissiveLift })` → `{ group, rig, pose, blend }`. About 1.0 units tall, feet at y = 0, facing +z. Poses: idle, peace, wave, fall, crouch, jump, point. Joints in `rig` can also be animated directly.
 - HyperFrames serves only files inside the project folder, so copy `characters/avatar.js` into each project and import `./avatar.js`. After editing the master, re-copy it into the projects.
 - Preview: `character-preview/`, a 9s turnaround.
