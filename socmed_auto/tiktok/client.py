@@ -27,7 +27,7 @@ def get_user_info(access_token: str) -> dict:
     resp = requests.get(
         USER_URL,
         headers=_headers(access_token),
-        params={"fields": "open_id,union_id,avatar_url,display_name,follower_count"},
+        params={"fields": "open_id,union_id,avatar_url,display_name"},  # user.info.basic only
     )
     resp.raise_for_status()
     return resp.json().get("data", {}).get("user", {})
