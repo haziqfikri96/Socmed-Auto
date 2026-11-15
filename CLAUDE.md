@@ -181,3 +181,11 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 - Credentials come from environment variables `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET` (sandbox app "auto-poster") and `TIKTOK_REFRESH_TOKEN`. Never print them.
 - The API cannot set a caption on a draft, so always give the user the description text (with the sources) to paste.
 - The draft upload had not yet been tested against TikTok when this note was written.
+
+## Host avatar (3D character)
+
+The user wants their own stylised 3D character used in videos from now on, instead of the generic dummy.
+- Master copy: `characters/avatar.js`, built from Three.js primitives with no model files. Based on the user's photo: slick black hair, black tee with white contrast stitching, beige backpack, khaki pants, black/white rope lanyard with a blue phone, black watch on the right wrist.
+- Usage: `createAvatar(THREE, { emissiveLift })` → `{ group, rig, pose, blend }`. About 1.0 units tall, feet at y = 0, facing +z. Poses: idle, peace, wave, fall, crouch, jump, point. Joints in `rig` can also be animated directly.
+- HyperFrames serves only files inside the project folder, so copy `characters/avatar.js` into each project and import `./avatar.js`. After editing the master, re-copy it into the projects.
+- Preview: `character-preview/`, a 9s turnaround.
