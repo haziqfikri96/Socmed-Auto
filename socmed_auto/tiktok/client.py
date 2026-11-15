@@ -8,8 +8,10 @@ from pathlib import Path
 import requests
 
 CHUNK_SIZE = 10 * 1024 * 1024  # 10 MB per chunk
+SINGLE_CHUNK_MAX = 64 * 1024 * 1024  # files up to this size go up in one piece
 
 INIT_URL = "https://open.tiktokapis.com/v2/post/publish/video/init/"
+INBOX_INIT_URL = "https://open.tiktokapis.com/v2/post/publish/inbox/video/init/"
 STATUS_URL = "https://open.tiktokapis.com/v2/post/publish/status/fetch/"
 USER_URL = "https://open.tiktokapis.com/v2/user/info/"
 
@@ -106,3 +108,66 @@ def upload_video(
             raise RuntimeError(f"TikTok publish failed: {status}")
 
     raise TimeoutError("TikTok publish timed out after 60s")
+
+
+def _chunk_plan(file_size: int) -> tuple[int, int]:
+    """(chunk_size, total_chunks). TikTok wants whole chunks only; the last one absorbs the remainder."""
+    if file_size <= SINGLE_CHUNK_MAX:
+        return file_size, 1
+    return CHUNK_SIZE, file_size // CHUNK_SIZE
+
+
+def _send_file(upload_url: str, path: Path, chunk_size: int, total_chunks: int) -> None:
+    file_size = path.stat().st_size
+    with open(path, "rb") as f:
+        for idx in range(total_chunks):
+            last = idx == total_chunks - 1
+            chunk = f.read() if last else f.read(chunk_size)
+            start = idx * chunk_size
+            resp = requests.put(
+                upload_url,
+                headers={
+                    "Content-Range": f"bytes {start}-{start + len(chunk) - 1}/{file_size}",
+                    "Content-Length": str(len(chunk)),
+                    "Content-Type": "video/mp4",
+                },
+                data=chunk,
+                timeout=600,
+            )
+            resp.raise_for_status()
+
+
+def upload_draft(access_token: str, video_path: str) -> str:
+    """Send a video to the creator's TikTok inbox as a draft. They add the caption and post it in the app."""
+    path = Path(video_path)
+    file_size = path.stat().st_size
+    chunk_size, total_chunks = _chunk_plan(file_size)
+
+    init = requests.post(
+        INBOX_INIT_URL,
+        headers=_headers(access_token),
+        json={"source_info": {
+            "source": "FILE_UPLOAD",
+            "video_size": file_size,
+            "chunk_size": chunk_size,
+            "total_chunk_count": total_chunks,
+        }},
+        timeout=60,
+    )
+    body = init.json()
+    if body.get("error", {}).get("code") not in (None, "ok"):
+        raise RuntimeError(f"TikTok refused the upload: {body['error'].get('code')}: {body['error'].get('message')}")
+    data = body["data"]
+    _send_file(data["upload_url"], path, chunk_size, total_chunks)
+
+    publish_id = data["publish_id"]
+    for _ in range(40):
+        time.sleep(3)
+        status = requests.post(
+            STATUS_URL, headers=_headers(access_token), json={"publish_id": publish_id}, timeout=60
+        ).json().get("data", {})
+        if status.get("status") in ("SEND_TO_USER_INBOX", "PUBLISH_COMPLETE"):
+            return publish_id
+        if status.get("status") == "FAILED":
+            raise RuntimeError(f"TikTok draft upload failed: {status.get('fail_reason')}")
+    raise TimeoutError("TikTok did not confirm the draft within 2 minutes")
