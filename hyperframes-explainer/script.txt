@@ -1,0 +1,9 @@
+This whole video was made with code. No editing app. It's called HyperFrames.
+HyperFrames turns a web page into a video. You write HTML, and it renders every frame into an MP4.
+So anything a web page can do, your video can do.
+Kinetic text. Smooth animation. Real 3D. Charts that count up. Captions synced to your voice. Transitions, sound effects, even a whole website, turned into a video.
+And the best part? You don't write the code. Claude does.
+To install it in Claude Code, run these two commands.
+Then just ask: make me a video about anything.
+It's free and open source, made by HeyGen.
+Want a full tutorial? Comment HYPERFRAMES!

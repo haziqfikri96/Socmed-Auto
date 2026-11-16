@@ -1,0 +1,9 @@
+This whole video was made with code 🤯 HyperFrames turns HTML into video, and Claude writes the code for you. Free and open source.
+
+Install in Claude Code:
+claude plugin marketplace add heygen-com/hyperframes
+claude plugin install hyperframes@hyperframes
+
+Source: github.com/heygen-com/hyperframes (official README, Apache 2.0, by HeyGen)
+
+#ai #claude #videoediting #coding #learnontiktok

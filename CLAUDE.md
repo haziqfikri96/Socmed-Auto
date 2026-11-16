@@ -190,11 +190,6 @@ The user wants their own character, exactly as in their art, in videos from now 
   - API: `createPuppet(container, { base, height })` → `{ el, rig, pose, blend, face, place }`. Poses: idle, wave, waveL, point, pointL, armsUp, cheer, star, fall, handOnChest, handOnChestL. `face({ blink, talk })` (0..1) for blinking and lip flaps. `place({ x, y, scale, squash, rotate, flip })`, where x, y is the point between the feet. Angles are degrees, positive = clockwise. Pose field `front: ["R"]` puts that arm in front of the shirt.
   - Parts are DOM `<img>` layers, so HyperFrames waits for them to load. Copy the puppet folder into each project (HyperFrames serves only the project folder); skip `full.png` and `cut_parts.py`.
   - Limits: it faces the camera only (no turning or side views), and the hands keep their open shape (no peace sign).
-- **3D host from a GLB** (`characters/glb/`): `character.glb` is the user's Meshy export, and `character.js` loads it (`loadCharacter(THREE, GLTFLoader, url, opts)`).
-  - Timeline renders: `setSchedule([[t, "Idle" | "Talking" | "Pointing" | "Cheer"], ...])` + `evaluate(t)`. These are deterministic, with 0.4 s cross-fades worked out from t, so HyperFrames can seek any frame.
-  - Live pages: `play(state)` + `update(clock.getDelta())` from requestAnimationFrame. `preview.html` is the live preview (keys 1–4).
-  - Set `window.THREE = THREE` before loading; HyperFrames' Three.js adapter then waits for `THREE.DefaultLoadingManager` before capturing.
-  - The current GLB (Nov 2026) has **no skeleton, no animation clips and no textures**. `character.js` falls back to procedural rigid-body motion and paints placeholder colours (`SHICHI_PAINT`). A re-export with textures and a rig plus clips will be picked up automatically: clips are matched to states by name, or set `opts.clipMap`.
-  - Used in `auto-gearbox/` as a separate presenter pass (own scene, matching lights, shadow-catcher floor) layered over the machines and under the HUD.
+- **No 3D GLB character.** The user tried a Meshy 3D model (Nov 2026) and rejected it as ugly; it was removed. Use the 2D puppet.
 - `characters/avatar.js` is an older, simplified Three.js 3D model of the character. The user rejected it as not exact; use it only if they ask for a true 3D scene.
 - Preview: `character-preview/`, a 10s puppet demo (pop-in, wave with "Hi!", point, jump, hand on chest, cheer).
