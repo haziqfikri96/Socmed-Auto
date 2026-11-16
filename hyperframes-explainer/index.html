@@ -22,18 +22,17 @@
       #bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #F7F7F8 0%, #E8E8E8 55%, #DADCE0 100%); }
       .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
-      #chip { position: absolute; top: 96px; left: 50%; transform: translateX(-50%); padding: 14px 34px; border-radius: 999px; background: var(--ink); color: #fff;
+      #chip { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); padding: 14px 34px; border-radius: 999px; background: var(--ink); color: #fff;
         font-size: 32px; font-weight: 900; letter-spacing: 0.12em; white-space: nowrap; }
       #chip b { color: #93C5FD; }
 
-      #card { position: absolute; left: 60px; top: 200px; width: 960px; height: 900px; border-radius: 48px; background: #fff; overflow: hidden;
+      #card { position: absolute; left: 60px; top: 330px; width: 960px; height: 900px; transform: scale(1.04); transform-origin: 50% 0; border-radius: 48px; background: #fff; overflow: hidden;
         box-shadow: 0 30px 80px rgba(15, 23, 42, 0.16), 0 4px 14px rgba(15, 23, 42, 0.08); }
       .scene { position: absolute; inset: 0; opacity: 0; }
       .center { position: absolute; left: 0; width: 960px; text-align: center; }
 
-      #caption { position: absolute; top: 1140px; left: 0; width: 1080px; text-align: center; font-size: 84px; line-height: 100px; font-weight: 900; color: var(--ink); white-space: nowrap; letter-spacing: -0.02em; }
+      #caption { position: absolute; top: 1320px; left: 0; width: 1080px; text-align: center; font-size: 84px; line-height: 100px; font-weight: 900; color: var(--ink); white-space: nowrap; letter-spacing: -0.02em; }
       #caption.hot { color: var(--blue); }
-      #stage { position: absolute; inset: 0; }
 
       /* scene: hook */
       #rain { position: absolute; left: 70px; top: 0; width: 820px; font-size: 30px; line-height: 50px; color: #475569; white-space: pre; }
@@ -233,7 +232,6 @@
         </div>
       </div>
 
-      <div id="stage" class="clip" data-start="0" data-duration="45.6" data-track-index="1" data-layout-allow-overflow></div>
       <div id="caption" class="clip" data-start="0" data-duration="45.6" data-track-index="2" data-layout-allow-overlap>THIS WHOLE</div>
       <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="45.6" data-track-index="10" data-volume="1"></audio>
     </div>
@@ -249,7 +247,6 @@
     <script type="module">
       import * as THREE from "three";
       import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-      import { createPuppet } from "./puppet/puppet.js";
 
       const DUR = 45.6;
       const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -324,26 +321,6 @@
       const ball = new THREE.Mesh(new THREE.SphereGeometry(0.45, 48, 32), new THREE.MeshStandardMaterial({ color: 0x16a34a, metalness: 0.2, roughness: 0.25 }));
       s3.add(knot, cube, ball);
       const cam3 = new THREE.PerspectiveCamera(35, 960 / 900, 0.1, 50); cam3.position.set(0, 0.4, 7); cam3.lookAt(0, 0, 0);
-
-      /* ---------- host ---------- */
-      const host = createPuppet($("stage"), { base: "./puppet/", height: 660 });
-      const POSES = [[0, "waveL"], [2.4, "idle"], [5.0, "cheer"], [6.3, "idle"], [9.2, "pointL"], [13.6, "idle"], [14.0, "armsUp"], [15.4, "idle"],
-        [17.4, "pointL"], [26.9, "idle"], [28.6, "handOnChest"], [30.7, "pointL"], [36.4, "idle"], [38.2, "cheer"], [40.0, "idle"], [41.0, "waveL"], [43.0, "pointL"]];
-      const BLINKS = [1.4, 7.6, 12.9, 19.3, 24.4, 30.0, 35.6, 40.3, 44.6];
-
-      function hostAt(t) {
-        let i = 0;
-        while (i < POSES.length - 1 && t >= POSES[i + 1][0]) i++;
-        const p = host.blend(POSES[Math.max(0, i - 1)][1], POSES[i][1], i === 0 ? 1 : seg(t, POSES[i][0], POSES[i][0] + 0.3));
-        p.head = (p.head || 0) + 1.6 * Math.sin(t * 1.9);
-        if (POSES[i][1] === "waveL") p.elbowL += 20 * Math.sin(t * 9);
-        host.pose(p);
-        let talk = 0;
-        for (const w of window.WORDS) if (t >= w.s && t < w.e) { talk = 0.25 + 0.55 * Math.abs(Math.sin((t - w.s) * 17)); break; }
-        host.face({ blink: BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b) / 0.09), 0), talk });
-        const enter = t < 0.5 ? smooth(t / 0.4) * 1.08 - 0.08 * seg(t, 0.35, 0.5) : 1;
-        host.place({ x: 200, y: 1895, scale: Math.max(0.001, enter), squash: 1 + 0.006 * Math.sin(t * 2.4) });
-      }
 
       /* ---------- captions ---------- */
       const capEl = $("caption");
@@ -481,7 +458,6 @@
         $("ctaB").style.opacity = t >= 42.85 ? 1 : 0.15;
 
         captionAt(t);
-        hostAt(t);
       }
 
       window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
