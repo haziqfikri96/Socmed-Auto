@@ -46,5 +46,21 @@
   "falling_wind": {
     "seconds": 10.0,
     "prompt": "Strong wind rushing past the ears while falling very fast through a tunnel, steady whooshing air, no music, no voices"
+  },
+  "gear_clunk": {
+    "seconds": 1.0,
+    "prompt": "Single heavy mechanical gear engaging clunk, metal gears locking into place, tight and close, no reverb"
+  },
+  "hydraulic_hiss": {
+    "seconds": 1.2,
+    "prompt": "Short hydraulic pressure hiss and soft piston push, clean mechanical, no music"
+  },
+  "machine_whir": {
+    "seconds": 6.0,
+    "prompt": "Smooth steady spinning machine whir, gears and fluid turning inside a metal housing, even tone, no music, no voices"
+  },
+  "lock_click": {
+    "seconds": 0.6,
+    "prompt": "Crisp metallic latch lock click, short and solid"
   }
 }

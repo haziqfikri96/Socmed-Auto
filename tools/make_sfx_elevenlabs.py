@@ -25,6 +25,10 @@ KIT = {
     "ocean_ambience": (22.0, "Deep underwater ambience, muffled low ocean rumble with slow gentle swells and faint distant bubbles, no melody, no drums, no voices"),
     "sonar_ping": (1.5, "Single clean submarine sonar ping with a soft echo tail"),
     "falling_wind": (10.0, "Strong wind rushing past the ears while falling very fast through a tunnel, steady whooshing air, no music, no voices"),
+    "gear_clunk": (1.0, "Single heavy mechanical gear engaging clunk, metal gears locking into place, tight and close, no reverb"),
+    "hydraulic_hiss": (1.2, "Short hydraulic pressure hiss and soft piston push, clean mechanical, no music"),
+    "machine_whir": (6.0, "Smooth steady spinning machine whir, gears and fluid turning inside a metal housing, even tone, no music, no voices"),
+    "lock_click": (0.6, "Crisp metallic latch lock click, short and solid"),
 }
 
 manifest = {}
