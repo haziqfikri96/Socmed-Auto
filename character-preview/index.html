@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #E8E8E8; }
+      #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; }
+      #bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, #F8F8F8, #D9DCE2 78%); }
+      #stage { position: absolute; inset: 0; }
+      #shadow { position: absolute; left: 540px; top: 1660px; width: 420px; height: 60px; margin-left: -210px; margin-top: -30px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,0.28), rgba(0,0,0,0) 70%); }
+      .label { position: absolute; left: 0; width: 1080px; top: 170px; text-align: center; font-weight: 900; font-size: 76px; color: #0F0F0F; letter-spacing: -0.02em; }
+      .label b { color: #2563EB; }
+      #hi { position: absolute; left: 640px; top: 470px; padding: 18px 34px; border-radius: 40px; background: #fff; font-weight: 900; font-size: 56px; color: #0F0F0F; box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="character-preview" data-start="0" data-duration="10" data-width="1080" data-height="1920">
+      <div id="bg"></div>
+      <div id="stage" class="clip" data-start="0" data-duration="10" data-track-index="0" data-layout-allow-overflow>
+        <div id="shadow"></div>
+      </div>
+      <div id="labels" class="clip" data-start="0" data-duration="10" data-track-index="1" data-layout-allow-overlap>
+        <div id="l1" class="label"><b>MEET</b> THE HOST</div>
+        <div id="l2" class="label"><b>NEXT</b> VIDEO STAR</div>
+        <div id="hi">Hi! 👋</div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 10 }, 0);
+      tl.fromTo("#l1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.3);
+      tl.to("#l1", { opacity: 0, duration: 0.3 }, 4.7);
+      tl.fromTo("#hi", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.5)" }, 1.5);
+      tl.to("#hi", { opacity: 0, scale: 0.8, duration: 0.25 }, 3.4);
+      tl.fromTo("#l2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 8.0);
+      window.__timelines["character-preview"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import { createPuppet } from "./puppet/puppet.js";
+      const host = createPuppet(document.getElementById("stage"), { base: "./puppet/", height: 1280 });
+      const shadow = document.getElementById("shadow");
+
+      const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const blinkAt = (t, at) => Math.max(0, 1 - Math.abs(t - at) / 0.09);
+
+      // pose keys: [time, pose]; the pose eases in over 0.35 s
+      const KEYS = [[0, "idle"], [1.2, "wave"], [3.6, "point"], [5.0, "idle"], [5.35, "armsUp"], [6.5, "idle"], [6.9, "handOnChest"], [8.0, "cheer"], [10, "cheer"]];
+
+      function renderAt(t) {
+        let i = 0;
+        while (i < KEYS.length - 2 && t >= KEYS[i + 1][0]) i++;
+        let p = host.blend(KEYS[Math.max(0, i - 1)][1], KEYS[i][1], seg(t, KEYS[i][0], KEYS[i][0] + 0.35));
+        if (i === 0) p = host.blend("idle", "idle", 1);
+        // living details
+        p.head += 1.5 * Math.sin(t * 1.7);
+        if (t >= 1.5 && t < 3.6) p.elbowR += 22 * Math.sin((t - 1.5) * 9);           // waving
+        if (t >= 8.2) { const b = Math.sin((t - 8.2) * 8); p.elbowR += 10 * b; p.elbowL -= 10 * b; }
+        host.pose(p);
+        const talk = (t > 1.6 && t < 3.0) || (t > 7.1 && t < 7.9) ? Math.abs(Math.sin(t * 13)) * 0.8 : 0;
+        host.face({ blink: Math.max(blinkAt(t, 1.0), blinkAt(t, 4.4), blinkAt(t, 7.5), blinkAt(t, 9.3)), talk });
+
+        // pop in, jump at 5.0-6.5, little hops while cheering
+        const pop = t < 0.6 ? 1.15 * smooth(t / 0.5) - 0.15 * seg(t, 0.45, 0.6) : 1;
+        let y = 0, squash = 1 + 0.006 * Math.sin(t * 2.4);
+        if (t >= 4.8 && t < 5.15) squash = 1 - 0.1 * Math.sin(Math.PI * (t - 4.8) / 0.35);  // crouch
+        if (t >= 5.15 && t < 6.25) { const u = (t - 5.15) / 1.1; y = -230 * 4 * u * (1 - u); squash = 1.04; }
+        if (t >= 6.25 && t < 6.6) squash = 1 - 0.09 * Math.sin(Math.PI * (t - 6.25) / 0.35);  // land
+        if (t >= 8.2) { const u = ((t - 8.2) / 0.6) % 1; y = -70 * 4 * u * (1 - u); }
+        host.place({ x: 540, y: 1660 + y, scale: Math.max(0.001, pop), squash });
+        const lift = Math.min(1, -y / 230);
+        shadow.style.transform = `scale(${(1 - 0.45 * lift) * pop}, ${(1 - 0.45 * lift) * pop})`;
+        shadow.style.opacity = 1 - 0.5 * lift;
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["character-preview"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(root.time());
+    </script>
+  </body>
+</html>

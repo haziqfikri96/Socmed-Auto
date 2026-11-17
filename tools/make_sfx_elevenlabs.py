@@ -25,6 +25,15 @@ KIT = {
     "ocean_ambience": (22.0, "Deep underwater ambience, muffled low ocean rumble with slow gentle swells and faint distant bubbles, no melody, no drums, no voices"),
     "sonar_ping": (1.5, "Single clean submarine sonar ping with a soft echo tail"),
     "falling_wind": (10.0, "Strong wind rushing past the ears while falling very fast through a tunnel, steady whooshing air, no music, no voices"),
+    "gear_clunk": (1.0, "Single heavy mechanical gear engaging clunk, metal gears locking into place, tight and close, no reverb"),
+    "hydraulic_hiss": (1.2, "Short hydraulic pressure hiss and soft piston push, clean mechanical, no music"),
+    "machine_whir": (6.0, "Smooth steady spinning machine whir, gears and fluid turning inside a metal housing, even tone, no music, no voices"),
+    "lock_click": (0.6, "Crisp metallic latch lock click, short and solid"),
+    "eruption": (3.0, "Cartoon volcano eruption, deep rumble building into a big lava burst whoosh, fun and punchy, no music"),
+    "snore": (3.0, "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"),
+    "sparkle": (1.0, "Bright magical sparkle chime, short twinkling anime shine sound, clean, no music"),
+    "gulp": (0.8, "Cartoon nervous gulp swallow with a tiny water-drop plink, anime sweat drop sound effect"),
+    "sting": (1.2, "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"),
 }
 
 manifest = {}

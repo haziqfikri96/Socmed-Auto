@@ -174,10 +174,42 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 - `fun-facts-ocean/` — 60s, five ocean facts
 - `earth-hole/` — 37.5s, one-question 3D short with word-by-word captions
 
-**Audio**: narration and sound effects come from ElevenLabs (key stored as a network secret for `api.elevenlabs.io`; send header `xi-api-key: proxy-injected`). Tools: `tools/make_voiceover_elevenlabs.py`, `tools/make_voiceover_timed.py`, `tools/make_sfx_elevenlabs.py`; reusable effects are in `sfx/elevenlabs/`. Each project's `make_audio.py` builds its `assets/mix.wav` (run with `~/.cache/editor-v1/venv/bin/python`, or any Python with numpy and soundfile).
+**Audio**: narration and sound effects come from ElevenLabs (key stored as a network secret for `api.elevenlabs.io`; send header `xi-api-key: proxy-injected`). Tools: `tools/make_voiceover_elevenlabs.py`, `tools/make_voiceover_timed.py`, `tools/make_sfx_elevenlabs.py`; reusable effects are in `sfx/elevenlabs/`. Each project's `make_audio.py` builds its `assets/mix.wav` (run with any Python that has numpy and soundfile (`pip install numpy soundfile`)).
 
 **Posting to TikTok — drafts only**:
 - The user reviews every video first. Only after they approve, send it with `python tiktok_draft.py videos/<file>.mp4`. This puts a draft in their TikTok inbox; they add the caption and post it in the app. Never use direct posting.
 - Credentials come from environment variables `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET` (sandbox app "auto-poster") and `TIKTOK_REFRESH_TOKEN`. Never print them.
 - The API cannot set a caption on a draft, so always give the user the description text (with the sources) to paste.
 - The draft upload had not yet been tested against TikTok when this note was written.
+
+# HyperFrames Speed & Render Rules
+- Always use `/hyperframes` and `/hyperframes-cli` skills when editing or rendering.
+- During iteration, ALWAYS render with `npx hyperframes render --quality draft --output review.mp4` (never `high` until I explicitly ask for the final export).
+- Avoid expensive browser paint operations: do NOT use `backdrop-filter: blur()`, large `filter: blur()`, or multi-layered drop-shadows on animated elements. Use solid semi-transparent RGBA backgrounds instead.
+- Never regenerate existing TTS audio or SFX files unless the spoken text for that exact line changed.
+
+## Render workflow (set by the user, Nov 2026)
+
+- **Drafts by default.** Every intermediate render is a draft: `tools/hf_render.sh <project>` runs `npx hyperframes@0.9.30 render --quality draft --fps 30 --output review.mp4` in the project folder (1080x1920; `review.mp4` is gitignored). Always pin `@0.9.30`. Master quality (`tools/hf_render.sh <project> --final`) only when the user explicitly asks for the final export.
+- Projects with a 3D scene have `render-mode.js` (`window.HF_DRAFT`); the script sets it during drafts, so WebGL draws at half resolution without AA and with cheaper shadows. The output is still 1080x1920. The script restores it afterwards.
+- **Test clips only on request**: `tools/hf_render.sh <project> <start> <end>` renders just that span to `review-<start>-<end>.mp4`.
+- **Preview**: `npx hyperframes@0.9.30 preview --background --no-open --port 3002` from the project folder; `--status` / `--stop`.
+- **Never regenerate audio that exists.** `make_dialogue.py` reuses takes by hash of speaker+text (only changed lines are voiced); `tools/make_sfx_elevenlabs.py` skips existing effects. Rebuilding `assets/mix.wav` with `make_audio.py` is local and free.
+- **Cheap paint only**: no `backdrop-filter`, CSS `filter: blur()`/`drop-shadow()` or large blurred `box-shadow` on cards, emotes or the canvas; use solid/semi-transparent fills, borders and radial-gradient halos.
+- Extra render workers don't speed up WebGL projects here (software GPU); measured: 2s clip 108s at full quality, 40s as a draft.
+
+## Host character (use the user's exact art)
+
+The user wants their own character, exactly as in their art, in videos from now on, not a generic dummy and not a re-drawn version.
+- **Use `characters/puppet/`**: a 2D cut-out puppet made from the front view of `characters/reference-sheet.jpg` (the user's Gemini character sheet: black side-part hair, black "Shichi.AI" tee, khaki chinos, navy sneakers). The art is used pixel for pixel; only the joints move.
+  - Files: part PNGs, `rig.js` (generated joints and boxes), `puppet.js` (API), `full.png` (whole cut-out), `cut_parts.py` (re-slices the parts from `full.png`; needs numpy and pillow).
+  - API: `createPuppet(container, { base, height })` → `{ el, rig, pose, blend, face, place }`. Poses: idle, wave, waveL, point, pointL, armsUp, cheer, star, fall, handOnChest, handOnChestL. `face({ blink, talk })` (0..1) for blinking and lip flaps. `place({ x, y, scale, squash, rotate, flip })`, where x, y is the point between the feet. Angles are degrees, positive = clockwise. Pose field `front: ["R"]` puts that arm in front of the shirt.
+  - Parts are DOM `<img>` layers, so HyperFrames waits for them to load. Copy the puppet folder into each project (HyperFrames serves only the project folder); skip `full.png` and `cut_parts.py`.
+  - Limits: it faces the camera only (no turning or side views), and the hands keep their open shape (no peace sign).
+- **Skit characters (low-poly, original)**: `characters/lowpoly/characters.js`, for comedy-skit videos in the style of the "Wait What Did You Do" page. Preview: `characters/lowpoly/preview-sheet.png`.
+  - `createDev(THREE, { glasses, print })`: the host dev from the user's sheet (side-part black hair, black "Shichi.AI" tee, khaki chinos, navy sneakers), chibi proportions, flat-shaded. `pose(name)` (idle, wave, point, shrug, facepalm, think, cheer, typing), `blend(a, b, t)`, `face({ blink, talk, mood })`.
+  - `createBot(THREE)`: original AI sidekick (white floating bot, dark screen face, cyan eyes, antenna light, floating hands, thruster). `face({ mood: neutral|wide|happy|sly, blink, talk })`, `update(t, gesture, g)` with gestures none, point, wave, shrug.
+  - Deterministic: state comes only from the values passed in, so HyperFrames can seek any frame. Do not copy the reference page's orange mascot or Anthropic's logo.
+- **No 3D GLB character.** The user tried a Meshy 3D model (Nov 2026) and rejected it as ugly; it was removed. Use the 2D puppet.
+- `characters/avatar.js` is an older, simplified Three.js 3D model of the character. The user rejected it as not exact; use it only if they ask for a true 3D scene.
+- Preview: `character-preview/`, a 10s puppet demo (pop-in, wave with "Hi!", point, jump, hand on chest, cheer).

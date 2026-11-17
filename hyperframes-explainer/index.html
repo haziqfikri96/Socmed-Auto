@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="captions.js"></script>
+    <script src="words.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      :root { --bg: #E8E8E8; --ink: #0F0F0F; --blue: #2563EB; --green: #16A34A; --amber: #D97706; --violet: #7C3AED; --red: #DC2626; --cyan: #0891B2; --muted: #6B7280; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: var(--ink); }
+      #bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #F7F7F8 0%, #E8E8E8 55%, #DADCE0 100%); }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+      #chip { position: absolute; top: 200px; left: 50%; transform: translateX(-50%); padding: 14px 34px; border-radius: 999px; background: var(--ink); color: #fff;
+        font-size: 32px; font-weight: 900; letter-spacing: 0.12em; white-space: nowrap; }
+      #chip b { color: #93C5FD; }
+
+      #card { position: absolute; left: 60px; top: 330px; width: 960px; height: 900px; transform: scale(1.04); transform-origin: 50% 0; border-radius: 48px; background: #fff; overflow: hidden;
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.16), 0 4px 14px rgba(15, 23, 42, 0.08); }
+      .scene { position: absolute; inset: 0; opacity: 0; }
+      .center { position: absolute; left: 0; width: 960px; text-align: center; }
+
+      #caption { position: absolute; top: 1320px; left: 0; width: 1080px; text-align: center; font-size: 84px; line-height: 100px; font-weight: 900; color: var(--ink); white-space: nowrap; letter-spacing: -0.02em; }
+      #caption.hot { color: var(--blue); }
+
+      /* scene: hook */
+      #rain { position: absolute; left: 70px; top: 0; width: 820px; font-size: 30px; line-height: 50px; color: #475569; white-space: pre; }
+      #rain .k { color: #6D28D9; } #rain .s { color: #15803D; } #rain .t { color: #1D4ED8; }
+      #brand { top: 330px; font-size: 128px; font-weight: 900; letter-spacing: -0.04em; }
+      #brand span { color: var(--blue); }
+      #brandSub { top: 500px; font-size: 38px; font-weight: 800; color: var(--muted); }
+      #logo { position: absolute; left: 400px; top: 150px; width: 160px; height: 160px; border-radius: 40px; background: var(--blue); color: #fff; font-size: 64px; font-weight: 900; text-align: center; line-height: 160px; }
+
+      /* scene: html -> video */
+      #codeBox { position: absolute; left: 50px; top: 90px; width: 450px; height: 560px; border-radius: 28px; background: #0F172A; padding: 34px 30px; font-size: 25px; line-height: 44px; color: #E2E8F0; white-space: pre; }
+      #codeBox .k { color: #C084FC; } #codeBox .s { color: #4ADE80; } #codeBox .t { color: #60A5FA; } #codeBox .c { color: #F472B6; }
+      #arrow { position: absolute; left: 512px; top: 330px; font-size: 64px; font-weight: 900; color: var(--blue); }
+      #mini { position: absolute; left: 590px; top: 90px; width: 320px; height: 560px; border-radius: 28px; background: linear-gradient(160deg, #1D4ED8, #7C3AED); overflow: hidden; }
+      #miniTitle { position: absolute; left: 0; width: 320px; top: 230px; text-align: center; color: #fff; font-size: 64px; font-weight: 900; }
+      #strip { position: absolute; left: 0; top: 700px; height: 140px; width: 2400px; }
+      .fr { position: absolute; top: 0; width: 100px; height: 140px; border-radius: 14px; background: linear-gradient(160deg, #1D4ED8, #7C3AED); border: 4px solid #0F172A; color: #fff; font-size: 20px; font-weight: 900; text-align: center; overflow: hidden; }
+      .fr i { position: absolute; left: 0; width: 92px; text-align: center; font-style: normal; }
+      #mp4 { position: absolute; left: 640px; top: 590px; padding: 14px 28px; border-radius: 999px; background: var(--green); color: #fff; font-size: 40px; font-weight: 900; }
+
+      /* scene: grid */
+      .tile { position: absolute; width: 260px; height: 260px; border-radius: 36px; text-align: center; color: #fff; font-weight: 900; }
+      .tile .ic { font-size: 96px; line-height: 170px; height: 170px; }
+      .tile .lb { font-size: 28px; letter-spacing: 0.04em; }
+
+      /* scene: kinetic */
+      .kw { position: absolute; left: 0; width: 960px; text-align: center; font-size: 170px; font-weight: 900; letter-spacing: -0.05em; line-height: 180px; }
+
+      /* scene: animation */
+      .ball { position: absolute; width: 120px; height: 120px; border-radius: 50%; }
+      .lane { position: absolute; left: 80px; width: 800px; height: 4px; background: #E5E7EB; border-radius: 4px; }
+      .ease { position: absolute; left: 80px; font-size: 26px; font-weight: 800; color: var(--muted); }
+
+      /* scene: 3d */
+      #three { position: absolute; left: 0; top: 0; width: 960px; height: 900px; }
+
+      /* scene: chart */
+      .bar { position: absolute; bottom: 160px; width: 120px; border-radius: 18px 18px 6px 6px; }
+      #count { top: 70px; font-size: 140px; font-weight: 900; letter-spacing: -0.04em; color: var(--ink); }
+      #countL { top: 230px; font-size: 34px; font-weight: 800; color: var(--muted); }
+
+      /* scene: captions */
+      #capVid { position: absolute; left: 80px; top: 80px; width: 800px; height: 520px; border-radius: 30px; background: linear-gradient(160deg, #0F172A, #1E3A8A); overflow: hidden; }
+      #capLine { position: absolute; left: 0; width: 800px; top: 400px; text-align: center; font-size: 38px; white-space: nowrap; font-weight: 900; color: #fff; }
+      #capLine span { margin: 0 4px; opacity: 0.35; }
+      #capLine span.on { opacity: 1; color: #FACC15; }
+      .wv { position: absolute; bottom: 120px; width: 14px; border-radius: 7px; background: var(--blue); }
+
+      /* scene: transitions */
+      .pane { position: absolute; inset: 0; color: #fff; font-size: 120px; font-weight: 900; text-align: center; line-height: 900px; letter-spacing: -0.03em; }
+
+      /* scene: sound */
+      #spk { top: 120px; font-size: 180px; }
+      .sfx { position: absolute; top: 470px; padding: 16px 30px; border-radius: 999px; font-size: 38px; font-weight: 900; color: #fff; }
+
+      /* scene: website */
+      #browser { position: absolute; left: 60px; top: 60px; width: 840px; height: 780px; border-radius: 26px; background: #F8FAFC; border: 4px solid #CBD5E1; overflow: hidden; transform-origin: 50% 50%; }
+      #bar { height: 70px; background: #E2E8F0; display: flex; align-items: center; gap: 12px; padding: 0 24px; }
+      #bar i { width: 18px; height: 18px; border-radius: 50%; background: #F87171; display: inline-block; }
+      #bar i:nth-child(2) { background: #FBBF24; } #bar i:nth-child(3) { background: #34D399; }
+      #url { margin-left: 16px; flex: 1; height: 42px; border-radius: 21px; background: #fff; font-size: 24px; line-height: 42px; padding-left: 22px; color: var(--muted); font-weight: 600; }
+      #page { position: absolute; left: 0; top: 70px; width: 832px; }
+      .hero { margin: 30px; height: 300px; border-radius: 22px; background: linear-gradient(120deg, #2563EB, #7C3AED); color: #fff; font-size: 54px; font-weight: 900; padding: 60px 40px; }
+      .row { display: flex; gap: 22px; margin: 0 30px 22px; }
+      .row div { flex: 1; height: 190px; border-radius: 18px; background: #E2E8F0; }
+      #play { position: absolute; left: 400px; top: 360px; width: 160px; height: 160px; border-radius: 50%; background: rgba(15, 23, 42, 0.85); color: #fff; font-size: 70px; line-height: 160px; text-align: center; opacity: 0; }
+
+      /* chat + terminal */
+      .bubble { position: absolute; max-width: 760px; padding: 26px 32px; border-radius: 34px; font-size: 38px; font-weight: 700; line-height: 52px; }
+      .user { right: 50px; background: var(--blue); color: #fff; border-bottom-right-radius: 10px; }
+      .bot { left: 50px; background: #F1F5F9; color: var(--ink); border-bottom-left-radius: 10px; }
+      .bot .mono { display: block; margin-top: 12px; font-size: 24px; line-height: 36px; color: #475569; white-space: pre; }
+      #term { position: absolute; left: 40px; top: 60px; width: 880px; height: 640px; border-radius: 26px; background: #0B1020; overflow: hidden; }
+      #termBar { height: 60px; background: #1E293B; color: #94A3B8; font-size: 24px; font-weight: 700; line-height: 60px; padding-left: 26px; }
+      #termBody { padding: 30px 24px; font-size: 22.5px; line-height: 44px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; }
+      #termBody .p { color: #4ADE80; } #termBody .ok { color: #4ADE80; } #termBody .cur { background: #E2E8F0; color: #0B1020; }
+      #req { top: 760px; font-size: 32px; font-weight: 800; color: var(--muted); }
+      #req b { color: var(--ink); }
+      #prog { position: absolute; left: 90px; top: 520px; width: 780px; height: 30px; border-radius: 15px; background: #E2E8F0; overflow: hidden; }
+      #progFill { height: 100%; width: 0; background: var(--green); }
+      #result { position: absolute; left: 70px; top: 400px; width: 300px; height: 440px; border-radius: 26px; overflow: hidden; background: linear-gradient(180deg, #1E1B4B 0%, #7C2D12 100%); opacity: 0; }
+      #volc { position: absolute; left: 30px; bottom: 0; width: 0; height: 0; border-left: 120px solid transparent; border-right: 120px solid transparent; border-bottom: 220px solid #292524; }
+      #lava { position: absolute; left: 115px; bottom: 190px; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle, #FDE047, #F97316 55%, rgba(249,115,22,0) 70%); }
+      #resultL { position: absolute; left: 0; width: 300px; top: 30px; text-align: center; color: #fff; font-size: 30px; font-weight: 900; }
+      .pill { position: absolute; top: 120px; padding: 18px 30px; border-radius: 999px; font-size: 40px; font-weight: 900; color: #fff; opacity: 0; }
+
+      /* CTA */
+      #ctaA { top: 120px; font-size: 64px; font-weight: 900; color: var(--muted); }
+      #ctaB { top: 200px; font-size: 118px; font-weight: 900; letter-spacing: -0.04em; color: var(--blue); }
+      #ctaTerm { position: absolute; left: 50px; top: 430px; width: 860px; border-radius: 24px; background: #0B1020; padding: 30px 24px; font-size: 22px; line-height: 44px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; }
+      #ctaTerm .p { color: #4ADE80; }
+      #ctaTerm .h { color: #94A3B8; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="hyperframes-explainer" data-start="0" data-duration="45.6" data-width="1080" data-height="1920">
+      <div id="bg"></div>
+
+      <div id="ui" class="clip" data-start="0" data-duration="45.6" data-track-index="0" data-layout-allow-overflow data-layout-allow-overlap>
+        <div id="chip">HYPER<b>FRAMES</b></div>
+        <div id="card">
+          <!-- 0 hook -->
+          <div class="scene" id="s-hook">
+            <div id="rain" class="mono"></div>
+            <div id="logo">&lt;/&gt;</div>
+            <div id="brand" class="center">Hyper<span>Frames</span></div>
+            <div id="brandSub" class="center">HTML → video</div>
+          </div>
+          <!-- 1 html -> video -->
+          <div class="scene" id="s-html">
+            <div id="codeBox" class="mono"></div>
+            <div id="arrow">→</div>
+            <div id="mini"><div id="miniTitle">Hello!</div></div>
+            <div id="strip"></div>
+            <div id="mp4">MP4 ✓</div>
+          </div>
+          <!-- 2 grid -->
+          <div class="scene" id="s-grid"></div>
+          <!-- 3 kinetic text -->
+          <div class="scene" id="s-kin">
+            <div class="kw" id="kw1" style="top: 170px; color: var(--blue)">MAKE</div>
+            <div class="kw" id="kw2" style="top: 360px; color: var(--ink)">IT</div>
+            <div class="kw" id="kw3" style="top: 550px; color: var(--red)">POP</div>
+          </div>
+          <!-- 4 animation -->
+          <div class="scene" id="s-anim">
+            <div class="ease" style="top: 150px">linear</div><div class="lane" style="top: 260px"></div><div class="ball" id="b1" style="top: 200px; background: var(--muted)"></div>
+            <div class="ease" style="top: 380px">ease out</div><div class="lane" style="top: 490px"></div><div class="ball" id="b2" style="top: 430px; background: var(--blue)"></div>
+            <div class="ease" style="top: 610px">bounce</div><div class="lane" style="top: 720px"></div><div class="ball" id="b3" style="top: 660px; background: var(--amber)"></div>
+          </div>
+          <!-- 5 3d -->
+          <div class="scene" id="s-3d"><canvas id="three" width="960" height="900"></canvas></div>
+          <!-- 6 chart -->
+          <div class="scene" id="s-chart">
+            <div id="count" class="center">0</div>
+            <div id="countL" class="center">views this week</div>
+          </div>
+          <!-- 7 captions -->
+          <div class="scene" id="s-cap">
+            <div id="capVid"><div id="capLine"></div></div>
+          </div>
+          <!-- 8 transitions -->
+          <div class="scene" id="s-trans">
+            <div class="pane" id="p1" style="background: var(--blue)">WIPE</div>
+            <div class="pane" id="p2" style="background: var(--violet)">ZOOM</div>
+            <div class="pane" id="p3" style="background: var(--amber)">FLASH</div>
+          </div>
+          <!-- 9 sound -->
+          <div class="scene" id="s-sfx">
+            <div id="spk" class="center">🔊</div>
+            <div class="sfx" id="x1" style="left: 90px; background: var(--blue)">whoosh</div>
+            <div class="sfx" id="x2" style="left: 390px; background: var(--violet)">pop</div>
+            <div class="sfx" id="x3" style="left: 620px; background: var(--green)">ding</div>
+          </div>
+          <!-- 10 website -->
+          <div class="scene" id="s-web">
+            <div id="browser">
+              <div id="bar"><i></i><i></i><i></i><div id="url">yourwebsite.com</div></div>
+              <div id="page">
+                <div class="hero">Your website</div>
+                <div class="row"><div></div><div></div><div></div></div>
+                <div class="row"><div></div><div></div></div>
+                <div class="row"><div></div><div></div><div></div></div>
+                <div class="row"><div></div><div></div></div>
+              </div>
+            </div>
+            <div id="play">▶</div>
+          </div>
+          <!-- 11 claude writes it -->
+          <div class="scene" id="s-claude">
+            <div class="bubble user" id="u1" style="top: 70px">Make a 20-second video about volcanoes 🌋</div>
+            <div class="bubble bot" id="c1" style="top: 330px">Writing <b>index.html</b>…<span class="mono" id="c1code"></span></div>
+          </div>
+          <!-- 12 install -->
+          <div class="scene" id="s-inst">
+            <div id="term"><div id="termBar">Terminal — Claude Code</div><div id="termBody" class="mono"></div></div>
+            <div id="req" class="center">Needs <b>Node.js 22+</b> and <b>FFmpeg</b></div>
+          </div>
+          <!-- 13 just ask -->
+          <div class="scene" id="s-ask">
+            <div class="bubble user" id="u2" style="top: 70px; white-space: nowrap">Make me a video about anything ✨</div>
+            <div class="bubble bot" id="c2" style="top: 270px">Rendering… <b id="pct">0%</b></div>
+            <div id="prog"><div id="progFill"></div></div>
+            <div id="result"><div id="resultL">volcano.mp4 ▶</div><div id="volc"></div><div id="lava"></div></div>
+            <div class="pill" id="f1" style="left: 440px; top: 450px; background: var(--green)">FREE</div>
+            <div class="pill" id="f2" style="left: 440px; top: 570px; background: var(--violet)">OPEN SOURCE</div>
+            <div class="pill" id="f3" style="left: 440px; top: 690px; background: var(--ink)">by HeyGen</div>
+          </div>
+          <!-- 14 cta -->
+          <div class="scene" id="s-cta">
+            <div id="ctaA" class="center">Comment</div>
+            <div id="ctaB" class="center">HYPERFRAMES</div>
+            <div id="ctaTerm" class="mono"><span class="h"># install in Claude Code</span>
+<span class="p">$</span> claude plugin marketplace add heygen-com/hyperframes
+<span class="p">$</span> claude plugin install hyperframes@hyperframes</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="caption" class="clip" data-start="0" data-duration="45.6" data-track-index="2" data-layout-allow-overlap>THIS WHOLE</div>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="45.6" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 45.6 }, 0);
+      window.__timelines["hyperframes-explainer"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+      const DUR = 45.6;
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const outBack = (x) => { x = clamp(x, 0, 1); const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+      const pop = (t, a, d = 0.35) => outBack((t - a) / d);
+      const $ = (id) => document.getElementById(id);
+
+      /* scenes: [id, start, end, chip label] — times from assets/words.json */
+      const SCENES = [
+        ["s-hook", 0, 6.35, "MADE WITH <b>CODE</b>"], ["s-html", 6.35, 13.75, "HTML <b>→ VIDEO</b>"], ["s-grid", 13.75, 17.4, "WHAT IT <b>CAN DO</b>"],
+        ["s-kin", 17.4, 18.58, "KINETIC <b>TEXT</b>"], ["s-anim", 18.58, 19.8, "SMOOTH <b>ANIMATION</b>"], ["s-3d", 19.8, 20.8, "REAL <b>3D</b>"],
+        ["s-chart", 20.8, 22.05, "<b>CHARTS</b>"], ["s-cap", 22.05, 23.9, "SYNCED <b>CAPTIONS</b>"], ["s-trans", 23.9, 24.8, "<b>TRANSITIONS</b>"],
+        ["s-sfx", 24.8, 25.62, "SOUND <b>EFFECTS</b>"], ["s-web", 25.62, 28.45, "WEBSITE <b>→ VIDEO</b>"], ["s-claude", 28.45, 31.65, "CLAUDE <b>WRITES IT</b>"],
+        ["s-inst", 31.65, 36.5, "INSTALL IN <b>CLAUDE CODE</b>"], ["s-ask", 36.5, 40.95, "JUST <b>ASK</b>"], ["s-cta", 40.95, DUR + 1, "<b>FULL TUTORIAL?</b>"],
+      ];
+      const chip = $("chip");
+
+      /* ---------- static content ---------- */
+      const RAIN = [
+        '<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>',
+        '<span class="t">gsap</span>.from(<span class="s">".title"</span>, { y: 200 })',
+        '<span class="k">&lt;audio</span> <span class="t">src</span>=<span class="s">"voice.wav"</span><span class="k">&gt;</span>',
+        '<span class="t">data-start</span>=<span class="s">"2.5"</span> <span class="t">data-duration</span>=<span class="s">"4"</span>',
+        '<span class="k">&lt;canvas</span> <span class="t">id</span>=<span class="s">"three"</span><span class="k">&gt;</span>',
+        '<span class="t">tl</span>.to(<span class="s">".chart"</span>, { scaleY: 1 })',
+        '<span class="k">&lt;img</span> <span class="t">src</span>=<span class="s">"logo.png"</span><span class="k">&gt;</span>',
+        'npx hyperframes render',
+      ];
+      $("rain").innerHTML = Array.from({ length: 30 }, (_, i) => RAIN[i % RAIN.length]).join("\n");
+      const CODE = [
+        ['<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>', 22],
+        ['  Hello!', 8],
+        ['<span class="k">&lt;/div&gt;</span>', 6],
+        ['', 0],
+        ['<span class="k">&lt;script&gt;</span>', 8],
+        ['  <span class="t">gsap</span>.from(<span class="s">".title"</span>,', 21],
+        ['    { y: <span class="c">200</span>, opacity: <span class="c">0</span> })', 26],
+        ['<span class="k">&lt;/script&gt;</span>', 9],
+      ];
+      const strip = $("strip");
+      for (let i = 0; i < 20; i++) {
+        const f = document.createElement("div"); f.className = "fr"; f.style.left = i * 116 + "px";
+        const y = Math.round(80 - 80 * Math.min(1, (i % 10) / 6));
+        f.innerHTML = `<i style="top:${40 + y}px;opacity:${Math.min(1, (i % 10) / 5).toFixed(2)}">Hello!</i>`;
+        strip.appendChild(f);
+      }
+      const TILES = [["Aa", "TEXT", "#2563EB"], ["◐", "MOTION", "#7C3AED"], ["⬢", "3D", "#0891B2"], ["▮▮", "CHARTS", "#16A34A"], ["“…”", "CAPTIONS", "#D97706"], ["🌐", "WEBSITES", "#DC2626"]];
+      TILES.forEach(([ic, lb, c], i) => {
+        const d = document.createElement("div"); d.className = "tile"; d.id = "tile" + i;
+        d.style.cssText = `left:${60 + (i % 3) * 290}px;top:${150 + Math.floor(i / 3) * 310}px;background:${c};`;
+        d.innerHTML = `<div class="ic">${ic}</div><div class="lb">${lb}</div>`;
+        $("s-grid").appendChild(d);
+      });
+      const BAR_H = [180, 260, 220, 360, 470]; const BAR_C = ["#93C5FD", "#60A5FA", "#3B82F6", "#2563EB", "#1D4ED8"];
+      BAR_H.forEach((h, i) => { const b = document.createElement("div"); b.className = "bar"; b.id = "bar" + i; b.style.cssText = `left:${110 + i * 155}px;background:${BAR_C[i]};height:${h}px;`; $("s-chart").appendChild(b); });
+      const CAPW = ["captions", "that", "follow", "your", "voice"];
+      $("capLine").innerHTML = CAPW.map((w, i) => `<span id="cw${i}">${w}</span>`).join(" ");
+      for (let i = 0; i < 40; i++) { const w = document.createElement("div"); w.className = "wv"; w.id = "wv" + i; w.style.left = 100 + i * 19.5 + "px"; $("s-cap").appendChild(w); }
+      for (let i = 0; i < 40; i++) { const w = document.createElement("div"); w.className = "wv"; w.id = "sw" + i; w.style.left = 100 + i * 19.5 + "px"; w.style.background = "#7C3AED"; $("s-sfx").appendChild(w); }
+      const C1CODE = '&lt;div class="volcano"&gt;\n  gsap.to(".lava", { y: -300 })\n  &lt;audio src="rumble.wav"&gt;\nnpx hyperframes render ✓';
+
+      /* ---------- 3D demo (Three.js inside the card) ---------- */
+      const r3 = new THREE.WebGLRenderer({ canvas: $("three"), alpha: true, antialias: true, preserveDrawingBuffer: true });
+      r3.setSize(960, 900, false); r3.setPixelRatio(1); r3.toneMapping = THREE.ACESFilmicToneMapping;
+      const s3 = new THREE.Scene();
+      s3.environment = new THREE.PMREMGenerator(r3).fromScene(new RoomEnvironment(), 0.04).texture;
+      const k3 = new THREE.DirectionalLight(0xffffff, 2.2); k3.position.set(3, 4, 5); s3.add(k3);
+      const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.0, 0.34, 220, 32), new THREE.MeshStandardMaterial({ color: 0x2563eb, metalness: 0.6, roughness: 0.22 }));
+      const cube = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.3, roughness: 0.3 }));
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.45, 48, 32), new THREE.MeshStandardMaterial({ color: 0x16a34a, metalness: 0.2, roughness: 0.25 }));
+      s3.add(knot, cube, ball);
+      const cam3 = new THREE.PerspectiveCamera(35, 960 / 900, 0.1, 50); cam3.position.set(0, 0.4, 7); cam3.lookAt(0, 0, 0);
+
+      /* ---------- captions ---------- */
+      const capEl = $("caption");
+      function captionAt(t) {
+        let cue = null;
+        for (const c of window.CAPTIONS) if (t >= c.s && t < c.e) { cue = c; break; }
+        if (!cue) { capEl.style.opacity = 0; return; }
+        capEl.textContent = cue.t;
+        capEl.style.fontSize = Math.min(84, Math.round(1250 / cue.t.length)) + "px";
+        capEl.className = "clip" + (cue.hot ? " hot" : "");
+        capEl.style.opacity = 1;
+        capEl.style.transform = `scale(${(1 + 0.16 * Math.max(0, 1 - (t - cue.s) / 0.12)).toFixed(3)})`;
+      }
+
+      /* ---------- typing helper: reveal plain characters of an HTML string ---------- */
+      function typeHTML(html, n) {
+        let out = "", shown = 0, i = 0;
+        while (i < html.length && shown < n) {
+          if (html[i] === "<") { const j = html.indexOf(">", i); out += html.slice(i, j + 1); i = j + 1; continue; }
+          if (html[i] === "&") { const j = html.indexOf(";", i); out += html.slice(i, j + 1); i = j + 1; shown++; continue; }
+          out += html[i++]; shown++;
+        }
+        const open = (out.match(/<span[^>]*>/g) || []).length - (out.match(/<\/span>/g) || []).length;
+        return out + "</span>".repeat(Math.max(0, open));
+      }
+
+      /* ---------- per-frame ---------- */
+      function renderAt(t) {
+        let label = SCENES[0][3];
+        for (const [id, a, b, lb] of SCENES) {
+          const vis = t >= a && t < b;
+          const el = $(id);
+          el.style.opacity = vis ? seg(t, a, a + 0.18) : 0;
+          el.style.transform = vis ? `scale(${0.94 + 0.06 * outBack((t - a) / 0.3)})` : "";
+          if (vis) label = lb;
+        }
+        if (chip.innerHTML !== label) chip.innerHTML = label;
+
+        // hook: code rain, then the wordmark
+        $("rain").style.transform = `translateY(${-((t * 140) % 400)}px)`;
+        $("rain").style.opacity = 1 - 0.94 * seg(t, 4.6, 5.0);
+        $("logo").style.transform = `scale(${pop(t, 4.9)})`;
+        $("brand").style.transform = `scale(${pop(t, 5.0)})`;
+        $("brandSub").style.opacity = seg(t, 5.4, 5.7);
+
+        // html -> video
+        if (t >= 6.35 && t < 13.75) {
+          const chars = Math.floor(clamp((t - 9.15) / 1.55, 0, 1) * 100);
+          let left = chars, html = "";
+          for (const [line, len] of CODE) { html += typeHTML(line, Math.max(0, left)) + "\n"; left -= len; }
+          $("codeBox").innerHTML = html + (t < 10.7 ? '<span style="background:#E2E8F0">&nbsp;</span>' : "");
+          const loop = ((t - 10.7) % 1.6 + 1.6) % 1.6, u = t < 10.7 ? 0 : smooth(loop / 0.9);
+          $("miniTitle").style.transform = `translateY(${200 * (1 - u)}px)`; $("miniTitle").style.opacity = u;
+          $("strip").style.transform = `translateX(${-((t - 11.0) * 260) * (t > 11 ? 1 : 0)}px)`;
+          $("strip").style.opacity = seg(t, 10.9, 11.2);
+          $("mp4").style.transform = `scale(${pop(t, 12.45)})`;
+          $("mp4").style.opacity = t >= 12.45 ? 1 : 0;
+        }
+
+        // feature grid
+        TILES.forEach((_, i) => { $("tile" + i).style.transform = `scale(${pop(t, 13.9 + i * 0.25)}) rotate(${4 * Math.sin(t * 2 + i)}deg)`; });
+
+        // kinetic text
+        ["kw1", "kw2", "kw3"].forEach((id, i) => {
+          const a = 17.45 + i * 0.22, k = pop(t, a, 0.25);
+          $(id).style.transform = `scale(${0.3 + 0.7 * k}) rotate(${(1 - k) * (i % 2 ? 8 : -8)}deg)`; $(id).style.opacity = t >= a ? 1 : 0;
+        });
+
+        // easing demo: three balls, same distance, different easing
+        const u = ((t - 18.6) % 1.2 + 1.2) % 1.2 / 1.0, uu = clamp(u, 0, 1);
+        const bounce = (x) => { const n = 7.5625, d = 2.75; if (x < 1 / d) return n * x * x; if (x < 2 / d) return n * (x -= 1.5 / d) * x + 0.75; if (x < 2.5 / d) return n * (x -= 2.25 / d) * x + 0.9375; return n * (x -= 2.625 / d) * x + 0.984375; };
+        [["b1", uu], ["b2", 1 - Math.pow(1 - uu, 3)], ["b3", bounce(uu)]].forEach(([id, v]) => { $(id).style.left = 80 + 680 * v + "px"; });
+
+        // 3D
+        if (t >= 19.8 && t < 20.8) {
+          const a = (t - 19.8) * 2.2;
+          knot.rotation.set(a * 0.6, a, 0); cube.position.set(-1.55, 1.25, 0); cube.rotation.set(a, a * 1.3, 0);
+          ball.position.set(1.5, -1.3 + 0.3 * Math.abs(Math.sin(a * 3)), 0.5);
+          r3.render(s3, cam3);
+        }
+
+        // chart
+        BAR_H.forEach((h, i) => { $("bar" + i).style.transform = `scaleY(${seg(t, 20.85 + i * 0.07, 21.35 + i * 0.07)})`; $("bar" + i).style.transformOrigin = "50% 100%"; });
+        $("count").textContent = Math.round(12480 * seg(t, 20.85, 21.75)).toLocaleString("en-US");
+
+        // captions demo: words light up in time
+        CAPW.forEach((_, i) => $("cw" + i).classList.toggle("on", t >= 22.1 + i * 0.3));
+        for (let i = 0; i < 40; i++) {
+          const h = 20 + 90 * Math.abs(Math.sin(t * 9 + i * 0.7)) * (0.4 + 0.6 * Math.abs(Math.sin(i * 1.3)));
+          $("wv" + i).style.height = h + "px";
+          $("sw" + i).style.height = (20 + 120 * Math.abs(Math.sin(t * 13 + i * 0.5)) * Math.exp(-((t - 24.85) % 0.33) * 4)) + "px";
+        }
+
+        // transitions: wipe, zoom, flash
+        $("p1").style.clipPath = `inset(0 ${100 - 100 * seg(t, 23.9, 24.15)}% 0 0)`;
+        $("p2").style.opacity = t >= 24.2 ? 1 : 0; $("p2").style.transform = `scale(${0.2 + 0.8 * pop(t, 24.2, 0.25)})`;
+        $("p3").style.opacity = t >= 24.5 ? 1 : 0; $("p3").style.filter = `brightness(${1 + 3 * Math.max(0, 1 - (t - 24.5) / 0.15)})`;
+
+        // sound effects
+        [["x1", 24.85], ["x2", 25.15], ["x3", 25.4]].forEach(([id, a]) => { $(id).style.transform = `scale(${pop(t, a, 0.2)})`; });
+        $("spk").style.transform = `scale(${1 + 0.12 * Math.abs(Math.sin(t * 10))})`;
+
+        // website -> video
+        $("page").style.transform = `translateY(${-420 * seg(t, 25.8, 26.8)}px)`;
+        const shrink = seg(t, 26.9, 27.4);
+        $("browser").style.transform = `scale(${1 - 0.35 * shrink})`; $("browser").style.borderRadius = 26 + 30 * shrink + "px";
+        $("play").style.opacity = shrink; $("play").style.transform = `scale(${pop(t, 27.2)})`;
+
+        // Claude writes it
+        $("u1").style.transform = `scale(${pop(t, 28.6)})`; $("u1").style.opacity = t >= 28.6 ? 1 : 0;
+        $("c1").style.transform = `scale(${pop(t, 29.5)})`; $("c1").style.opacity = t >= 29.5 ? 1 : 0;
+        $("c1code").innerHTML = typeHTML(C1CODE, Math.floor(clamp((t - 29.7) / 1.8, 0, 1) * 110));
+
+        // install
+        if (t >= 31.65 && t < 36.5) {
+          const L1 = "claude plugin marketplace add heygen-com/hyperframes", L2 = "claude plugin install hyperframes@hyperframes";
+          const n1 = Math.floor(clamp((t - 31.9) / 1.35, 0, 1) * L1.length), n2 = Math.floor(clamp((t - 33.6) / 1.3, 0, 1) * L2.length);
+          let out = `<span class="p">$</span> ${L1.slice(0, n1)}`;
+          if (t >= 33.4) out += `\n<span class="ok">✓ Marketplace "hyperframes" added</span>\n<span class="p">$</span> ${L2.slice(0, n2)}`;
+          if (t >= 35.0) out += `\n<span class="ok">✓ Installed hyperframes</span>\n\n<span class="p">$</span> claude`;
+          $("termBody").innerHTML = out + (Math.floor(t * 3) % 2 ? '<span class="cur">&nbsp;</span>' : " ");
+        }
+
+        // just ask
+        $("u2").style.transform = `scale(${pop(t, 36.6)})`;
+        $("c2").style.opacity = t >= 36.9 ? 1 : 0; $("prog").style.opacity = t >= 36.9 && t < 38.0 ? 1 : 0;
+        const pr = seg(t, 36.9, 37.85);
+        $("progFill").style.width = pr * 100 + "%"; $("pct").textContent = t >= 37.9 ? "done ✓" : Math.round(pr * 100) + "%";
+        $("result").style.opacity = t >= 37.9 ? 1 : 0; $("result").style.transform = `scale(${pop(t, 37.9)})`;
+        $("lava").style.transform = `translateY(${-140 * ((t * 0.9) % 1)}px) scale(${1 + 0.4 * ((t * 0.9) % 1)})`;
+        [["f1", 38.3], ["f2", 38.8], ["f3", 39.5]].forEach(([id, a]) => { $(id).style.opacity = t >= a ? 1 : 0; $(id).style.transform = `scale(${pop(t, a)})`; });
+
+        // CTA
+        $("ctaB").style.transform = `scale(${pop(t, 42.9, 0.4) * (1 + 0.03 * Math.sin(t * 6))})`;
+        $("ctaB").style.opacity = t >= 42.85 ? 1 : 0.15;
+
+        captionAt(t);
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["hyperframes-explainer"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>

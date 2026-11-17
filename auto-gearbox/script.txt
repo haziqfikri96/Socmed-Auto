@@ -1,0 +1,9 @@
+How does an automatic car change gears with no clutch pedal? Let me show you inside.
+First, the engine isn't bolted to the gears. It spins a fan inside a sealed case full of oil. The oil hits a second fan and turns it. That's why you can stop in Drive without stalling. At cruising speed, a clutch locks the two fans together, so less power is wasted.
+Next, the clever part: planetary gears. A sun in the middle, planets around it, and a ring outside.
+Hold the ring still, and the planets crawl around slowly. That's low gear, for maximum pull.
+Lock everything together, and it spins as one. Direct drive.
+Hold the planet carrier, and the ring spins backwards. Reverse!
+Clutches pushed by oil grab and release these parts in a split second, and a computer decides when.
+Modern ten-speeds stack four of these gearsets.
+So, manual or automatic? Tell me in the comments!
