@@ -198,7 +198,7 @@ export function createDev(THREE, opts = {}) {
     lids.forEach((l) => (l.visible = false));
     lows.forEach((l) => (l.visible = false));
     for (const m in mouths) mouths[m].visible = false;
-    const shape = talk > 0.12 ? (X.talkShape || "talk") : X.mouth;
+    const shape = talk > 0.12 ? (X.talkShape || "talk") : talk > 0.01 ? "flat" : X.mouth;   // mid-speech closed = flat line
     mouths[shape].visible = true;
     if (talk > 0.12) mouths[shape].scale.set((shape === "shout" ? 1.25 : 1) + 0.15 * talk, (shape === "shout" ? 0.8 : 0.2) + talk * 1.5, 1);   // clearly open-small vs open-wide
     blush.forEach((b) => { b.visible = X.blush > 0.05; b.material.opacity = 0.6 * X.blush; });
@@ -309,7 +309,7 @@ export function createBot(THREE) {
       b.rotation.z = -sx * (X.browTilt || 0);
     });
     for (const m in qMouths) qMouths[m].visible = false;
-    const shape = talk > 0.12 ? (X.talkShape || "grin") : X.mouth;
+    const shape = talk > 0.12 ? (X.talkShape || "grin") : talk > 0.01 ? "flat" : X.mouth;   // mid-speech closed = flat line
     qMouths[shape].visible = true;
     qMouths[shape].scale.set(talk > 0.12 ? 1 + 0.12 * talk : 1, talk > 0.12 ? 0.3 + 1.4 * talk : 1, 1);
     qSweat.visible = !!X.sweat; qSweat.position.y = 0.12 - 0.03 * ((t * 0.8) % 1);

@@ -12,6 +12,16 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 L = json.loads((HERE / "assets/lines.json").read_text())
 DUR = float((HERE / "lines.js").read_text().split("window.DUR = ")[1].split(";")[0])
+import hashlib
+import numpy as np, soundfile as sf
+for l in L:
+    k = hashlib.sha1(f"{l['who']}|{l['text']}".encode()).hexdigest()[:12]
+    a, sr = sf.read(HERE / f"assets/lines/{k}.wav"); a = np.abs(a if a.ndim == 1 else a.mean(1))
+    env = np.convolve(a, np.ones(int(0.02 * sr)) / int(0.02 * sr), "same")
+    end = round(l["s"] + np.where(env > env.max() * 0.05)[0][-1] / sr + 0.03, 3)
+    if end < l["e"]:
+        l["e"] = end; l["words"][-1]["e"] = max(l["words"][-1]["s"] + 0.1, end)
+(HERE / "lines.js").write_text("window.LINES = " + json.dumps(L) + ";\nwindow.DUR = " + str(DUR) + ";\n")   # captions + mouths use the trimmed ends
 S = lambda i: L[i]["s"]
 E = lambda i: L[i]["e"]
 
@@ -48,21 +58,22 @@ def typing(text, t0, t1, seed):
 
 # ---- the three dives through Quill's screen: [open, close]
 P1 = [S(2) - 0.02, S(5) - 0.03]
-P2 = [W(6, "using") - 0.25, S(7) + 0.2]
+P2 = [W(6, "using") - 0.25, S(7) - 0.02]
 P3 = [S(8) - 0.04, S(9) - 0.02]
 PORTALS = [P1, P2, P3]
-OPEN, SHUT = 0.45, 0.22          # unmask in (expo-out), pull back (ease-in) before the cut
+OPEN, SHUT = 0.45, 0.18          # unmask in (expo-out), pull back (ease-in) before the cut
 
 # ---- what appears on Quill's screen. Each row: [portal, kind, text, char_times]
 rows = []
 rows.append([0, "comment", "# you need Node 22+", words_in("# you need Node 22+", P1[0] + 0.45, W(2, "twenty-two", True))])
 rows.append([0, "comment", "# and FFmpeg", words_in("# and FFmpeg", W(2, "and"), W(2, "ffmpeg"))])
-rows.append([0, "cmd", "node -v", typing("node -v", W(2, "ffmpeg", True) + 0.05, W(2, "computer", True) - 0.05, 2)])
-rows.append([0, "cmd", "ffmpeg -version", typing("ffmpeg -version", W(2, "computer", True), S(3) + 0.35, 3)])
+rows.append([0, "cmd", "node -v", typing("node -v", 6.8, 7.25, 2)])
+rows.append([0, "cmd", "ffmpeg -version", typing("ffmpeg -version", 7.35, 8.0, 3)])
 C1 = "claude plugin marketplace add heygen-com/hyperframes"
-rows.append([0, "cmd", C1, typing(C1, W(3, "add"), W(3, "marketplace", True) + 0.15, 4)])
+rows.append([0, "cmd", C1, typing(C1, 8.8, 10.4, 4), len("claude plugin marketplace add")])     # 5th item: hanging-indent wrap point
 C2 = "claude plugin install hyperframes@hyperframes"
-rows.append([0, "cmd", C2, typing(C2, S(4) + 0.05, S(5) - 0.03 - 0.22 - 0.12, 5)])
+rows.append([0, "cmd", C2, typing(C2, 10.8, 12.4, 5), len("claude plugin install")])
+HOLD = 12.4                              # the finished terminal holds completely still until the pull-back (screenshot moment)
 # the prompt types word by word as Quill says it
 spoken = [("Using", "using"), ("/hyperframes,", "slash", "hyperframes"), ("make", "make"), ("a", ("a", 0)), ("10-second", "ten-second"),
           ("intro", "intro"), ("with", "with"), ("a", ("a", 1)), ("fade-in", "fade-in"), ("title", "title")]
@@ -86,13 +97,14 @@ for item in spoken:
     if prompt:
         prompt += " "; ptimes.append(r(s0 - 0.02))
     prompt += word
-    ptimes += typing(word, s0, max(s0 + 0.08, min(e1 - 0.04, s0 + 0.25)), sum(map(ord, word)))
+    ptimes += [r(s0)] * len(word)          # whole words, on the spoken word
+rows.append([1, "hint", '# run "claude" in terminal', [r(P2[0])] * len('# run "claude" in terminal')])
 rows.append([1, "prompt", prompt, ptimes])
 rows.append([2, "cmd", "npx hyperframes preview", typing("npx hyperframes preview", W(8, "preview") - 0.1, W(8, "browser", True) - 0.2, 6)])
 rows.append([2, "cmd", "npx hyperframes render", typing("npx hyperframes render", W(8, "render") - 0.05, W(8, "mp4") - 0.05, 7)])
 PREVIEW_AT = W(8, "browser")             # the live 9:16 preview opens
 FILE_AT = W(8, "mp4") + 0.05             # my-video.mp4 lands
-WORKING = [W(6, "title") + 0.3, P2[1] - SHUT]   # Claude Code's working indicator after the prompt
+WORKING = [W(6, "title") + 0.12, P2[1] - SHUT + 0.02]   # Claude Code's working indicator after the prompt
 
 # ---- acting
 dev = [
@@ -104,10 +116,11 @@ quill = [
     [S(5), "happy", "none"], [S(6), "smug", "shrug"], [S(7), "happy", "none"], [S(8), "proud", "point"],
     [S(9), "cheeky", "none"], [S(10), "cheeky", "none"], [W(10, "follow"), "excited", "wave"],
 ]
+LOOP = DUR - 0.27
 # ---- camera outside the dives (inside a dive the camera is pushed into Quill's screen)
 shots = [[0, "quillPush", 1], [S(1) - 0.03, "devClose", 1], [S(2) - 0.03, "quillClose", 1],
          [S(5) - 0.03, "devClose", 1], [S(6) - 0.03, "quillClose", 1], [S(7) - 0.03, "dev", 1],
-         [S(8) - 0.03, "quillClose", 1], [S(9) - 0.03, "devClose", 1], [S(10) - 0.03, "quillEnd", 1]]
+         [S(8) - 0.03, "quillClose", 1], [S(9) - 0.03, "devClose", 1], [S(10) - 0.03, "quillEnd", 1], [LOOP, "quillLoop", 0]]
 emotes = [[S(5) + 0.45, S(6) - 0.06, "dev", "question"], [S(9), S(10) - 0.06, "dev", "bang"]]
 GLOW = [W(0, "here"), P1[0]]             # Quill's screen brightens before the first dive
 PART2 = W(10, "part")                    # "part 2 →" appears on Quill's own screen
@@ -116,9 +129,9 @@ PART2 = W(10, "part")                    # "part 2 →" appears on Quill's own s
 sfx = [["impact_deep", P1[0] + 0.37, -6], ["sparkle", P1[0] + 0.55, -14],
        ["whoosh_soft", P2[0], -10], ["whoosh_soft", P3[0], -10],
        ["ding", FILE_AT + 0.05, -9], ["pop", emotes[0][0], -10], ["ding", emotes[1][0], -6], ["sparkle", PART2, -12]]
-for pi, kind, text, times in rows:
+for pi, kind, text, times, *_ in rows:
     for k, t in enumerate(times):
-        if text[k] != " " and k % 2 == 0:           # every other keystroke, so it reads as typing, not a drumroll
+        if kind in ("cmd",) and text[k] != " " and k % 2 == 0:           # every other keystroke, so it reads as typing, not a drumroll
             sfx.append(["tick", t, -20])
 RISER = [P1[0] + 0.2]                                # the riser ends here, then silence until the impact
 
@@ -127,7 +140,7 @@ out = {"DUR": DUR, "VOL": [-10, -9], "SLP": [-10, -9], "dev": [[r(t), a, b] for 
        "emotes": [[r(a), r(b), w, k] for a, b, w, k in emotes], "cards": [],
        "portals": [[r(a), r(b)] for a, b in PORTALS], "OPEN": OPEN, "SHUT": SHUT,
        "rows": rows, "previewAt": r(PREVIEW_AT), "fileAt": r(FILE_AT), "working": [r(x) for x in WORKING],
-       "glow": [r(x) for x in GLOW], "part2": r(PART2),
+       "glow": [r(x) for x in GLOW], "part2": r(PART2), "hold": HOLD, "loop": r(LOOP),
        "sfx": [[n, r(t), g] for n, t, g in sfx], "riser": [r(x) for x in RISER], "snore": [], "shakes": []}
 (HERE / "direction.json").write_text(json.dumps(out, indent=1))
 (HERE / "direction.js").write_text("window.D = " + json.dumps(out) + ";\n")

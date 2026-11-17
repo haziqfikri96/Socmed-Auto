@@ -70,10 +70,11 @@
         background: radial-gradient(ellipse 120% 70% at 50% 38%, #142540 0%, #0a1220 62%, #060b14 100%); }
       #pscreen::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 2px, rgba(0,0,0,0) 2px 6px); }
       #pin { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 50% 40%; }
-      #term { position: absolute; left: 64px; top: 0; font-size: 64px; line-height: 96px; color: #e2e8f0; white-space: pre; }
+      #term { position: absolute; left: 80px; top: 0; font-size: 44px; line-height: 68px; color: #e2e8f0; white-space: pre; }
       #term .cm { color: #64748b; } #term .ps { color: #5eead4; } #term .k { color: #5eead4; }
-      .caret { display: inline-block; width: 36px; height: 70px; vertical-align: -12px; background: #5eead4; }
+      .caret { display: inline-block; width: 26px; height: 52px; vertical-align: -10px; background: #5eead4; }
       #ask { position: absolute; left: 50px; width: 980px; top: 440px; }
+      #askHint { font-size: 44px; color: #64748b; margin: 0 0 22px 10px; }
       #askBox { border: 4px solid #5eead4; border-radius: 30px; padding: 36px 40px; font-size: 64px; line-height: 94px; color: #f1f5f9; white-space: pre-wrap; min-height: 260px; }
       #askBox .gt { color: #5eead4; } #askBox .sl { color: #5eead4; }
       #work { margin-top: 44px; font-size: 54px; color: #5eead4; opacity: 0; }
@@ -100,8 +101,8 @@
       <div id="hud" class="clip" data-start="0" data-duration="29.72" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
         <div id="portal"><div id="pscreen" data-ui="terminal"><div id="pin">
           <div id="term" class="mono"></div>
-          <div id="ask"><div id="askBox" class="mono"></div><div id="work" class="mono"></div></div>
-          <div id="pv"><div id="pvFrame"><div id="pvTitle">Your Intro</div><div id="pvSub">made with HyperFrames</div></div></div>
+          <div id="ask"><div id="askHint" class="mono"># run "claude" in terminal</div><div id="askBox" class="mono"></div><div id="work" class="mono"></div></div>
+          <div id="pv"><div id="pvFrame"><div id="pvTitle">Your Intro</div></div></div>
           <div id="file"><div class="fi"><i></i></div><div class="fn mono">my-video.mp4</div></div>
         </div></div></div>
         <div id="face2" class="mono"><span>part 2 →</span></div>
@@ -211,6 +212,7 @@
         quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],
         quillPush: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],
         quillEnd: [[0.05, 0.76, 1.5], [0.34, 0.62, 0]],
+        quillLoop: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],
         sleepCam: [[1.25, 1.12, -0.12], [-0.32, 0.6, -0.45]],
       };
       function camAt(t) {
@@ -239,7 +241,7 @@
             const n = syllables(w.w), slot = (w.e - w.s) / n, p = ((t - w.s) % slot) / slot;
             return p < 0.14 || p > 0.9 ? 0.05 : p < 0.32 || p > 0.7 ? 0.45 : 0.95;   // closed / small / wide per syllable   // small -> wide -> small within each syllable
           }
-          return 0;   // between words: closed
+          return 0.05;   // between words inside a line: closed (flat)
         }
         void L; return 0;
       }
@@ -317,39 +319,33 @@
         $("pscreen").style.transform = on ? `translate(${rr.x.toFixed(1)}px, ${(rr.y + rr.h / 2 - 960 * sc).toFixed(1)}px) scale(${sc.toFixed(4)})` : "";
 
         // a slow push while inside the screen, so a held line still has a living camera
-        if (P) { const cz = clamp((t - P[0]) / (P[1] - P[0]), 0, 1); $("pin").style.transform = `scale(${(1 + 0.06 * cz).toFixed(4)}) translateY(${(-24 * cz).toFixed(1)}px) rotate(${(0.6 * Math.sin(t * 0.9)).toFixed(3)}deg)`; }
+        if (P) { const tc = pi === 0 ? Math.min(t, D.hold) : t, cz = clamp((tc - P[0]) / (P[1] - P[0]), 0, 1); $("pin").style.transform = pi === 0 ? `scale(${(1 + 0.03 * cz).toFixed(4)})` : `scale(${(1 + 0.06 * cz).toFixed(4)}) translateY(${(-24 * cz).toFixed(1)}px) rotate(${(0.6 * Math.sin(t * 0.9)).toFixed(3)}deg)`; }
         // ---------- what is on the screen ----------
         const rows = D.rows.filter((r) => r[0] === pi);
         const blink = Math.floor(t * 2.4) % 2 === 0;
         const caret = '<span class="caret"></span>';
-        // terminal rows (portal 0 and 2)
-        let html = "", cur = -1, caretCol = 0, n = 0, lineNo = 0;
-        const termRows = rows.filter((r) => r[1] !== "prompt");
+        // terminal rows (portal 0 and 2): hanging-indent wrap, no pan; comments arrive whole with no cursor
+        let html = "", lastKind = "", lastDone = true;
+        const termRows = rows.filter((r) => r[1] === "cmd" || r[1] === "comment");
+        const esc = (x) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;");
         termRows.forEach((r, ri) => {
-          const [, kind, text, times] = r;
+          const [, kind, text, times, wrapAt] = r;
           const shown = times.filter((x) => x <= t).length;
-          if (shown === 0 && ri > 0 && t < times[0]) return;
-          if (ri > 0) { html += "\n"; lineNo++; if (kind === "cmd" && termRows[ri - 1][1] === "comment") { html += "\n"; lineNo++; } }
-          const body = text.slice(0, shown).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-          html += kind === "comment" ? `<span class="cm">${body}</span>` : `<span class="ps">$ </span>${body}`;
-          cur = lineNo; caretCol = (kind === "comment" ? 0 : 2) + shown; n = shown;
+          if (shown === 0 && t < times[0] && ri > 0) return;
+          if (ri > 0) html += "\n" + (kind === "cmd" && termRows[ri - 1][1] === "comment" ? "\n" : "");
+          let body = text.slice(0, shown);
+          if (wrapAt && shown > wrapAt) body = body.slice(0, wrapAt) + "\n    " + body.slice(wrapAt + 1);
+          html += kind === "comment" ? `<span class="cm">${esc(body)}</span>` : `<span class="ps">$ </span>${esc(body)}`;
+          lastKind = kind; lastDone = shown >= text.length;
         });
-        if (termRows.length && cur >= 0) html += blink || n < 1 ? caret : "";
+        const still = pi === 0 && t >= D.hold;
+        if (termRows.length && lastKind === "cmd" && !still) html += blink || !lastDone ? caret : "";
         $("term").innerHTML = html;
-        // pan along a long line (the camera follows the caret; text cropped by the frame edge) and scroll down the lines
-        const CW = 64 * 0.6;
-        const panAt = (tt) => {
-          let col = 0;
-          termRows.forEach((r) => { const s = r[3].filter((x) => x <= tt).length; if (s > 0 && s < r[2].length + 1 && tt >= r[3][0]) col = (r[1] === "comment" ? 0 : 2) + s; });
-          return Math.max(0, 64 + col * CW - 880);
-        };
-        let pan = 0; for (let j = 0; j < 8; j++) pan += panAt(t - j * 0.03) / 8;
-        const topY = pi === 2 ? 300 : 560 - Math.max(0, cur - 3) * 96;
-        $("term").style.transform = `translate(${(-pan).toFixed(1)}px, ${topY}px)`;
+        $("term").style.transform = `translate(0px, ${pi === 2 ? 300 : 520}px)`;
         $("term").style.opacity = termRows.length ? 1 : 0;
 
         // the prompt (portal 1), typed as Quill says it
-        const pr = rows.find((r) => r[1] === "prompt");
+        const pr = rows.find((r) => r[1] === "prompt");   // (the hint row is static text in #askHint)
         $("ask").style.opacity = pr ? 1 : 0;
         if (pr) {
           const shown = pr[3].filter((x) => x <= t).length;
@@ -367,14 +363,13 @@
         $("pv").style.transform = `translateY(${(120 * (1 - pvU) + 60 * into).toFixed(1)}px) scale(${((1.12 - 0.12 * pvU) * (1 - 0.7 * into)).toFixed(4)})`;
         const ft = clamp((t - D.previewAt - 0.25) / 1.1, 0, 1);       // the title fades in: exactly what the prompt asked for
         $("pvTitle").style.opacity = ft; $("pvTitle").style.transform = `translateY(${(26 * (1 - ft)).toFixed(1)}px)`;
-        $("pvSub").style.opacity = clamp((t - D.previewAt - 0.9) / 0.6, 0, 1);
         const fOn = pi === 2 && t >= D.fileAt, fu = fOn ? expoOut((t - D.fileAt) / 0.35) : 0;
         $("file").style.opacity = fOn ? 1 : 0;
         $("file").style.transform = `scale(${(2.6 - 1.6 * fu).toFixed(4)})`;     // lands from oversize, decelerating, no bounce
 
         // ---------- the ending: Quill's own screen says "part 2" ----------
         const f2 = t >= D.part2 ? expoOut((t - D.part2) / 0.3) : 0;
-        $("face2").style.opacity = t >= D.part2 ? 1 : 0;
+        $("face2").style.opacity = t >= D.part2 ? (1 - smooth((t - D.loop) / 0.27)).toFixed(3) : 0;
         if (t >= D.part2) {
           const h = R.h * 0.9, w = R.w * 0.92;
           $("face2").style.width = w + "px"; $("face2").style.height = h + "px";
@@ -384,7 +379,7 @@
         }
 
         // ---------- captions: word by word, chunked, speaker colour on the active word ----------
-        const li = lineAt(t), L = LINES[li], capOn = t >= L.s - 0.05 && t < L.e + 0.25;
+        const li = lineAt(t), L = LINES[li], capOn = t >= L.s - 0.05 && t < L.e + 0.02;
         $("cap").style.opacity = capOn ? 1 : 0;
         if (capOn) {
           const ws = L.words, chunks = [[]];
