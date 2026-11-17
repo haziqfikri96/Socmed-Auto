@@ -12,3 +12,6 @@ videos/
 
 # set by tools/hf_render.sh during draft renders (missing = full quality)
 render-mode.js
+# draft renders (tools/hf_render.sh)
+review.mp4
+review-*.mp4

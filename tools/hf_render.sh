@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fast HyperFrames renders. Draft by default; master quality only when asked.
-#   tools/hf_render.sh <project>                 full draft  -> videos/<project>.draft.mp4
-#   tools/hf_render.sh <project> 27 29           test clip   -> videos/<project>.clip-27-29.mp4
+#   tools/hf_render.sh <project>                 full draft  -> <project>/review.mp4
+#   tools/hf_render.sh <project> 27 29           test clip   -> <project>/review-27-29.mp4
 #   tools/hf_render.sh <project> --final         master      -> videos/<project>.mp4
 # Audio is never regenerated here: run make_dialogue.py / make_audio.py yourself (both reuse cached takes).
 set -euo pipefail
@@ -18,7 +18,7 @@ fi
 if [[ "${1:-}" == "--final" ]]; then
   npx --yes hyperframes@0.9.30 render --quality high --fps 30 --workers "$WORKERS" --quiet --output "../videos/$P.mp4"
 elif [[ $# -ge 2 ]]; then
-  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --start "$1" --end "$2" --output "../videos/$P.clip-$1-$2.mp4"
+  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --start "$1" --end "$2" --output "review-$1-$2.mp4"
 else
-  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --output "../videos/$P.draft.mp4"
+  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --output review.mp4
 fi
