@@ -62,9 +62,9 @@ while b * BEAT * 4 < D["DUR"]:
 # every cue from the direction (emote SFX are synced to the emote pop-ins there)
 for name, at, g in D["sfx"]:
     add(fxm, load(name), at, db(g))
-# tension riser that stops dead, then silence until "It's you."
+# soft tension riser that stops dead, then silence until "It's you."
 riser = load("riser"); r_end = D["riser"][0]
-add(fxm, riser, r_end - len(riser) / SR, db(-8))
+add(fxm, lowpass(riser, 2500), r_end - len(riser) / SR, db(-8 - 14))   # soft swell, well under the dialogue
 # snore: 6 dB down and low-passed so it sits inside the lo-fi bed
 add(fxm, lowpass(load("snore"), 1400), D["snore"][0], db(-6) * 0.5)
 

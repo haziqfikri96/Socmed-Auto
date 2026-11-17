@@ -47,7 +47,7 @@ quill = [
     [S(17), "innocent", "shrug"], [S(18) + 0.05, "wince", "cover"], [S(19), "cheeky", "shrug"], [S(20), "cheeky", "wave"],
 ]
 # Camera: always on whoever is talking; reaction cutaways are 0.8 s or less. [time, shot, hard cut]
-shots = [[0, "hookPunch", 1], [W(0, "final") + 0.08, "quillClose", 1], [W(0, "final") + 0.78, "hookHold", 1]]   # 0.7 s nervous-Quill reaction on "final final v3"
+shots = [[0, "hookPunch", 1]]   # stay on Shichi for his whole first line
 for i, line in enumerate(L):
     if i == 0:
         continue
