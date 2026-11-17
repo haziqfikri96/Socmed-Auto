@@ -9,3 +9,6 @@ build/
 *.egg-info/
 videos/
 .tiktok_tokens.json
+
+# set by tools/hf_render.sh during draft renders (missing = full quality)
+render-mode.js
