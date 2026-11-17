@@ -18,3 +18,5 @@ work-*/
 .hyperframes/
 .review.hf-transaction-*/
 .*.hf-transaction-*/
+# scratch text for the voice tool
+*/assets/lines/tmp.txt
