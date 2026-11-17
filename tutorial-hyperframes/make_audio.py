@@ -82,4 +82,13 @@ mix = bed * duck[:, None] + fxm + dia * 0.95
 mix = mix / np.abs(mix).max() * 0.89
 fade = int(0.02 * SR); mix[-fade:] *= np.linspace(1, 0, fade)[:, None]   # click-free loop point
 sf.write(sys.argv[1], mix, SR, subtype="PCM_16")
+# deliver at -14 LUFS / -1 dBTP (TikTok's loudness target), two-pass ffmpeg loudnorm
+import subprocess, re as _re, shutil
+if shutil.which("ffmpeg"):
+    m = subprocess.run(["ffmpeg", "-hide_banner", "-i", sys.argv[1], "-af", "loudnorm=I=-14:TP=-1:LRA=9:print_format=json", "-f", "null", "-"], capture_output=True, text=True).stderr
+    j = json.loads(m[m.rindex("{"):m.rindex("}") + 1])
+    flt = f"loudnorm=I=-14:TP=-1:LRA=9:measured_I={j['input_i']}:measured_TP={j['input_tp']}:measured_LRA={j['input_lra']}:measured_thresh={j['input_thresh']}:offset={j['target_offset']}:linear=true"
+    tmp = sys.argv[1] + ".tmp.wav"
+    subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", sys.argv[1], "-af", flt, "-ar", str(SR), "-c:a", "pcm_s16le", tmp], check=True)
+    Path(tmp).replace(sys.argv[1])
 print("wrote", sys.argv[1], f"{D['DUR']:.2f}s, {len(D['sfx'])} cues")

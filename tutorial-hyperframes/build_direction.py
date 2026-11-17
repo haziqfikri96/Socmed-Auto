@@ -26,6 +26,14 @@ def W(i, word, end=False):
 r = lambda x: round(x, 3)
 
 
+def words_in(text, t0, t1):
+    """Whole words at speech rhythm (comments are Quill's annotation, not typed input): each word's chars share one time."""
+    ws = text.split(" "); step = (t1 - t0) / max(1, len(ws)); out = []
+    for i, w in enumerate(ws):
+        out += [r(t0 + i * step)] * (len(w) + (1 if i < len(ws) - 1 else 0))
+    return out
+
+
 def typing(text, t0, t1, seed):
     """Per-character reveal times between t0 and t1 with an authored, irregular (seeded) rhythm."""
     rnd = random.Random(seed)
@@ -47,8 +55,8 @@ OPEN, SHUT = 0.45, 0.22          # unmask in (expo-out), pull back (ease-in) bef
 
 # ---- what appears on Quill's screen. Each row: [portal, kind, text, char_times]
 rows = []
-rows.append([0, "comment", "# you need Node 22+", typing("# you need Node 22+", P1[0] + 0.45, W(2, "twenty-two", True), 1)])
-rows.append([0, "comment", "# and FFmpeg", typing("# and FFmpeg", W(2, "and"), W(2, "ffmpeg", True), 11)])
+rows.append([0, "comment", "# you need Node 22+", words_in("# you need Node 22+", P1[0] + 0.45, W(2, "twenty-two", True))])
+rows.append([0, "comment", "# and FFmpeg", words_in("# and FFmpeg", W(2, "and"), W(2, "ffmpeg"))])
 rows.append([0, "cmd", "node -v", typing("node -v", W(2, "ffmpeg", True) + 0.05, W(2, "computer", True) - 0.05, 2)])
 rows.append([0, "cmd", "ffmpeg -version", typing("ffmpeg -version", W(2, "computer", True), S(3) + 0.35, 3)])
 C1 = "claude plugin marketplace add heygen-com/hyperframes"

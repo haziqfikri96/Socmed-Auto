@@ -24,12 +24,12 @@ def sub(s, a, b):
 
 
 # ---------------- HTML: Quill's screen (portal), the part-2 face, captions
-html = '''<div id="portal"><div id="pscreen">
+html = '''<div id="portal"><div id="pscreen" data-ui="terminal"><div id="pin">
           <div id="term" class="mono"></div>
           <div id="ask"><div id="askBox" class="mono"></div><div id="work" class="mono"></div></div>
           <div id="pv"><div id="pvFrame"><div id="pvTitle">Your Intro</div><div id="pvSub">made with HyperFrames</div></div></div>
           <div id="file"><div class="fi"><i></i></div><div class="fn mono">my-video.mp4</div></div>
-        </div></div>
+        </div></div></div>
         <div id="face2" class="mono"><span>part 2 →</span></div>
         <div id="cap"></div>
       </div>
@@ -47,6 +47,7 @@ css = '''
       #pscreen { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0;
         background: radial-gradient(ellipse 120% 70% at 50% 38%, #142540 0%, #0a1220 62%, #060b14 100%); }
       #pscreen::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 2px, rgba(0,0,0,0) 2px 6px); }
+      #pin { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 50% 40%; }
       #term { position: absolute; left: 64px; top: 0; font-size: 64px; line-height: 96px; color: #e2e8f0; white-space: pre; }
       #term .cm { color: #64748b; } #term .ps { color: #5eead4; } #term .k { color: #5eead4; }
       .caret { display: inline-block; width: 36px; height: 70px; vertical-align: -12px; background: #5eead4; }
@@ -107,6 +108,8 @@ hud = r'''function hud(t) {
         const sc = on ? Math.max(rr.w / 1080, 0.05) : 1;
         $("pscreen").style.transform = on ? `translate(${rr.x.toFixed(1)}px, ${(rr.y + rr.h / 2 - 960 * sc).toFixed(1)}px) scale(${sc.toFixed(4)})` : "";
 
+        // a slow push while inside the screen, so a held line still has a living camera
+        if (P) { const cz = clamp((t - P[0]) / (P[1] - P[0]), 0, 1); $("pin").style.transform = `scale(${(1 + 0.06 * cz).toFixed(4)}) translateY(${(-24 * cz).toFixed(1)}px) rotate(${(0.6 * Math.sin(t * 0.9)).toFixed(3)}deg)`; }
         // ---------- what is on the screen ----------
         const rows = D.rows.filter((r) => r[0] === pi);
         const blink = Math.floor(t * 2.4) % 2 === 0;
