@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
     <script src="lines.js"></script>
     <script src="direction.js"></script>
+    <script src="render-mode.js"></script>
     <script type="importmap">
       { "imports": {
           "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
@@ -19,6 +20,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0d0920; }
       #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; background: radial-gradient(circle at 50% 40%, #241a45, #0d0920 75%); }
+      #dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #0b0820; opacity: 0; pointer-events: none; }
       #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; transform-origin: 50% 50%; }
       .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
@@ -26,17 +28,18 @@
       #who { display: table; margin: 0 auto 10px; padding: 8px 22px; border-radius: 999px; font-size: 26px; font-weight: 900; letter-spacing: 0.12em; }
       #who.dev { background: #F59E0B; color: #1a1205; }
       #who.quill { background: #2DD4BF; color: #04211d; }
-      #line { display: inline-block; padding: 10px 26px 14px; border-radius: 26px; background: rgba(8, 6, 20, 0.66); font-size: 46px; line-height: 60px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+      #line { display: inline-block; padding: 10px 26px 14px; border-radius: 26px; background: rgba(8, 6, 20, 0.66); font-size: 46px; line-height: 60px; font-weight: 800; }
 
       .card { position: absolute; left: 90px; top: 300px; width: 840px; border-radius: 40px; background: rgba(10, 14, 32, 0.78); border: 2px solid rgba(148, 163, 184, 0.35);
-        box-shadow: 0 30px 80px rgba(0,0,0,0.45); padding: 40px 42px; opacity: 0; transform-origin: 50% 40%; }
+        padding: 40px 42px; opacity: 0; transform-origin: 50% 40%; }
       .card h3 { font-size: 28px; font-weight: 900; letter-spacing: 0.14em; color: #94A3B8; margin-bottom: 22px; }
       .card h3 b { color: #2DD4BF; }
 
       /* hook: the mystery file bouncing on screen */
       #fileIcon { position: absolute; left: 0; top: 0; width: 300px; margin: -330px 0 0 -150px; text-align: center; opacity: 0; transform-origin: 50% 100%; }
       #fileIcon .doc { width: 190px; height: 230px; margin: 0 auto; border-radius: 26px; background: linear-gradient(160deg, #fde68a, #f59e0b); position: relative;
-        box-shadow: 0 0 60px rgba(250, 204, 21, 0.8), 0 0 140px rgba(250, 204, 21, 0.45); }
+        }
+      #fileIcon .doc::before { content: ""; position: absolute; left: -75px; top: -55px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(250,204,21,0.55), rgba(250,204,21,0) 65%); z-index: -1; }
       #fileIcon .doc::after { content: ""; position: absolute; left: 70px; top: 80px; border-left: 64px solid #1f1300; border-top: 38px solid transparent; border-bottom: 38px solid transparent; }
       #fileIcon .nm { margin-top: 18px; display: inline-block; padding: 10px 22px; border-radius: 18px; background: rgba(8, 6, 20, 0.85); border: 2px solid #f59e0b; font-size: 32px; font-weight: 900; white-space: nowrap; }
 
@@ -70,7 +73,7 @@
 
       /* volcano mini-video */
       #vplayer { position: absolute; left: 160px; top: 230px; width: 760px; height: 1000px; border-radius: 44px; overflow: hidden; opacity: 0; transform-origin: 50% 0;
-        background: linear-gradient(180deg, #0f0a2a 0%, #3b1d4a 45%, #b4472c 82%, #2a1208 100%); box-shadow: 0 40px 100px rgba(0,0,0,0.6); border: 3px solid rgba(255,255,255,0.15); }
+        background: linear-gradient(180deg, #0f0a2a 0%, #3b1d4a 45%, #b4472c 82%, #2a1208 100%); border: 3px solid rgba(255,255,255,0.15); }
       #vsky { position: absolute; inset: 0; }
       #vglow { position: absolute; left: 180px; top: 430px; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(253,186,116,0.75), rgba(249,115,22,0) 70%); }
       #vmount { position: absolute; left: 40px; bottom: 110px; width: 680px; height: 500px; background: #241a1f; clip-path: polygon(0 100%, 40% 6%, 60% 6%, 100% 100%); }
@@ -87,28 +90,29 @@
       #vname { position: absolute; left: 36px; bottom: 52px; font-size: 28px; font-weight: 800; color: #fff; }
 
       /* phone clip of Shichi asleep: the 3D view is scaled to 80% and framed, with its own mock UI inside the frame */
-      #ttFrame { position: absolute; left: 108px; top: 192px; width: 864px; height: 1536px; border-radius: 56px; border: 6px solid #1e293b; box-shadow: 0 40px 120px rgba(0,0,0,0.7); opacity: 0; pointer-events: none; }
+      #ttFrame { position: absolute; left: 108px; top: 192px; width: 864px; height: 1536px; border-radius: 56px; border: 6px solid #1e293b; opacity: 0; pointer-events: none; }
       #tt { position: absolute; left: 108px; top: 192px; width: 864px; height: 1536px; border-radius: 56px; overflow: hidden; opacity: 0; }
       #ttVig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.6) 100%); }
-      #ttRec { position: absolute; left: 40px; top: 50px; font-size: 30px; font-weight: 900; text-shadow: 0 2px 8px #000; }
+      #ttRec { position: absolute; left: 40px; top: 50px; font-size: 30px; font-weight: 900; text-shadow: 0 2px 0 #000; }
       #ttRec i { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: #ef4444; margin-right: 10px; vertical-align: -2px; }
       #ttViews { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); padding: 14px 30px; border-radius: 999px; background: rgba(0,0,0,0.6); font-size: 50px; font-weight: 900; white-space: nowrap; }
       #ttViews b { color: #F472B6; }
-      #ttSide { position: absolute; right: 40px; top: 640px; width: 110px; text-align: center; font-size: 26px; font-weight: 900; text-shadow: 0 2px 8px #000; }
+      #ttSide { position: absolute; right: 40px; top: 640px; width: 110px; text-align: center; font-size: 26px; font-weight: 900; text-shadow: 0 2px 0 #000; }
       #ttSide div { margin-bottom: 34px; } #ttSide span { display: block; font-size: 64px; line-height: 78px; }
-      #ttCap { position: absolute; left: 40px; right: 170px; top: 1200px; font-size: 30px; font-weight: 800; text-shadow: 0 2px 8px #000; line-height: 44px; }
+      #ttCap { position: absolute; left: 40px; right: 170px; top: 1200px; font-size: 30px; font-weight: 800; text-shadow: 0 2px 0 #000; line-height: 44px; }
       #ttZ { position: absolute; left: 0; top: 0; }
       #ttBar { position: absolute; left: 0; bottom: 0; height: 8px; width: 100%; background: rgba(255,255,255,0.25); }
       #ttBarF { height: 100%; width: 0; background: #fff; }
 
-      .emote { position: absolute; left: 0; top: 0; width: 150px; height: 150px; margin: -75px 0 0 -75px; opacity: 0; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.45)); }
+      .emote { position: absolute; left: 0; top: 0; width: 150px; height: 150px; margin: -75px 0 0 -75px; opacity: 0; }
       #mark { position: absolute; left: 60px; top: 190px; font-size: 26px; font-weight: 800; color: #fff; opacity: 0.6; letter-spacing: 0.06em; }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="skit-hyperframes" data-start="0" data-duration="38.36" data-width="1080" data-height="1920">
+    <div id="root" data-composition-id="skit-hyperframes" data-start="0" data-duration="38.36" data-width="1080" data-height="1920" data-fps="30">
       <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="38.36" data-track-index="0" data-layout-allow-overflow></canvas>
 
+      <div id="dim"></div>
       <div id="hud" class="clip" data-start="0" data-duration="38.36" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
         <div id="ttFrame"></div>
         <div id="tt"><div id="ttVig"></div><div id="ttRec"><i></i>REC 03:12 AM</div><div id="ttViews">👁 <b>0</b> views</div>
@@ -177,9 +181,11 @@
       const [VOL0, VOL1] = D.VOL, [SLP0, SLP1] = D.SLP;
 
       /* ---------------- renderer + low-poly night balcony ---------------- */
-      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: true, preserveDrawingBuffer: true });
-      renderer.setSize(1080, 1920, false); renderer.setPixelRatio(1);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      // draft renders draw the 3D at half resolution (no AA, cheaper shadows); the page and output stay 1080x1920
+      const DRAFT = !!window.HF_DRAFT;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setSize(DRAFT ? 540 : 1080, DRAFT ? 960 : 1920, false); renderer.setPixelRatio(1);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true; renderer.shadowMap.type = DRAFT ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
       const scene = new THREE.Scene();
       const sky = document.createElement("canvas"); sky.width = 4; sky.height = 512;
       const sg = sky.getContext("2d"), gr = sg.createLinearGradient(0, 0, 0, 512);
@@ -192,7 +198,7 @@
       const box = (w, h, d, m, x, y, z, parent = scene) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; parent.add(b); return b; };
       scene.add(new THREE.HemisphereLight(0xd6ccff, 0x5a3a52, 1.5));
       const key = new THREE.DirectionalLight(0xffd2a1, 2.3); key.position.set(1.4, 2.6, 2.4); key.castShadow = true;
-      key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+      key.shadow.mapSize.set(DRAFT ? 1024 : 2048, DRAFT ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
       Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 1.8, bottom: -0.6, near: 0.5, far: 8 }); scene.add(key);
       const rim = new THREE.DirectionalLight(0x7dd3fc, 1.5); rim.position.set(-2, 1.6, -2.2); scene.add(rim);
       const screenLight = new THREE.PointLight(0x60a5fa, 1.2, 1.6); screenLight.position.set(-0.35, 0.8, -0.35); scene.add(screenLight);
@@ -373,9 +379,9 @@
         const vol = t >= VOL0 && t < VOL1 ? 1 - seg(t, LINES[14].s - 0.05, LINES[14].s + 0.3) : 0;
         blur = Math.max(blur, vol);
         const sleeping = t >= SLP0 && t < SLP1;
-        // light blur only, so Quill stays visible (bobbing, blinking) behind the semi-transparent cards
+        // light dim only, so Quill stays visible (bobbing, blinking) behind the semi-transparent cards
         const canvas = $("three");
-        canvas.style.filter = blur > 0.01 ? `blur(${(3 * blur).toFixed(2)}px) brightness(${(1 - 0.25 * blur).toFixed(3)})` : "none";
+        $("dim").style.opacity = (0.35 * blur).toFixed(3);   // flat dim, no per-frame blur filter
         canvas.style.transform = sleeping ? "scale(0.8)" : "none";
         canvas.style.clipPath = sleeping ? "inset(0 round 70px)" : "none";
 

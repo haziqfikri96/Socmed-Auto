@@ -182,6 +182,16 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 - The API cannot set a caption on a draft, so always give the user the description text (with the sources) to paste.
 - The draft upload had not yet been tested against TikTok when this note was written.
 
+## Render workflow (set by the user, Nov 2026)
+
+- **Drafts by default.** Every intermediate render is a draft: `tools/hf_render.sh <project>` (draft quality, 1080x1920, 30fps -> `videos/<project>.draft.mp4`). Master quality (`tools/hf_render.sh <project> --final`) only when the user explicitly asks for the final export.
+- Projects with a 3D scene have `render-mode.js` (`window.HF_DRAFT`); the script sets it during drafts, so WebGL draws at half resolution without AA and with cheaper shadows. The output is still 1080x1920. The script restores it afterwards.
+- **Test clips only on request**: `tools/hf_render.sh <project> <start> <end>` renders just that span.
+- **Preview**: `npx hyperframes@0.9.30 preview --background --no-open --port 3002` from the project folder; `--status` / `--stop`.
+- **Never regenerate audio that exists.** `make_dialogue.py` reuses takes by hash of speaker+text (only changed lines are voiced); `tools/make_sfx_elevenlabs.py` skips existing effects. Rebuilding `assets/mix.wav` with `make_audio.py` is local and free.
+- **Cheap paint only**: no `backdrop-filter`, CSS `filter: blur()`/`drop-shadow()` or large blurred `box-shadow` on cards, emotes or the canvas; use solid/semi-transparent fills, borders and radial-gradient halos.
+- Extra render workers don't speed up WebGL projects here (software GPU); measured: 2s clip 108s at full quality, 40s as a draft.
+
 ## Host character (use the user's exact art)
 
 The user wants their own character, exactly as in their art, in videos from now on, not a generic dummy and not a re-drawn version.
