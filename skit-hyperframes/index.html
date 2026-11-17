@@ -21,10 +21,10 @@
       .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
       #sub { position: absolute; left: 70px; width: 940px; top: 1300px; text-align: center; }
-      #who { display: inline-block; padding: 8px 22px; border-radius: 999px; font-size: 28px; font-weight: 900; letter-spacing: 0.12em; margin-bottom: 14px; }
+      #who { display: table; margin: 0 auto; padding: 8px 22px; border-radius: 999px; font-size: 28px; font-weight: 900; letter-spacing: 0.12em; margin-bottom: 14px; }
       #who.dev { background: #F59E0B; color: #1a1205; }
       #who.quill { background: #2DD4BF; color: #04211d; }
-      #line { font-size: 52px; line-height: 66px; font-weight: 800; text-shadow: 0 4px 18px rgba(0,0,0,0.85), 0 0 2px #000; }
+      #line { display: inline-block; padding: 10px 26px 14px; border-radius: 26px; background: rgba(8, 6, 20, 0.62); font-size: 50px; line-height: 64px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
 
       .card { position: absolute; left: 70px; top: 330px; width: 940px; border-radius: 40px; background: rgba(10, 14, 32, 0.94); border: 2px solid rgba(148, 163, 184, 0.35);
         box-shadow: 0 30px 80px rgba(0,0,0,0.5); padding: 46px 48px; opacity: 0; }
@@ -80,6 +80,7 @@
       #ctaTerm { border-radius: 22px; background: #0B1020; padding: 26px 22px; font-size: 21.5px; line-height: 42px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; }
       #ctaTerm .p { color: #4ADE80; } #ctaTerm .h { color: #A3B1C6; }
 
+      .emote { position: absolute; left: 0; top: 0; font-size: 120px; line-height: 1; opacity: 0; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)); }
       #mark { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font-size: 26px; font-weight: 800; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; }
     </style>
   </head>
@@ -213,39 +214,69 @@
       const quill = createBot(THREE);
       quill.group.position.set(0.34, 0.2, 0.05); quill.group.rotation.y = -0.45; quill.group.scale.setScalar(1.05); scene.add(quill.group);
 
-      /* per-line acting: [dev pose, dev mood, quill gesture, quill mood] */
-      const ACT = [
-        ["point", "neutral", "none", "neutral"], ["idle", "neutral", "wave", "happy"], ["shrug", "neutral", "none", "neutral"], ["idle", "neutral", "shrug", "sly"],
-        ["idle", "wide", "none", "happy"], ["idle", "neutral", "point", "neutral"], ["point", "neutral", "none", "happy"], ["idle", "happy", "wave", "happy"],
-        ["think", "neutral", "none", "neutral"], ["idle", "neutral", "shrug", "sly"], ["think", "neutral", "none", "neutral"], ["idle", "neutral", "point", "neutral"],
-        ["idle", "wide", "none", "neutral"], ["cheer", "happy", "wave", "happy"], ["point", "happy", "none", "neutral"], ["idle", "neutral", "point", "happy"],
-        ["think", "neutral", "none", "sly"], ["idle", "neutral", "shrug", "sly"], ["facepalm", "wide", "none", "happy"], ["facepalm", "neutral", "wave", "happy"],
+      /* ---------------- direction: beats keyed to words in assets/lines.json ---------------- */
+      // dev: [time, expression, pose]
+      const DEV_BEATS = [
+        [0, "neutral", "idle"], [0.3, "suspicious", "handsHips"], [1.25, "confused", "point"], [3.0, "suspicious", "handsHips"],
+        [6.7, "unimpressed", "idle"], [6.95, "unimpressed", "shrug"], [8.6, "unimpressed", "crossArms"],
+        [10.42, "shock", "recoil"], [12.1, "curious", "idle"], [17.55, "curious", "crossArms"], [18.6, "curious", "idle"],
+        [23.9, "suspicious", "chinThink"], [27.15, "hopeful", "idle"], [27.75, "curious", "chinThink"], [29.4, "curious", "idle"],
+        [31.75, "hopeful", "idle"], [33.2, "happy", "idle"], [35.6, "happy", "point"], [38.3, "happy", "idle"],
+        [39.4, "suspicious", "crossArms"], [40.7, "worried", "crossArms"], [42.0, "worried", "idle"], [43.75, "horror", "recoil"],
+        [45.0, "angry", "angry"], [46.4, "unimpressed", "handsHips"],
       ];
+      // quill: [time, mood, gesture]
+      const Q_BEATS = [
+        [0, "neutral", "none"], [1.25, "innocent", "none"], [3.0, "nervous", "none"], [5.25, "innocent", "shrug"], [6.0, "proud", "none"],
+        [6.95, "neutral", "none"], [8.95, "smug", "shrug"], [10.0, "proud", "none"], [10.75, "happy", "none"],
+        [12.6, "proud", "point"], [13.65, "excited", "point"], [17.5, "happy", "none"], [18.6, "excited", "cheer"], [23.9, "neutral", "none"],
+        [26.1, "smug", "shrug"], [26.6, "proud", "none"], [27.7, "happy", "none"], [29.95, "happy", "point"], [31.75, "smug", "none"],
+        [33.15, "proud", "cheer"], [35.6, "excited", "none"], [38.25, "proud", "none"], [38.7, "sly", "none"], [40.7, "innocent", "none"],
+        [42.0, "innocent", "shrug"], [43.75, "sly", "none"], [45.2, "wince", "cover"], [46.05, "happy", "wave"],
+      ];
+      // shots: [time, shot, hard cut?]
+      const SHOTS = [
+        [0, "wide", 0], [1.2, "dev", 0], [3.25, "quillClose", 1], [5.25, "quill", 0], [6.7, "dev", 1], [8.95, "quill", 0],
+        [10.42, "devPunch", 1], [12.05, "quill", 0], [17.55, "dev", 0], [18.6, "quill", 0], [23.95, "dev", 0], [26.1, "quill", 0],
+        [27.15, "dev", 1], [29.95, "quill", 0], [31.75, "devClose", 1], [33.15, "quill", 0], [35.6, "dev", 0], [38.25, "quill", 0],
+        [38.7, "quillClose", 1], [40.3, "devClose", 1], [42.0, "quill", 0], [43.75, "devPunch", 1], [45.0, "devPunch", 1],
+        [45.6, "quillClose", 1], [46.05, "quill", 0],
+      ];
+      // pop-up symbols above heads: [from, to, who, symbol]
+      const EMOTES = [[3.05, 4.7, "dev", "❓"], [3.3, 5.1, "quill", "💦"], [10.05, 10.42, "quill", "✨"], [10.45, 12.0, "dev", "❗"],
+        [24.1, 25.5, "dev", "❓"], [26.65, 27.6, "quill", "✨"], [31.8, 33.1, "dev", "✨"], [39.1, 40.2, "quill", "😏"],
+        [40.35, 41.5, "dev", "❓"], [43.8, 45.0, "dev", "💦"], [45.05, 46.0, "dev", "💢"], [45.6, 46.0, "quill", "❗"]];
+
+      const beatAt = (B, t) => { let i = 0; while (i < B.length - 1 && t >= B[i + 1][0]) i++; return i; };
       const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.15) i++; return i; };
-      const BLINKS = [2.0, 6.3, 11.5, 16.2, 21.0, 26.8, 31.2, 37.0, 41.6, 47.6];
+      const BLINKS = [2.0, 6.3, 11.5, 16.2, 21.0, 26.8, 30.9, 37.0, 41.6, 47.6];
 
       /* ---------------- camera shots ---------------- */
       const SHOT = {
         wide: [[0.05, 0.85, 3.9], [0.0, 0.5, 0]],
         dev: [[0.18, 0.95, 2.15], [-0.3, 0.7, 0]],
+        devClose: [[0.08, 0.98, 1.55], [-0.3, 0.82, 0]],
+        devPunch: [[0.04, 0.98, 1.45], [-0.31, 0.84, 0]],
         quill: [[-0.08, 0.82, 2.0], [0.34, 0.58, 0]],
+        quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],
       };
-      const shotFor = (i, t) => (i === 0 && t < 2.2) || i === 18 ? "wide" : LINES[i].who;
       function camAt(t) {
-        const i = lineAt(t), now = shotFor(i, t);
-        const prevT = i === 0 ? 2.2 : LINES[i].s - 0.15, prev = i === 0 ? "wide" : shotFor(i - 1, prevT - 0.01);
-        const k = (i === 0 && t >= 2.2) ? seg(t, 2.2, 2.75) : seg(t, prevT, prevT + 0.5);
+        const i = beatAt(SHOTS, t), [t0, now, hard] = SHOTS[i], prev = SHOTS[Math.max(0, i - 1)][1];
+        const k = hard || i === 0 ? 1 : seg(t, t0, t0 + 0.5);
         const A = SHOT[prev], B = SHOT[now];
         const p = A[0].map((v, j) => v + (B[0][j] - v) * k), l = A[1].map((v, j) => v + (B[1][j] - v) * k);
+        // slow push-in on punch shots, gentle drift everywhere, shake on "Quill!"
+        const push = now === "devPunch" ? 0.07 * seg(t, t0, t0 + 1.2) : 0;
+        const shake = t >= 45.0 && t < 45.6 ? 0.025 * (1 - (t - 45.0) / 0.6) : 0;
         const drift = 0.03 * Math.sin(t * 0.4);
-        return [[p[0] + drift, p[1] + 0.01 * Math.sin(t * 0.7), p[2]], l];
+        return [[p[0] + drift + shake * Math.sin(t * 90), p[1] + 0.01 * Math.sin(t * 0.7) + shake * Math.cos(t * 77), p[2] - push], l];
       }
       const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.05, 40);
       camera.setViewOffset(1080, 1920, 0, 120, 1080, 1920);
 
       /* ---------------- cards ---------------- */
-      const CARDS = [["cHtml", S(5), E(5) + 0.2], ["cFeat", S(7), E(7) + 0.15], ["cTerm", S(11), S(13) - 0.05], ["cGit", S(13) - 0.05, E(13) + 0.2],
-        ["cVolc", S(15), S(15) + 1.4], ["cPhone", S(17) - 0.05, E(17) + 0.1], ["cCta", S(19) - 0.05, DUR + 1]];
+      const CARDS = [["cHtml", S(5), E(5) + 0.15], ["cFeat", S(7), E(7) + 0.1], ["cTerm", S(11), 31.75], ["cGit", S(13) - 0.05, E(13) + 0.1],
+        ["cVolc", S(15), 38.7], ["cPhone", 42.55, 43.75], ["cCta", 46.6, DUR + 1]];
       const CODE = '<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>\n  Hello!\n<span class="k">&lt;/div&gt;</span>\n<span class="k">&lt;script&gt;</span>\n  <span class="t">gsap</span>.from(<span class="s">".title"</span>,\n    { y: 200 })\n<span class="k">&lt;/script&gt;</span>';
       const frames = $("frames");
       for (let i = 0; i < 16; i++) { const f = document.createElement("div"); f.className = "fr"; f.style.left = i * 80 + "px"; frames.appendChild(f); }
@@ -317,25 +348,46 @@
         return 0;
       }
 
+      const emoteEls = EMOTES.map(() => { const d = document.createElement("div"); d.className = "emote"; $("hud").appendChild(d); return d; });
+
       function renderAt(t) {
-        const i = lineAt(t), [dp, dm, qg, qm] = ACT[i], [pdp] = ACT[Math.max(0, i - 1)];
-        const k = i === 0 ? 1 : seg(t, LINES[i].s - 0.15, LINES[i].s + 0.25);
-        const pose = dev.blend(pdp, dp, k);
-        pose.head = [pose.head?.[0] || 0, (pose.head?.[1] || 0) + 0.05 * Math.sin(t * 1.1), (pose.head?.[2] || 0) + 0.03 * Math.sin(t * 1.7)];
-        if (dp === "point" || dp === "cheer") pose.body = [0, 0, 0.02 * Math.sin(t * 2)];
+        // dev: pose + expression, both eased between beats
+        const di = beatAt(DEV_BEATS, t), [d0, dExpr, dPose] = DEV_BEATS[di], [, pExpr, pPose] = DEV_BEATS[Math.max(0, di - 1)];
+        const dk = di === 0 ? 1 : seg(t, d0, d0 + 0.28);
+        const pose = dev.blend(pPose, dPose, dk);
+        // look at Quill while Quill talks, at the camera otherwise
+        const qTalking = LINES[lineAt(t)].who === "quill";
+        const turn = qTalking ? 0.32 : 0;
+        pose.head = [(pose.head?.[0] || 0) + 0.02 * Math.sin(t * 1.3), (pose.head?.[1] || 0) + turn + 0.04 * Math.sin(t * 1.1), (pose.head?.[2] || 0) + 0.03 * Math.sin(t * 1.7)];
+        if (dPose === "angry") pose.body = [0.12, 0, 0.03 * Math.sin(t * 30) * (t < 45.6 ? 1 : 0)];
         dev.pose(pose);
-        dev.group.position.y = 0.004 * Math.sin(t * 2.4);
+        const hop = dExpr === "shock" || dExpr === "horror" ? 0.025 * Math.max(0, Math.sin(Math.min(1, (t - d0) / 0.25) * Math.PI)) : 0;
+        dev.group.position.y = 0.004 * Math.sin(t * 2.4) + hop;
         const blink = BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b) / 0.08), 0);
-        dev.face({ talk: talkOf("dev", t), blink, mood: dm });
-        const qMood = i === 15 && t > LINES[15].words[1].s ? "sly" : qm;
-        quill.face({ mood: qMood, talk: talkOf("quill", t), blink: BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b - 0.9) / 0.08), 0) });
-        quill.update(t, qg, seg(t, LINES[i].s - 0.15, LINES[i].s + 0.3));
-        if (i === 18) quill.group.position.x = 0.34 + 0.05 * seg(t, LINES[18].s, LINES[18].s + 0.2); // tiny flinch at "Quill!"
-        else quill.group.position.x = 0.34;
+        dev.face({ expr: pExpr, to: dExpr, k: dk, talk: talkOf("dev", t), blink, t });
+
+        // quill: mood + gesture
+        const qi = beatAt(Q_BEATS, t), [q0, qMood, qGest] = Q_BEATS[qi];
+        quill.face({ mood: qMood, talk: talkOf("quill", t), blink: BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b - 0.9) / 0.08), 0), t });
+        quill.update(t, qGest, seg(t, q0, q0 + 0.3));
+        quill.group.position.x = 0.34 + (qMood === "wince" ? 0.06 * seg(t, q0, q0 + 0.15) : 0);
+        quill.group.rotation.y = -0.45 + (qTalking ? 0 : -0.15);
+
         const [cp, cl] = camAt(t);
         camera.position.set(...cp); camera.lookAt(...cl);
         renderer.render(scene, camera);
         hud(t);
+
+        // emotes follow the heads on screen
+        EMOTES.forEach(([a, b, who, sym], n) => {
+          const el = emoteEls[n], on = t >= a && t < b;
+          el.style.opacity = on ? 1 - seg(t, b - 0.15, b) : 0;
+          if (!on) return;
+          const anchor = who === "dev" ? dev.rig.head.localToWorld(new THREE.Vector3(0.17, 0.42, 0)) : quill.group.localToWorld(new THREE.Vector3(-0.22, 0.72, 0));
+          const v = anchor.project(camera), x = (v.x + 1) / 2 * 1080, y = (1 - v.y) / 2 * 1920;
+          el.textContent = sym;
+          el.style.transform = `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${pop(t, a, 0.25).toFixed(3)}) rotate(${(8 * Math.sin(t * 6)).toFixed(1)}deg)`;
+        });
       }
 
       window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
