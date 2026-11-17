@@ -338,7 +338,7 @@ export function createBot(THREE) {
     });
     return api;
   }
-  const api = { group, face: face_, update, height: 0.6 };
+  const api = { group, face: face_, update, height: 0.6, screen: face };   // screen: the face-screen pivot (local rect ±0.125 × ±0.085)
   face_({}); update(0);
   return api;
 }
