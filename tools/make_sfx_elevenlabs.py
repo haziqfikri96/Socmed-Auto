@@ -31,6 +31,9 @@ KIT = {
     "lock_click": (0.6, "Crisp metallic latch lock click, short and solid"),
     "eruption": (3.0, "Cartoon volcano eruption, deep rumble building into a big lava burst whoosh, fun and punchy, no music"),
     "snore": (3.0, "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"),
+    "sparkle": (1.0, "Bright magical sparkle chime, short twinkling anime shine sound, clean, no music"),
+    "gulp": (0.8, "Cartoon nervous gulp swallow with a tiny water-drop plink, anime sweat drop sound effect"),
+    "sting": (1.2, "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"),
 }
 
 manifest = {}

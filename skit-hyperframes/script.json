@@ -1,7 +1,7 @@
 [
  [
   "dev",
-  "Quill. Why is there a video on my desktop called final final v3?"
+  "Quill, what's final final v3?"
  ],
  [
   "quill",
@@ -9,27 +9,19 @@
  ],
  [
   "dev",
-  "I don't even have a video editor."
+  "I don't even have an editor!"
  ],
  [
   "quill",
-  "You don't need one. I wrote it."
+  "Don't need one. HyperFrames turns HTML into an MP4."
  ],
  [
   "dev",
-  "You wrote a video?"
+  "You made a video with code?"
  ],
  [
   "quill",
-  "In HTML. HyperFrames turns a web page into an MP4. Every single frame."
- ],
- [
-  "dev",
-  "Show me."
- ],
- [
-  "quill",
-  "Text. Animation. Real 3D. Captions synced to your voice. It's all just code."
+  "Every single frame. Text, animation, real 3D, captions synced to your voice."
  ],
  [
   "dev",
@@ -61,8 +53,7 @@
  ],
  [
   "quill",
-  "Done.",
-  3.2
+  "Done."
  ],
  [
   "dev",
@@ -74,16 +65,22 @@
  ],
  [
   "dev",
-  "Yeah?"
+  "Yeah?",
+  0.13
  ],
  [
   "quill",
-  "It's you. Asleep at your desk. Two million views.",
-  2.6
+  "It's you. Asleep at your desk. Two million views."
  ],
  [
   "dev",
-  "Quill!"
+  "Quill!",
+  0,
+  3
+ ],
+ [
+  "quill",
+  "You're welcome."
  ],
  [
   "quill",

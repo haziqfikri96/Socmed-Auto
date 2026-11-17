@@ -51,7 +51,7 @@ DEV_POSES.sleep = { body: [0.72, 0, 0], head: [0.05, -1.35, 0.35], armR: [-1.15,
 /* expression presets: brows (y offset, tilt + = angry inner-down, - = worried), eyes (scale, height, look), whites/pupil for shock,
    lids (upper 0..1, squint = lower lid), mouth shape at rest and while talking, blush, sweat, red (anger flush) */
 export const DEV_EXPR = {
-  neutral:    { browY: 0, browTilt: 0.08, browAsym: 0, eyeS: 1, eyeY: 1, look: 0, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "flat", talkShape: "talk", blush: 0, sweat: 0, red: 0 },
+  neutral:    { browY: 0, browTilt: 0.08, browAsym: 0, eyeS: 1, eyeY: 1, look: 0, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "flat", talkShape: "talk", blush: 0, sweat: 0, red: 0, stars: 0 },
   happy:      { browY: 0.008, browTilt: -0.05, browAsym: 0, eyeS: 1, eyeY: 0.8, look: 0, white: 0, pupil: 1, lid: 0, squint: 0.45, mouth: "grin", talkShape: "grin", blush: 0.6, sweat: 0, red: 0 },
   confused:   { browY: 0.004, browTilt: 0.02, browAsym: 0.018, eyeS: 1, eyeY: 1, look: 0.004, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "smirk", talkShape: "talk", blush: 0, sweat: 0, red: 0 },
   suspicious: { browY: -0.006, browTilt: 0.2, browAsym: 0.012, eyeS: 1, eyeY: 0.75, look: 0.008, white: 0, pupil: 1, lid: 0.35, squint: 0.3, mouth: "flat", talkShape: "talk", blush: 0, sweat: 0, red: 0 },
@@ -61,6 +61,7 @@ export const DEV_EXPR = {
   hopeful:    { browY: 0.014, browTilt: -0.2, browAsym: 0, eyeS: 1.2, eyeY: 1.1, look: 0, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "o", talkShape: "o", blush: 0.4, sweat: 0, red: 0 },
   worried:    { browY: 0.012, browTilt: -0.28, browAsym: 0, eyeS: 1.05, eyeY: 1.0, look: -0.006, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "wavy", talkShape: "talk", blush: 0, sweat: 1, red: 0 },
   horror:     { browY: 0.015, browTilt: -0.3, browAsym: 0, eyeS: 1.2, eyeY: 1.1, look: 0, white: 1, pupil: 0.35, lid: 0, squint: 0, mouth: "wavy", talkShape: "o", blush: 0.9, sweat: 1, red: 0 },
+  starstruck: { browY: 0.016, browTilt: -0.14, browAsym: 0, eyeS: 1.1, eyeY: 1, look: 0, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "grin", talkShape: "grin", blush: 0.7, sweat: 0, red: 0, stars: 1 },
   amazed:     { browY: 0.015, browTilt: -0.12, browAsym: 0, eyeS: 1.18, eyeY: 1.05, look: 0, white: 1, pupil: 0.6, lid: 0, squint: 0, mouth: "grin", talkShape: "grin", blush: 0.5, sweat: 0, red: 0 },
   asleep:     { browY: -0.004, browTilt: -0.05, browAsym: 0, eyeS: 1, eyeY: 1, look: 0, white: 0, pupil: 1, lid: 1, squint: 0, mouth: "o", talkShape: "o", blush: 0.3, sweat: 0, red: 0 },
   angry:      { browY: -0.012, browTilt: 0.38, browAsym: 0, eyeS: 1.0, eyeY: 0.85, look: 0, white: 1, pupil: 0.55, lid: 0.15, squint: 0.15, mouth: "frown", talkShape: "shout", blush: 0, sweat: 0, red: 0.75 },
@@ -144,6 +145,13 @@ export function createDev(THREE, opts = {}) {
   addMesh(THREE, mouths.shout, new THREE.CircleGeometry(0.014, 8), basic(0xd9485f), [0, -0.016, 0.001], [0, 0, 0], [1.3, 0.7, 1]);
   const wavyPts = Array.from({ length: 9 }, (_, i) => new THREE.Vector3(-0.026 + i * 0.0065, 0.004 * Math.sin(i * 1.6), 0));
   mouths.wavy = addMesh(THREE, MG, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(wavyPts), 24, 0.0035, 4), lipMat, [0, -0.004, 0]);
+  const starShapeD = new THREE.Shape();
+  for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 0.02 : 0.05; i ? starShapeD.lineTo(r * Math.cos(a), r * Math.sin(a)) : starShapeD.moveTo(r * Math.cos(a), r * Math.sin(a)); }
+  const starEyes = [1, -1].map((s) => {
+    const st = addMesh(THREE, face, new THREE.ExtrudeGeometry(starShapeD, { depth: 0.006, bevelEnabled: false }), basic(0xfacc15), [s * 0.072, 0.008, 0.016], [0, s * 0.3, 0]);
+    addMesh(THREE, st, new THREE.ShapeGeometry(starShapeD), basic(0xfff7c2), [0.006, 0.006, 0.007], [0, 0, 0], [0.45, 0.45, 1]);
+    st.visible = false; return st;
+  });
   const blush = [1, -1].map((s) => addMesh(THREE, face, new THREE.CircleGeometry(0.03, 10), basic(0xff6b8b, { transparent: true, opacity: 0.55 }), [s * 0.115, -0.038, -0.004], [0, s * 0.55, 0], [1.3, 0.7, 1]));
   const sweat = new THREE.Group(); face.add(sweat); sweat.position.set(-0.16, 0.06, -0.03);
   addMesh(THREE, sweat, new THREE.SphereGeometry(0.02, 8, 6), basic(0x7dd3fc), [0, 0, 0], [0, 0, 0], [0.9, 1.1, 0.6]);
@@ -183,7 +191,10 @@ export function createDev(THREE, opts = {}) {
       e.scale.set(0.85 * X.eyeS * p, Math.max(0.08, 1.1 * X.eyeS * X.eyeY * p * lidK), 1);
       e.position.set((i === 0 ? 1 : -1) * 0.072 + X.look, 0.005 - 0.014 * close + 0.006 * X.squint, 0.012);
     });
-    whites.forEach((w) => { w.visible = X.white > 0.5 && blink < 0.5; w.scale.set(0.9 * X.eyeS, 1.1 * X.eyeS * X.eyeY * (1 - 0.6 * X.lid), 1); });
+    const stars = X.stars > 0.5;
+    starEyes.forEach((st) => { st.visible = stars; st.rotation.z = 0.25 * Math.sin(t * 7); st.scale.setScalar(1 + 0.12 * Math.abs(Math.sin(t * 9))); });
+    eyes.forEach((e) => { if (stars) e.scale.set(0.001, 0.001, 1); });
+    whites.forEach((w) => { w.visible = X.white > 0.5 && blink < 0.5 && !stars; w.scale.set(0.9 * X.eyeS, 1.1 * X.eyeS * X.eyeY * (1 - 0.6 * X.lid), 1); });
     lids.forEach((l) => (l.visible = false));
     lows.forEach((l) => (l.visible = false));
     for (const m in mouths) mouths[m].visible = false;
@@ -216,6 +227,7 @@ export const BOT_MOODS = {
   worried:  { eyes: "pill", eyeS: 0.9, browY: 0.008, browTilt: -0.4, mouth: "wavy", talkShape: "o", sweat: true },
   wince:    { eyes: "wince", browTilt: 0.25, browY: -0.004, mouth: "wavy", talkShape: "o", lean: 0.05, pitch: 0.22, alarm: true },
   sly:      { eyes: "pill", eyeSY: 0.45, browTilt: 0.18, mouth: "smirk", talkShape: "grin", tilt: 0.1 },
+  cheeky:   { eyes: "arc", eyeS: 1.05, browY: 0.01, browAsym: 0.014, browTilt: 0.22, mouth: "smile", talkShape: "grin", tilt: 0.16, pitch: -0.08, sparkle: true },
 };
 export function createBot(THREE) {
   const C = { shell: 0xf1f4f9, trim: 0x14b8a6, screen: 0x0a1220, glow: 0x5eead4, warm: 0xfbbf24 };

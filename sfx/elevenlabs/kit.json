@@ -70,5 +70,17 @@
   "snore": {
     "seconds": 3.0,
     "prompt": "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"
+  },
+  "sparkle": {
+    "seconds": 1.0,
+    "prompt": "Bright magical sparkle chime, short twinkling anime shine sound, clean, no music"
+  },
+  "gulp": {
+    "seconds": 0.8,
+    "prompt": "Cartoon nervous gulp swallow with a tiny water-drop plink, anime sweat drop sound effect"
+  },
+  "sting": {
+    "seconds": 1.2,
+    "prompt": "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"
   }
 }

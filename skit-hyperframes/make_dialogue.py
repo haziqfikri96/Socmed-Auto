@@ -10,11 +10,14 @@ import numpy as np, soundfile as sf
 HERE = Path(__file__).resolve().parent
 TOOL = HERE.parent / "tools/make_voiceover_timed.py"
 VOICE = {"dev": ("bIHbv24MWmeRgasZH58o", 1.04), "quill": ("FGY2WhTYpPnrIDTdsKH5", 1.1)}  # Will, Laura
-GAP = {"dev": 0.22, "quill": 0.18}
+GAP = {"dev": 0.04, "quill": 0.02}   # seconds from the previous line's last word to this line (tight banter)
+TAIL = 0.3                            # the video ends this long after the final word, so it loops cleanly
 lines = json.loads((HERE / "script.json").read_text())
 SR, t, chunks, out = 48000, 0.25, [], []
 for i, entry in enumerate(lines):
-    who, text, pause = entry[0], entry[1], (entry[2] if len(entry) > 2 else 0)  # optional pause after the line (seconds)
+    who, text = entry[0], entry[1]
+    pause = entry[2] if len(entry) > 2 else 0      # optional pause after the line (seconds)
+    gain = 10 ** ((entry[3] if len(entry) > 3 else 0) / 20)  # optional vocal boost in dB
     key = hashlib.sha1(f"{who}|{text}".encode()).hexdigest()[:12]               # takes are cached by content
     wav, words = HERE / f"assets/lines/{key}.wav", HERE / f"assets/lines/{key}.json"
     if not wav.exists():
@@ -25,9 +28,10 @@ for i, entry in enumerate(lines):
     dur = len(a) / SR
     out.append({"who": who, "text": text, "s": round(t, 3), "e": round(t + w[-1]["e"], 3),
                 "words": [{"w": x["w"], "s": round(t + x["s"], 3), "e": round(t + x["e"], 3)} for x in w]})
-    chunks.append((int(t * SR), a))
-    t += dur + GAP[who] + (0.45 if text.endswith("?") and who == "dev" else 0) + pause
-total = t + 1.6
+    chunks.append((int(t * SR), a * gain))
+    t += w[-1]["e"] + pause
+    if i + 1 < len(lines): t += GAP[lines[i + 1][0]]
+total = t + TAIL
 mix = np.zeros((int(total * SR), 2))
 for i0, a in chunks: mix[i0:i0 + len(a)] += a[:, :2] if a.shape[1] > 1 else np.repeat(a, 2, axis=1)
 sf.write(HERE / "assets/dialogue.wav", mix, SR, subtype="PCM_16")
