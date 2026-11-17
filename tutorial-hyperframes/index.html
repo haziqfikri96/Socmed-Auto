@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="direction.js"></script>
+    <script src="render-mode.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      /* TikTok safe zone for UI: top >= 180px, bottom <= 1600px (320px reserved), right <= 960px (120px reserved) */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0d0920; }
+      #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; background: radial-gradient(circle at 50% 40%, #241a45, #0d0920 75%); }
+      #dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #0b0820; opacity: 0; pointer-events: none; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; transform-origin: 50% 50%; }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+      #sub { position: absolute; left: 90px; width: 840px; top: 1360px; text-align: center; }
+      #who { display: table; margin: 0 auto 10px; padding: 8px 22px; border-radius: 999px; font-size: 26px; font-weight: 900; letter-spacing: 0.12em; }
+      #who.dev { background: #F59E0B; color: #1a1205; }
+      #who.quill { background: #2DD4BF; color: #04211d; }
+      #line { display: inline-block; padding: 10px 26px 14px; border-radius: 26px; background: rgba(8, 6, 20, 0.66); font-size: 46px; line-height: 60px; font-weight: 800; }
+
+      .card { position: absolute; left: 90px; top: 300px; width: 840px; border-radius: 40px; background: rgba(10, 14, 32, 0.78); border: 2px solid rgba(148, 163, 184, 0.35);
+        padding: 40px 42px; opacity: 0; transform-origin: 50% 40%; }
+      .card h3 { font-size: 28px; font-weight: 900; letter-spacing: 0.14em; color: #94A3B8; margin-bottom: 22px; }
+      .card h3 b { color: #2DD4BF; }
+
+      /* html -> mp4 */
+      #code { width: 430px; height: 360px; border-radius: 22px; background: #0B1020; padding: 24px; font-size: 22px; line-height: 38px; color: #E2E8F0; white-space: pre; display: inline-block; vertical-align: top; }
+      #code .k { color: #C084FC; } #code .s { color: #4ADE80; } #code .t { color: #60A5FA; }
+      #arrow2 { display: inline-block; width: 66px; text-align: center; font-size: 56px; font-weight: 900; color: #2DD4BF; line-height: 360px; vertical-align: top; }
+      #mini { display: inline-block; width: 240px; height: 360px; border-radius: 22px; background: linear-gradient(160deg, #F97316, #7C3AED); vertical-align: top; position: relative; overflow: hidden; }
+      #miniT { position: absolute; left: 0; width: 240px; top: 150px; text-align: center; font-size: 42px; font-weight: 900; }
+      #frames { margin-top: 26px; height: 86px; position: relative; overflow: hidden; }
+      .fr { position: absolute; top: 0; width: 66px; height: 86px; border-radius: 10px; background: linear-gradient(160deg, #F97316, #7C3AED); border: 3px solid #0B1020; }
+      #mp4 { display: inline-block; margin-top: 22px; padding: 12px 26px; border-radius: 999px; background: #16A34A; font-size: 32px; font-weight: 900; opacity: 0; }
+
+      .feat { display: flex; align-items: center; gap: 22px; margin: 16px 0; padding: 20px 26px; border-radius: 22px; background: rgba(17, 26, 51, 0.9); font-size: 40px; font-weight: 800; opacity: 0; }
+      .feat i { font-style: normal; width: 62px; height: 62px; border-radius: 18px; text-align: center; line-height: 62px; font-size: 34px; }
+      .feat em { margin-left: auto; font-style: normal; color: #4ADE80; font-size: 40px; }
+
+      #termBody { font-size: 20.5px; line-height: 44px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; min-height: 240px; }
+      #termBody .p, .ok { color: #4ADE80; }
+      #termBody .cur { background: #E2E8F0; color: #0B1020; }
+
+      #repo { font-size: 28px; color: #94A3B8; font-weight: 700; }
+      #repoName { font-size: 50px; font-weight: 900; letter-spacing: -0.03em; margin: 6px 0 14px; white-space: nowrap; }
+      #repoDesc { font-size: 30px; color: #CBD5E1; margin-bottom: 26px; font-weight: 700; }
+      .tag { display: inline-block; margin: 0 10px 12px 0; padding: 12px 22px; border-radius: 999px; font-size: 30px; font-weight: 900; opacity: 0; }
+
+      #ctaA { text-align: center; font-size: 44px; font-weight: 800; color: #94A3B8; }
+      #ctaB { text-align: center; font-size: 100px; font-weight: 900; letter-spacing: -0.04em; color: #2DD4BF; margin: 4px 0 24px; }
+      #ctaTerm { border-radius: 22px; background: #0B1020; padding: 24px 20px; font-size: 20px; line-height: 40px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; }
+      #ctaTerm .p { color: #4ADE80; } #ctaTerm .h { color: #A3B1C6; }
+
+      .emote { position: absolute; left: 0; top: 0; width: 150px; height: 150px; margin: -75px 0 0 -75px; opacity: 0; }
+      #mark { position: absolute; left: 60px; top: 190px; font-size: 26px; font-weight: 800; color: #fff; opacity: 0.6; letter-spacing: 0.06em; }
+      #cTitle { text-align: center; top: 340px; }
+      #cTitle .tk { font-size: 40px; font-weight: 800; color: #94A3B8; letter-spacing: 0.2em; }
+      #cTitle .tb { font-size: 104px; line-height: 104px; font-weight: 900; letter-spacing: -0.04em; color: #2DD4BF; margin: 10px 0 18px; }
+      #cTitle .tt30 { display: inline-block; padding: 10px 26px; border-radius: 999px; background: #F59E0B; color: #1a1205; font-size: 34px; font-weight: 900; }
+      .term { border-radius: 22px; background: #0B1020; padding: 24px 22px; font-size: 30px; line-height: 50px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; min-height: 200px; }
+      .term .p, .term .ok { color: #4ADE80; } .term .h { color: #A3B1C6; } .term .cur { background: #E2E8F0; color: #0B1020; }
+      .bub { position: relative; border-radius: 26px; padding: 50px 28px 24px; font-size: 36px; line-height: 50px; font-weight: 800; margin: 10px 0 18px; }
+      .bub .lb { position: absolute; left: 24px; top: 12px; font-size: 22px; letter-spacing: 0.14em; font-weight: 900; }
+      .bub.you { background: #1E293B; margin-left: 60px; } .bub.you .lb { color: #F59E0B; }
+      .bub.ai { background: rgba(45, 212, 191, 0.14); border: 2px solid rgba(45, 212, 191, 0.5); margin-right: 60px; font-size: 30px; line-height: 44px; } .bub.ai .lb { color: #2DD4BF; }
+      .bub .sl { color: #C084FC; }
+      #mini2 { margin: 20px auto 0; width: 300px; height: 300px; border-radius: 22px; background: linear-gradient(160deg, #2563EB, #7C3AED); position: relative; overflow: hidden; opacity: 0; }
+      #mini2T { position: absolute; left: 0; width: 300px; top: 118px; text-align: center; font-size: 52px; font-weight: 900; }
+      #cCta { text-align: center; }
+      #ctaA { font-size: 64px; font-weight: 900; margin-bottom: 18px; }
+      #ctaB { font-size: 60px; line-height: 64px; font-weight: 900; letter-spacing: -0.02em; margin: 22px 0 10px; } #ctaB b { color: #2DD4BF; font-size: 110px; line-height: 116px; }
+      #ctaC { font-size: 36px; font-weight: 800; color: #94A3B8; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="tutorial-hyperframes" data-start="0" data-duration="29.72" data-width="1080" data-height="1920" data-fps="30">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="29.72" data-track-index="0" data-layout-allow-overflow></canvas>
+
+      <div id="dim"></div>
+      <div id="hud" class="clip" data-start="0" data-duration="29.72" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div class="card" id="cTitle"><div class="tk">THE FULL</div><div class="tb">HYPERFRAMES<br />TUTORIAL</div><div class="tt30">⏱ 30 seconds</div></div>
+        <div class="card" id="cReq"><h3>STEP 0 · <b>YOU NEED</b></h3>
+          <div class="feat" id="rq0"><i style="background:#16A34A">⬢</i>Node.js 22+<em>✓</em></div>
+          <div class="feat" id="rq1"><i style="background:#7C3AED">▶</i>FFmpeg<em>✓</em></div>
+        </div>
+        <div class="card" id="cInst"><h3>STEP 1 · <b>INSTALL IN CLAUDE CODE</b></h3><div id="instBody" class="term mono"></div></div>
+        <div class="card" id="cAsk"><h3>STEP 2 · <b>JUST ASK</b></h3>
+          <div class="bub you"><span class="lb">YOU</span><div id="askText"></div></div>
+          <div class="bub ai" id="askAI"><span class="lb">CLAUDE</span><div id="askAIText"></div></div>
+        </div>
+        <div class="card" id="cRun"><h3>STEP 3 · <b>PREVIEW → RENDER</b></h3><div id="runBody" class="term mono"></div>
+          <div id="mini2"><div id="mini2T">Hello!</div></div></div>
+        <div class="card" id="cCta"><div id="ctaA">That's it.</div>
+          <span class="tag" id="tg0" style="background:#16A34A">FREE</span><span class="tag" id="tg1" style="background:#7C3AED">OPEN SOURCE</span><span class="tag" id="tg2" style="background:#334155">by HeyGen</span>
+          <div id="ctaB">FOLLOW FOR<br /><b>PART 2</b></div><div id="ctaC">making your first video →</div></div>
+
+        <div id="sub"><div id="who" class="dev">SHICHI</div><div id="line"></div></div>
+        <div id="mark">@shichi.ai</div>
+      </div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="29.72" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 29.72 }, 0);
+      window.__timelines["tutorial-hyperframes"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { createDev, createBot } from "./characters.js";
+
+      const LINES = window.LINES, D = window.D, DUR = D.DUR;
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      // GSAP back.out(1.7): spring overshoot used for every card and pop-in
+      const backOut = (x, c1 = 1.7) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const springIn = (t, a, d = 0.4) => backOut((t - a) / d);
+      const pop = springIn;
+      const $ = (id) => document.getElementById(id);
+      const S = (i) => LINES[i].s, E = (i) => LINES[i].e;
+      const [VOL0, VOL1] = D.VOL, [SLP0, SLP1] = D.SLP;
+
+      /* ---------------- renderer + low-poly night balcony ---------------- */
+      // draft renders draw the 3D at half resolution (no AA, cheaper shadows); the page and output stay 1080x1920
+      const DRAFT = !!window.HF_DRAFT;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setSize(DRAFT ? 540 : 1080, DRAFT ? 960 : 1920, false); renderer.setPixelRatio(1);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true; renderer.shadowMap.type = DRAFT ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+      const scene = new THREE.Scene();
+      const sky = document.createElement("canvas"); sky.width = 4; sky.height = 512;
+      const sg = sky.getContext("2d"), gr = sg.createLinearGradient(0, 0, 0, 512);
+      gr.addColorStop(0, "#120c2b"); gr.addColorStop(0.55, "#3d2763"); gr.addColorStop(0.85, "#a85a64"); gr.addColorStop(1, "#e08a5f");
+      sg.fillStyle = gr; sg.fillRect(0, 0, 4, 512);
+      const skyT = new THREE.CanvasTexture(sky); skyT.colorSpace = THREE.SRGBColorSpace; scene.background = skyT;
+      scene.fog = new THREE.Fog(0x3d2763, 6, 16);
+
+      const flat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.85, ...extra });
+      const box = (w, h, d, m, x, y, z, parent = scene) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; parent.add(b); return b; };
+      scene.add(new THREE.HemisphereLight(0xd6ccff, 0x5a3a52, 1.5));
+      const key = new THREE.DirectionalLight(0xffd2a1, 2.3); key.position.set(1.4, 2.6, 2.4); key.castShadow = true;
+      key.shadow.mapSize.set(DRAFT ? 1024 : 2048, DRAFT ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+      Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 1.8, bottom: -0.6, near: 0.5, far: 8 }); scene.add(key);
+      const rim = new THREE.DirectionalLight(0x7dd3fc, 1.5); rim.position.set(-2, 1.6, -2.2); scene.add(rim);
+      const screenLight = new THREE.PointLight(0x60a5fa, 1.2, 1.6); screenLight.position.set(-0.35, 0.8, -0.35); scene.add(screenLight);
+
+      // deck, railing
+      const deck = flat(0x6b4a35), rail = flat(0x3b2a33);
+      for (let i = 0; i < 11; i++) box(0.36, 0.06, 6.0, i % 2 ? deck : flat(0x5f4230), -1.8 + i * 0.36, -0.03, 1.8);
+      box(3.4, 0.05, 0.05, rail, 0, 0.62, -1.15); box(3.4, 0.04, 0.04, rail, 0, 0.32, -1.15);
+      for (let i = 0; i < 9; i++) box(0.05, 0.62, 0.05, rail, -1.6 + i * 0.4, 0.31, -1.15);
+      // desk + monitor + mug + plant
+      const wood = flat(0x8a5a3c), dark = flat(0x1f2433);
+      box(0.9, 0.04, 0.45, wood, -0.3, 0.52, -0.5);
+      for (const x of [-0.7, 0.1]) for (const z of [-0.68, -0.32]) box(0.04, 0.5, 0.04, wood, x, 0.25, z);
+      const monBox = box(0.5, 0.32, 0.03, dark, -0.32, 0.78, -0.6), monStand = box(0.05, 0.16, 0.05, dark, -0.32, 0.6, -0.6);
+      const monC = document.createElement("canvas"); monC.width = 512; monC.height = 312;
+      const monT = new THREE.CanvasTexture(monC); monT.colorSpace = THREE.SRGBColorSpace;
+      const mon = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.28), new THREE.MeshBasicMaterial({ map: monT })); mon.position.set(-0.32, 0.78, -0.584); scene.add(mon);
+      const mug = box(0.06, 0.08, 0.06, flat(0xf472b6), 0.0, 0.58, -0.45);
+      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.07, 0.16, 7), flat(0xc2410c)); pot.position.set(1.05, 0.08, -0.85); pot.castShadow = true; scene.add(pot);
+      for (let i = 0; i < 5; i++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.32, 4), flat(0x16a34a)); l.position.set(1.05 + Math.cos(i * 1.3) * 0.05, 0.3, -0.85 + Math.sin(i * 1.3) * 0.05); l.rotation.set(Math.cos(i) * 0.4, i, Math.sin(i) * 0.4); scene.add(l); }
+      // string lights
+      const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffd27a });
+      for (let i = 0; i <= 18; i++) { const u = i / 18, x = -1.6 + 3.2 * u, y = 1.75 - 0.22 * Math.sin(Math.PI * u); const b = new THREE.Mesh(new THREE.IcosahedronGeometry(0.022, 0), bulbMat); b.position.set(x, y, -1.1); scene.add(b); }
+      // city skyline
+      let sd = 5; const rnd = () => ((sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const winOn = new THREE.MeshBasicMaterial({ color: 0xffd27a }), winOff = new THREE.MeshBasicMaterial({ color: 0x3b2f5c });
+      for (let i = 0; i < 34; i++) {
+        const h = 1.4 + rnd() * 3.2, w = 0.4 + rnd() * 0.6, z = -4 - rnd() * 3, x = -4.5 + i * 0.28 + rnd() * 0.2;
+        box(w, h, 0.5, flat(0x221a3d), x, h / 2 - 0.9, z);
+        for (let k = 0; k < 10; k++) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.08), rnd() > 0.45 ? winOn : winOff); p.position.set(x - w / 2.6 + rnd() * w * 0.77, -0.6 + rnd() * (h - 0.4), z + 0.255); scene.add(p); }
+      }
+
+      /* ---------------- characters ---------------- */
+      const dev = createDev(THREE, { glasses: false });
+      dev.group.position.set(-0.32, 0, 0); dev.group.rotation.y = 0.35; scene.add(dev.group);
+      const quill = createBot(THREE);
+      quill.group.position.set(0.34, 0.2, 0.05); quill.group.rotation.y = -0.45; quill.group.scale.setScalar(1.05); scene.add(quill.group);
+
+      /* ---------------- direction (from direction.js, anchored to words) ---------------- */
+      const beatAt = (B, t) => { let i = 0; while (i < B.length - 1 && t >= B[i + 1][0]) i++; return i; };
+      const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.05) i++; return i; };
+      const BLINK_DEV = [2.6, 6.8, 11.9, 15.8, 19.2, 23.0, 26.3, 30.1, 37.2];
+      const BLINK_Q = [1.2, 4.9, 8.2, 11.2, 13.9, 16.4, 20.6, 24.1, 27.9, 33.2, 36.8];   // Quill keeps blinking behind the cards too
+      const blinkOf = (L, t) => L.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b) / 0.07), 0);
+
+      /* ---------------- camera ---------------- */
+      const SHOT = {
+        hookPunch: [[-0.36, 0.98, -1.7], [-0.33, 0.96, 0]],     // from the monitor, punching in on his shocked face
+        hookHold: [[-0.36, 0.98, -1.4], [-0.33, 0.96, 0]],
+        wide: [[0.05, 0.85, 3.9], [0.0, 0.5, 0]],
+        dev: [[0.18, 0.95, 2.15], [-0.3, 0.7, 0]],
+        devClose: [[0.08, 0.98, 1.55], [-0.3, 0.82, 0]],
+        devLow: [[0.06, 1.3, 1.5], [-0.3, 1.18, 0]],
+        quill: [[-0.08, 0.82, 2.0], [0.34, 0.58, 0]],
+        quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],
+        sleepCam: [[1.25, 1.12, -0.12], [-0.32, 0.6, -0.45]],
+      };
+      function camAt(t) {
+        const i = beatAt(D.shots, t), [t0, now, hard] = D.shots[i], prev = D.shots[Math.max(0, i - 1)][1];
+        const k = hard || i === 0 ? 1 : seg(t, t0, t0 + 0.4);
+        const A = SHOT[prev], B = SHOT[now];
+        let p = A[0].map((v, j) => v + (B[0][j] - v) * k), l = A[1].map((v, j) => v + (B[1][j] - v) * k);
+        if (now === "hookPunch") p = [p[0], p[1], -1.7 + 0.3 * backOut((t - t0) / 0.5)];   // dynamic punch-in in the first half second
+        const drift = now.startsWith("hook") || now === "sleepCam" ? 0 : 0.025 * Math.sin(t * 0.4);
+        let sx = 0, sy = 0;
+        for (const [s0, sd] of D.shakes) if (t >= s0 && t < s0 + sd) { const f = Math.floor((t - s0) * 30); sx = [0.03, -0.035, 0.025, -0.02][f] || 0; sy = [-0.02, 0.025, -0.03, 0.015][f] || 0; }
+        return [[p[0] + drift + sx, p[1] + 0.008 * Math.sin(t * 0.7) + sy, p[2]], l];
+      }
+      const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.05, 40);
+      camera.setViewOffset(1080, 1920, 0, 120, 1080, 1920);
+
+      /* ---------------- three-state lip-sync: closed / open-small / open-wide per syllable ---------------- */
+      const syllables = (w) => Math.max(1, (w.toLowerCase().replace(/[^a-z]/g, "").replace(/e$/, "").match(/[aeiouy]+/g) || []).length);
+      function mouthOf(who, t) {
+        const L = LINES[lineAt(t)];
+        for (const line of LINES) {
+          if (line.who !== who || t < line.s || t >= line.e) continue;
+          for (const w of line.words) {
+            if (t < w.s || t >= w.e) continue;
+            const n = syllables(w.w), slot = (w.e - w.s) / n, p = ((t - w.s) % slot) / slot;
+            return p < 0.18 || p > 0.88 ? 0.45 : p < 0.3 || p > 0.72 ? 0.62 : 0.95;   // small -> wide -> small within each syllable
+          }
+          return 0;   // between words: closed
+        }
+        void L; return 0;
+      }
+
+      /* ---------------- custom vector emotes (low-poly two-tone, no system emoji) ---------------- */
+      const SVG = {
+        bang: `<svg viewBox="0 0 100 100"><polygon points="38,6 64,6 58,64 44,64" fill="#ef4444" stroke="#fff" stroke-width="5"/><polygon points="51,6 64,6 58,64 51,64" fill="#b91c1c"/><polygon points="51,72 61,78 61,90 51,96 41,90 41,78" fill="#ef4444" stroke="#fff" stroke-width="5"/></svg>`,
+        question: `<svg viewBox="0 0 100 100"><path d="M28 34 Q28 8 52 8 Q76 8 76 30 Q76 44 60 52 Q54 56 54 66 L42 66 Q42 50 54 43 Q63 38 63 30 Q63 20 52 20 Q41 20 41 34 Z" fill="#facc15" stroke="#3b2a05" stroke-width="5" stroke-linejoin="round"/><polygon points="48,74 58,79 58,90 48,95 38,90 38,79" fill="#facc15" stroke="#3b2a05" stroke-width="5"/></svg>`,
+        sparkle: `<svg viewBox="0 0 100 100"><polygon points="50,4 58,42 96,50 58,58 50,96 42,58 4,50 42,42" fill="#fde047" stroke="#7c5a00" stroke-width="3"/><polygon points="50,4 58,42 96,50 50,50" fill="#fff7c2"/><polygon points="82,10 85,22 97,25 85,28 82,40 79,28 67,25 79,22" fill="#fff"/><polygon points="20,66 23,76 33,79 23,82 20,92 17,82 7,79 17,76" fill="#fde047"/></svg>`,
+        sweat: `<svg viewBox="0 0 100 100"><path d="M40 10 Q62 40 62 58 Q62 76 44 76 Q26 76 26 58 Q26 40 40 10 Z" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="4"/><path d="M34 52 Q34 44 38 38" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M74 40 Q86 56 86 66 Q86 76 77 76 Q68 76 68 66 Q68 56 74 40 Z" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="3"/></svg>`,
+        anger: `<svg viewBox="0 0 100 100"><g fill="none" stroke="#ef4444" stroke-width="11" stroke-linecap="round"><path d="M40 12 Q40 40 12 40"/><path d="M60 12 Q60 40 88 40"/><path d="M40 88 Q40 60 12 60"/><path d="M60 88 Q60 60 88 60"/></g></svg>`,
+        zzz: `<svg viewBox="0 0 100 100"><g fill="#c7d2fe" stroke="#312e81" stroke-width="3" stroke-linejoin="round"><polygon points="10,52 44,52 44,60 24,80 44,80 44,88 10,88 10,80 30,60 10,60"/><polygon points="54,22 80,22 80,28 64,44 80,44 80,50 54,50 54,44 70,28 54,28"/></g></svg>`,
+      };
+      const emoteEls = D.emotes.map(([, , , kind]) => { const d = document.createElement("div"); d.className = "emote"; d.innerHTML = SVG[kind]; $("hud").appendChild(d); return d; });
+
+      /* ---------------- cards: semi-transparent, back.out(1.7) spring in, slow micro-zoom while up ---------------- */
+      const CODE = '<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>\n  Hello!\n<span class="k">&lt;/div&gt;</span>\n<span class="k">&lt;script&gt;</span>\n  <span class="t">gsap</span>.from(<span class="s">".title"</span>,\n    { y: 200 })\n<span class="k">&lt;/script&gt;</span>';
+      function typeHTML(html, n) {
+        let out = "", shown = 0, i = 0;
+        while (i < html.length && shown < n) {
+          if (html[i] === "<") { const j = html.indexOf(">", i); out += html.slice(i, j + 1); i = j + 1; continue; }
+          if (html[i] === "&") { const j = html.indexOf(";", i); out += html.slice(i, j + 1); i = j + 1; shown++; continue; }
+          out += html[i++]; shown++;
+        }
+        const open = (out.match(/<span[^>]*>/g) || []).length - (out.match(/<\/span>/g) || []).length;
+        return out + "</span>".repeat(Math.max(0, open));
+      }
+      const fmt = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(Math.round(n)));
+      const wordAt = (i, prefix) => LINES[i].words.find((w) => w.w.toLowerCase().replace(/[^a-z0-9]/g, "").startsWith(prefix)).s;
+
+      /* the desk monitor: desktop with the mystery file, then code while Quill explains */
+      const mx = monC.getContext("2d");
+      function monitorAt(t) {
+        const W = 512, H = 312;
+        if (t < LINES[3].s) {
+          const g = mx.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#3b2a7a"); g.addColorStop(1, "#c2507a"); mx.fillStyle = g; mx.fillRect(0, 0, W, H);
+          mx.fillStyle = "rgba(0,0,0,0.35)"; mx.fillRect(0, 0, W, 22);
+          [["notes.txt", 40, 50], ["memes", 40, 140]].forEach(([n, x, y]) => { mx.fillStyle = "#e2e8f0"; mx.fillRect(x, y, 46, 56); mx.fillStyle = "#fff"; mx.font = "bold 16px sans-serif"; mx.fillText(n, x - 6, y + 78); });
+          const glow = 0.5 + 0.5 * Math.sin(t * 6);
+          mx.fillStyle = `rgba(250,204,21,${0.35 + 0.35 * glow})`; mx.fillRect(250, 80, 190, 150);
+          mx.fillStyle = "#111827"; mx.fillRect(300, 95, 90, 70); mx.fillStyle = "#f97316"; mx.beginPath(); mx.moveTo(335, 115); mx.lineTo(335, 145); mx.lineTo(360, 130); mx.fill();
+          mx.fillStyle = "#fff"; mx.font = "bold 20px sans-serif"; mx.fillText("hyperframes", 280, 200);
+        } else {
+          mx.fillStyle = "#0b1020"; mx.fillRect(0, 0, W, H);
+          const cols = ["#c084fc", "#60a5fa", "#4ade80", "#f472b6", "#e2e8f0"];
+          const scroll = Math.floor((t - LINES[3].s) * 3);
+          for (let r = 0; r < 12; r++) {
+            const n = (r + scroll) * 7919 % 97;
+            mx.fillStyle = cols[n % 5]; mx.fillRect(20 + (n % 3) * 24, 18 + r * 24, 80 + (n * 37) % 300, 10);
+          }
+        }
+        monT.needsUpdate = true;
+      }
+
+      function hud(t) {
+        let blur = 0;
+        for (const [id, a, b] of D.cards) {
+          const v = t >= a && t < b, el = $(id);
+          el.style.opacity = v ? seg(t, a, a + 0.12) * (1 - seg(t, b - 0.15, b)) : 0;
+          el.style.transform = v ? `scale(${((0.86 + 0.14 * springIn(t, a, 0.45)) * (1 + 0.025 * clamp((t - a) / Math.max(0.5, b - a), 0, 1))).toFixed(4)})` : "";
+          if (v) blur = Math.max(blur, seg(t, a, a + 0.15) * (1 - seg(t, b - 0.15, b)));
+        }
+        $("dim").style.opacity = (0.35 * blur).toFixed(3);   // flat dim, no per-frame blur filter
+        const cur = Math.floor(t * 3) % 2 ? '<span class="cur">&nbsp;</span>' : " ";
+
+        // step 0: requirements pop on their words
+        [D.nodeAt, D.ffAt].forEach((a, i) => { $("rq" + i).style.opacity = t >= a ? 1 : 0; $("rq" + i).style.transform = `translateX(${((1 - springIn(t, a, 0.35)) * 60).toFixed(1)}px)`; });
+
+        // step 1: the two install commands type out as Quill says them
+        const C1 = "claude plugin marketplace add heygen-com/hyperframes", C2 = "claude plugin install hyperframes@hyperframes";
+        const n1 = Math.floor(clamp((t - D.T1) / 1.1, 0, 1) * C1.length), n2 = Math.floor(clamp((t - D.T2) / 0.85, 0, 1) * C2.length);
+        const wrap = (c, n, at) => (n > at ? c.slice(0, at) + "\n  " + c.slice(at + 1, n) : c.slice(0, n));
+        let term = `<span class="h"># in Claude Code</span>\n<span class="p">$</span> ${wrap(C1, n1, 29)}`;
+        if (t >= D.T2) term += `\n<span class="p">$</span> ${wrap(C2, n2, 21)}`;
+        if (t >= D.T2 + 1.0) term += `\n<span class="ok">✓ Installed hyperframes</span>`;
+        $("instBody").innerHTML = term + cur;
+
+        // step 2: the prompt types into the chat, then Claude answers
+        const a0 = D.cards[3][1], P = "Using /hyperframes, make a 10-second intro with a fade-in title";
+        const np = Math.floor(clamp((t - a0 - 0.1) / 1.9, 0, 1) * P.length);
+        $("askText").innerHTML = P.slice(0, np).replace("/hyperframes", '<span class="sl">/hyperframes</span>') + (np < P.length ? cur : "");
+        const aiOn = t >= a0 + 2.3;
+        $("askAI").style.opacity = aiOn ? 1 : 0; $("askAI").style.transform = `scale(${springIn(t, a0 + 2.3, 0.35).toFixed(3)})`;
+        const steps = ["✍️ writing index.html", "✓ checked: 0 errors", "✓ ready to preview"];
+        $("askAIText").innerHTML = steps.filter((_, k) => t >= a0 + 2.3 + k * 0.6).join("<br />");
+
+        // step 3: preview, then render
+        let run = `<span class="p">$</span> npx hyperframes preview`;
+        if (t >= D.previewAt + 0.4) run += `\n<span class="ok">✓ live at localhost:3002</span>`;
+        if (t >= D.renderAt) run += `\n<span class="p">$</span> npx hyperframes render`;
+        if (t >= D.renderAt + 0.6) run += `\n<span class="ok">✓ my-video.mp4</span>`;
+        $("runBody").innerHTML = run + cur;
+        const m0 = D.previewAt + 0.4, mu = t < m0 ? 0 : smooth((((t - m0) % 1.4) + 1.4) % 1.4 / 0.7);
+        $("mini2").style.opacity = t >= m0 ? 1 : 0; $("mini2").style.transform = `scale(${springIn(t, m0, 0.35).toFixed(3)})`;
+        $("mini2T").style.opacity = mu; $("mini2T").style.transform = `translateY(${(30 * (1 - mu)).toFixed(1)}px)`;
+
+        // CTA tags on "free" and "open source"
+        [D.freeAt, D.openAt, D.openAt + 0.5].forEach((a, i) => { $("tg" + i).style.opacity = t >= a ? 1 : 0; $("tg" + i).style.transform = `scale(${springIn(t, a, 0.3)})`; });
+
+        // subtitles + speaker badge (inside the safe zone)
+        const i = lineAt(t), L = LINES[i], on = t >= L.s - 0.05 && t < L.e + 0.2;
+        $("sub").style.opacity = on ? 1 : 0;
+        $("who").textContent = L.who === "dev" ? "SHICHI" : "QUILL"; $("who").className = L.who;
+        $("line").textContent = L.text;
+      }
+
+      function renderAt(t) {
+        monitorAt(t);
+        const shotNow = D.shots[beatAt(D.shots, t)][1];
+        // Shichi: pose + expression eased between beats
+        const di = beatAt(D.dev, t), [d0, dExpr, dPose] = D.dev[di], [, pExpr, pPose] = D.dev[Math.max(0, di - 1)];
+        const dk = di === 0 ? 1 : seg(t, d0, d0 + 0.25);
+        const pose = dev.blend(pPose, dPose, dk);
+        const qTalking = LINES[lineAt(t)].who === "quill";
+        pose.head = [(pose.head?.[0] || 0) + 0.02 * Math.sin(t * 1.3), (pose.head?.[1] || 0) + (qTalking ? 0.32 : 0) + 0.04 * Math.sin(t * 1.1), (pose.head?.[2] || 0) + 0.03 * Math.sin(t * 1.7)];
+        if (dPose === "angry") pose.body = [0.12, 0, 0.03 * Math.sin(t * 30) * (t < S(18) + 0.6 ? 1 : 0)];
+        dev.pose(pose);
+        const hop = dExpr === "shock" || dExpr === "horror" ? 0.025 * Math.max(0, Math.sin(Math.min(1, (t - d0) / 0.25) * Math.PI)) : 0;
+        const sleeping = t >= SLP0 && t < SLP1, facingMonitor = shotNow.startsWith("hook");
+        dev.group.position.set(-0.32, 0.004 * Math.sin(t * 2.4) + hop, sleeping ? -0.02 : 0);
+        dev.group.rotation.y = sleeping ? Math.PI : facingMonitor ? Math.PI + 0.15 : 0.35;
+        quill.group.visible = !sleeping && !facingMonitor; monBox.visible = monStand.visible = mon.visible = !facingMonitor;   // the camera is the monitor here
+        // monitor-POV hook: warm key from the camera side, dim cyan rim, so his face keeps its skin tone
+        if (facingMonitor) { key.position.set(-1.0, 2.2, -2.6); rim.intensity = 0.35; screenLight.intensity = 0.6; }
+        else { key.position.set(1.4, 2.6, 2.4); rim.intensity = 1.5; screenLight.intensity = 1.2; } mug.visible = !sleeping;
+        dev.face({ expr: pExpr, to: dExpr, k: dk, talk: mouthOf("dev", t), blink: dExpr === "asleep" ? 1 : blinkOf(BLINK_DEV, t), t });
+
+        // Quill: mood + gesture, idle bob and blinks all the time (also behind the cards)
+        const qi = beatAt(D.quill, t), [q0, qMood, qGest] = D.quill[qi];
+        quill.face({ mood: qMood, talk: mouthOf("quill", t), blink: blinkOf(BLINK_Q, t), t });
+        quill.update(t, qGest, seg(t, q0, q0 + 0.3));
+        quill.group.position.set(0.34 + (qMood === "wince" ? 0.06 * seg(t, q0, q0 + 0.12) : 0), 0.2 + 0.012 * Math.sin(t * 1.9), 0.05);
+        quill.group.rotation.y = -0.45 + (qTalking ? 0 : -0.15);
+
+        const [cp, cl] = camAt(t);
+        camera.position.set(...cp); camera.lookAt(...cl);
+        renderer.render(scene, camera);
+        hud(t);
+
+        // emotes ride above the heads, springing in with back.out(1.7)
+        D.emotes.forEach(([a, b, who], n) => {
+          const el = emoteEls[n], on = t >= a && t < b;
+          el.style.opacity = on ? 1 - seg(t, b - 0.12, b) : 0;
+          if (!on) return;
+          const anchor = who === "dev" ? dev.rig.head.localToWorld(new THREE.Vector3(0.17, 0.42, 0)) : quill.group.localToWorld(new THREE.Vector3(-0.22, 0.72, 0));
+          const v = anchor.project(camera);
+          let x = clamp((v.x + 1) / 2 * 1080, 140, 900), y = clamp((1 - v.y) / 2 * 1920, 260, 1300);
+          if (D.emotes[n][3] === "sparkle") {
+            const pop = D.cards.map((c) => c[0]).map($).find((e) => +e.style.opacity > 0.5);
+            if (pop) { const r = pop.getBoundingClientRect(); x = Math.min(r.right - 60, 880); y = Math.max(r.top + 60, 300); }
+            else { x = Math.max(x, 300); y = Math.max(y, 320); }   // never near the @shichi.ai mark
+          }
+          el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${springIn(t, a, 0.3).toFixed(3)}) rotate(${(8 * Math.sin(t * 6)).toFixed(1)}deg)`;
+        });
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["tutorial-hyperframes"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>

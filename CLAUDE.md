@@ -191,7 +191,7 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 ## Render workflow (set by the user, Nov 2026)
 
 - **Drafts by default.** Every intermediate render is a draft: `tools/hf_render.sh <project>` runs `npx hyperframes@0.9.30 render --quality draft --fps 30 --output review.mp4` in the project folder (1080x1920; `review.mp4` is gitignored). Always pin `@0.9.30`. Master quality (`tools/hf_render.sh <project> --final`) only when the user explicitly asks for the final export.
-- Projects with a 3D scene have `render-mode.js` (`window.HF_DRAFT`); the script sets it during drafts, so WebGL draws at half resolution without AA and with cheaper shadows. The output is still 1080x1920. The script restores it afterwards.
+- Projects with a 3D scene have a committed `render-mode.js` (`window.HF_DRAFT = false`). For drafts the script renders from a temporary copy with it set to true, so WebGL draws at half resolution without AA and with cheaper shadows; the output is still 1080x1920 and the tracked file never changes.
 - **Test clips only on request**: `tools/hf_render.sh <project> <start> <end>` renders just that span to `review-<start>-<end>.mp4`.
 - **Preview**: `npx hyperframes@0.9.30 preview --background --no-open --port 3002` from the project folder; `--status` / `--stop`.
 - **Never regenerate audio that exists.** `make_dialogue.py` reuses takes by hash of speaker+text (only changed lines are voiced); `tools/make_sfx_elevenlabs.py` skips existing effects. Rebuilding `assets/mix.wav` with `make_audio.py` is local and free.

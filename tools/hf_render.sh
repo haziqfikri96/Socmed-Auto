@@ -10,15 +10,19 @@ P="${1:?project folder}"; shift
 WORKERS="${HF_WORKERS:-3}"
 cd "$ROOT/$P"
 MODE=draft; [[ "${1:-}" == "--final" ]] && MODE=final
-# projects with a 3D scene read render-mode.js: half-res WebGL for drafts, full for the master; restored afterwards
-if [[ -f render-mode.js ]]; then
-  [[ $MODE == draft ]] && echo 'window.HF_DRAFT = true;   // tools/hf_render.sh sets this to true while it renders a draft' > render-mode.js
-  trap "echo 'window.HF_DRAFT = false;   // tools/hf_render.sh sets this to true while it renders a draft' > render-mode.js" EXIT
+OUT="$PWD"
+# 3D projects: drafts render from a temporary copy whose render-mode.js says HF_DRAFT = true (half-res WebGL),
+# so the tracked render-mode.js (full quality) is never modified.
+if [[ $MODE == draft && -f render-mode.js ]]; then
+  TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
+  cp -a . "$TMP/"; rm -f "$TMP"/review*.mp4
+  echo 'window.HF_DRAFT = true;' > "$TMP/render-mode.js"
+  cd "$TMP"
 fi
 if [[ "${1:-}" == "--final" ]]; then
   npx --yes hyperframes@0.9.30 render --quality high --fps 30 --workers "$WORKERS" --quiet --output "../videos/$P.mp4"
 elif [[ $# -ge 2 ]]; then
-  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --start "$1" --end "$2" --output "review-$1-$2.mp4"
+  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --start "$1" --end "$2" --output "$OUT/review-$1-$2.mp4"
 else
-  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --output review.mp4
+  npx --yes hyperframes@0.9.30 render --quality draft --fps 30 --workers "$WORKERS" --quiet --output "$OUT/review.mp4"
 fi

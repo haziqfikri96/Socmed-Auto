@@ -1,0 +1,17 @@
+You commented HYPERFRAMES, so here's the full setup 👇
+
+You need: Node.js 22+ and FFmpeg
+
+In Claude Code:
+claude plugin marketplace add heygen-com/hyperframes
+claude plugin install hyperframes@hyperframes
+
+Then just ask: "Using /hyperframes, make a 10-second intro with a fade-in title"
+Preview: npx hyperframes preview
+Render: npx hyperframes render
+
+Part 2 (making your first real video) is next. Follow so you don't miss it!
+
+Source: github.com/heygen-com/hyperframes (official README, Apache 2.0, by HeyGen)
+
+#claudecode #ai #coding #tutorial #opensource
