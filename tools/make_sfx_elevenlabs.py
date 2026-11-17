@@ -29,6 +29,8 @@ KIT = {
     "hydraulic_hiss": (1.2, "Short hydraulic pressure hiss and soft piston push, clean mechanical, no music"),
     "machine_whir": (6.0, "Smooth steady spinning machine whir, gears and fluid turning inside a metal housing, even tone, no music, no voices"),
     "lock_click": (0.6, "Crisp metallic latch lock click, short and solid"),
+    "eruption": (3.0, "Cartoon volcano eruption, deep rumble building into a big lava burst whoosh, fun and punchy, no music"),
+    "snore": (3.0, "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"),
 }
 
 manifest = {}

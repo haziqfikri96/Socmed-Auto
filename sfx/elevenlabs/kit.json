@@ -62,5 +62,13 @@
   "lock_click": {
     "seconds": 0.6,
     "prompt": "Crisp metallic latch lock click, short and solid"
+  },
+  "eruption": {
+    "seconds": 3.0,
+    "prompt": "Cartoon volcano eruption, deep rumble building into a big lava burst whoosh, fun and punchy, no music"
+  },
+  "snore": {
+    "seconds": 3.0,
+    "prompt": "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"
   }
 }

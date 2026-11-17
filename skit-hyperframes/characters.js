@@ -44,6 +44,9 @@ DEV_POSES.handsHips = { armR: [0, 0, -0.65], foreR: [0, 0, 1.9], armL: [0, 0, 0.
 DEV_POSES.recoil = { armR: [-0.4, 0, -0.9], foreR: [-1.2, 0, 0.3], armL: [-0.4, 0, 0.9], foreL: [-1.2, 0, -0.3], body: [-0.12, 0, 0], head: [-0.15, 0, 0] };
 DEV_POSES.angry = { armR: [0.1, 0, -0.45], foreR: [-0.3, 0, -0.2], armL: [0.1, 0, 0.45], foreL: [-0.3, 0, 0.2], body: [0.12, 0, 0], head: [0.1, 0, 0] };
 DEV_POSES.chinThink = { armR: [-0.9, 0, -0.2], foreR: [-2.3, 0, 0.35], armL: [-0.3, 0, 0.35], foreL: [-1.2, 0, -0.6], head: [0.04, 0, 0.14] };
+DEV_POSES.thumbBack = { armR: [0.5, 0, -0.55], foreR: [-1.9, 0, 0.6], head: [0, -0.25, 0.05] };
+DEV_POSES.amazed = { armR: [-0.3, 0, -1.2], foreR: [-0.6, 0, 0.4], armL: [-0.3, 0, 1.2], foreL: [-0.6, 0, -0.4], body: [-0.06, 0, 0], head: [-0.1, 0, 0] };
+DEV_POSES.sleep = { body: [0.72, 0, 0], head: [0.05, -1.35, 0.35], armR: [-1.15, 0, -0.35], foreR: [-1.35, 0.6, 0.9], armL: [-1.15, 0, 0.35], foreL: [-1.35, -0.6, -0.9] };
 
 /* expression presets: brows (y offset, tilt + = angry inner-down, - = worried), eyes (scale, height, look), whites/pupil for shock,
    lids (upper 0..1, squint = lower lid), mouth shape at rest and while talking, blush, sweat, red (anger flush) */
@@ -58,6 +61,8 @@ export const DEV_EXPR = {
   hopeful:    { browY: 0.014, browTilt: -0.2, browAsym: 0, eyeS: 1.2, eyeY: 1.1, look: 0, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "o", talkShape: "o", blush: 0.4, sweat: 0, red: 0 },
   worried:    { browY: 0.012, browTilt: -0.28, browAsym: 0, eyeS: 1.05, eyeY: 1.0, look: -0.006, white: 0, pupil: 1, lid: 0, squint: 0, mouth: "wavy", talkShape: "talk", blush: 0, sweat: 1, red: 0 },
   horror:     { browY: 0.015, browTilt: -0.3, browAsym: 0, eyeS: 1.2, eyeY: 1.1, look: 0, white: 1, pupil: 0.35, lid: 0, squint: 0, mouth: "wavy", talkShape: "o", blush: 0.9, sweat: 1, red: 0 },
+  amazed:     { browY: 0.015, browTilt: -0.12, browAsym: 0, eyeS: 1.18, eyeY: 1.05, look: 0, white: 1, pupil: 0.6, lid: 0, squint: 0, mouth: "grin", talkShape: "grin", blush: 0.5, sweat: 0, red: 0 },
+  asleep:     { browY: -0.004, browTilt: -0.05, browAsym: 0, eyeS: 1, eyeY: 1, look: 0, white: 0, pupil: 1, lid: 1, squint: 0, mouth: "o", talkShape: "o", blush: 0.3, sweat: 0, red: 0 },
   angry:      { browY: -0.012, browTilt: 0.38, browAsym: 0, eyeS: 1.0, eyeY: 0.85, look: 0, white: 1, pupil: 0.55, lid: 0.15, squint: 0.15, mouth: "frown", talkShape: "shout", blush: 0, sweat: 0, red: 0.75 },
 };
 

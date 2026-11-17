@@ -62,17 +62,37 @@
       .tag { display: inline-block; margin: 0 12px 14px 0; padding: 12px 24px; border-radius: 999px; font-size: 32px; font-weight: 900; opacity: 0; }
 
       /* volcano + phone */
-      #vthumb { width: 840px; height: 460px; border-radius: 26px; overflow: hidden; position: relative; background: linear-gradient(180deg, #1E1B4B, #7C2D12); }
-      #volc { position: absolute; left: 270px; bottom: 0; width: 0; height: 0; border-left: 150px solid transparent; border-right: 150px solid transparent; border-bottom: 260px solid #292524; }
-      #lava { position: absolute; left: 380px; bottom: 230px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #FDE047, #F97316 55%, rgba(249,115,22,0) 70%); }
-      #vlabel { margin-top: 24px; font-size: 40px; font-weight: 900; }
-      #vlabel b { color: #4ADE80; }
-      #phone { margin: 0 auto; width: 520px; height: 760px; border-radius: 60px; background: #050816; border: 10px solid #1E293B; position: relative; overflow: hidden; }
-      #pvid { position: absolute; inset: 0; background: linear-gradient(180deg, #312E81, #0F172A); }
-      #zzz { position: absolute; left: 0; width: 500px; top: 210px; text-align: center; font-size: 150px; }
-      #pname { position: absolute; left: 30px; bottom: 150px; font-size: 30px; font-weight: 800; }
-      #views { position: absolute; left: 30px; bottom: 70px; font-size: 64px; font-weight: 900; color: #F472B6; }
-      #views small { font-size: 30px; color: #fff; }
+      /* volcano mini-video (made by Quill) */
+      #vplayer { position: absolute; left: 90px; top: 250px; width: 900px; height: 1180px; border-radius: 44px; overflow: hidden; opacity: 0;
+        background: linear-gradient(180deg, #0f0a2a 0%, #3b1d4a 45%, #b4472c 82%, #2a1208 100%); box-shadow: 0 40px 100px rgba(0,0,0,0.6); border: 3px solid rgba(255,255,255,0.15); }
+      #vsky { position: absolute; inset: 0; }
+      #vglow { position: absolute; left: 250px; top: 520px; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(253,186,116,0.75), rgba(249,115,22,0) 70%); }
+      #vmount { position: absolute; left: 90px; bottom: 120px; width: 720px; height: 560px; background: #241a1f; clip-path: polygon(0 100%, 40% 6%, 60% 6%, 100% 100%); }
+      #vmount2 { position: absolute; left: 90px; bottom: 120px; width: 720px; height: 560px; background: #34242b; clip-path: polygon(50% 6%, 60% 6%, 100% 100%, 62% 100%); }
+      #vcrater { position: absolute; left: 378px; top: 580px; width: 144px; height: 30px; border-radius: 50%; background: radial-gradient(ellipse, #fde047, #f97316 60%, #7c2d12); }
+      #vground { position: absolute; left: 0; bottom: 0; width: 900px; height: 130px; background: #1a0f0c; }
+      .lavab { position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle, #fef08a, #f97316 55%, #b91c1c); }
+      .smoke { position: absolute; left: 0; top: 0; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(120,113,128,0.55), rgba(120,113,128,0) 70%); }
+      #vtitle { position: absolute; left: 0; width: 900px; top: 110px; text-align: center; font-size: 132px; font-weight: 900; letter-spacing: -0.04em; color: #fff; -webkit-text-stroke: 10px #1a0f0c; paint-order: stroke fill; }
+      #vsub { position: absolute; left: 0; width: 900px; top: 270px; text-align: center; font-size: 38px; font-weight: 800; color: #fed7aa; }
+      #vbar { position: absolute; left: 40px; right: 40px; bottom: 34px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.25); }
+      #vbarf { height: 100%; width: 0; border-radius: 5px; background: #f97316; }
+      #vname { position: absolute; left: 40px; bottom: 58px; font-size: 30px; font-weight: 800; color: #fff; }
+
+      /* phone-video overlay for the "final final v3" reveal */
+      #tt { position: absolute; inset: 0; opacity: 0; }
+      #ttVig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.65) 100%); }
+      #ttRec { position: absolute; left: 50px; top: 120px; font-size: 34px; font-weight: 900; color: #fff; letter-spacing: 0.06em; text-shadow: 0 2px 8px #000; }
+      #ttRec i { display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; margin-right: 12px; vertical-align: -2px; font-style: normal; }
+      #ttViews { position: absolute; left: 50%; top: 220px; transform: translateX(-50%); padding: 16px 34px; border-radius: 999px; background: rgba(0,0,0,0.6); font-size: 56px; font-weight: 900; white-space: nowrap; }
+      #ttViews b { color: #F472B6; }
+      #ttSide { position: absolute; right: 36px; top: 860px; width: 130px; text-align: center; font-size: 30px; font-weight: 900; text-shadow: 0 2px 8px #000; }
+      #ttSide div { margin-bottom: 40px; } #ttSide span { display: block; font-size: 76px; line-height: 90px; }
+      #ttCap { position: absolute; left: 50px; right: 200px; top: 1500px; font-size: 36px; font-weight: 800; text-shadow: 0 2px 8px #000; line-height: 50px; }
+      #ttCap b { font-size: 40px; }
+      #ttZ { position: absolute; left: 0; top: 0; font-size: 110px; }
+      #ttBar { position: absolute; left: 0; bottom: 0; height: 8px; width: 1080px; background: rgba(255,255,255,0.25); }
+      #ttBarF { height: 100%; width: 0; background: #fff; }
 
       /* cta */
       #ctaA { text-align: center; font-size: 48px; font-weight: 800; color: #94A3B8; }
@@ -85,10 +105,10 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="skit-hyperframes" data-start="0" data-duration="50.2" data-width="1080" data-height="1920">
-      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="50.2" data-track-index="0" data-layout-allow-overflow></canvas>
+    <div id="root" data-composition-id="skit-hyperframes" data-start="0" data-duration="57.4" data-width="1080" data-height="1920">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="57.4" data-track-index="0" data-layout-allow-overflow></canvas>
 
-      <div id="hud" class="clip" data-start="0" data-duration="50.2" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+      <div id="hud" class="clip" data-start="0" data-duration="57.4" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
         <div id="fileChip">🎬 final_final_v3.mp4</div>
 
         <div class="card" id="cHtml"><h3>HTML <b>→ MP4</b></h3>
@@ -116,14 +136,15 @@
           <span class="tag" id="tg3" style="background:#0F172A; border:2px solid #94A3B8">by HeyGen</span>
         </div>
 
-        <div class="card" id="cVolc"><h3>RENDER <b>DONE</b></h3>
-          <div id="vthumb"><div id="volc"></div><div id="lava"></div></div>
-          <div id="vlabel">volcano.mp4 <b>✓</b></div>
-        </div>
+        <div id="vplayer"><div id="vsky"></div><div id="vglow"></div><div id="vmount"></div><div id="vmount2"></div><div id="vcrater"></div>
+          <div id="vfx"></div><div id="vground"></div>
+          <div id="vtitle">VOLCANOES</div><div id="vsub">Episode 1 · made with HyperFrames</div>
+          <div id="vname">▶ volcano.mp4</div><div id="vbar"><div id="vbarf"></div></div></div>
 
-        <div class="card" id="cPhone" style="background: transparent; border: none; box-shadow: none;">
-          <div id="phone"><div id="pvid"></div><div id="zzz">😴</div><div id="pname">final_final_v3.mp4</div><div id="views">0 <small>views</small></div></div>
-        </div>
+        <div id="tt"><div id="ttVig"></div><div id="ttRec"><i></i>REC 03:12 AM</div><div id="ttViews">👁 <b>0</b> views</div>
+          <div id="ttSide"><div><span>❤️</span><b id="ttLikes">0</b></div><div><span>💬</span>48.1K</div><div><span>↗️</span>Share</div></div>
+          <div id="ttCap"><b>@quill.ai</b><br />final_final_v3.mp4 · my human at 3 a.m. 😴 #devlife #sleepcore</div>
+          <div id="ttZ">💤</div><div id="ttBar"><div id="ttBarF"></div></div></div>
 
         <div class="card" id="cCta">
           <div id="ctaA">Comment</div>
@@ -137,13 +158,13 @@
         <div id="mark">@shichi.ai</div>
       </div>
 
-      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="50.2" data-track-index="10" data-volume="1"></audio>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="57.4" data-track-index="10" data-volume="1"></audio>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      tl.to({}, { duration: 50.2 }, 0);
+      tl.to({}, { duration: 57.4 }, 0);
       window.__timelines["skit-hyperframes"] = tl;
       tl.seek(0);
     </script>
@@ -192,8 +213,10 @@
       box(0.9, 0.04, 0.45, wood, -0.3, 0.52, -0.5);
       for (const x of [-0.7, 0.1]) for (const z of [-0.68, -0.32]) box(0.04, 0.5, 0.04, wood, x, 0.25, z);
       box(0.5, 0.32, 0.03, dark, -0.32, 0.78, -0.6); box(0.05, 0.16, 0.05, dark, -0.32, 0.6, -0.6);
-      const mon = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.28), new THREE.MeshBasicMaterial({ color: 0x3b82f6 })); mon.position.set(-0.32, 0.78, -0.584); scene.add(mon);
-      box(0.06, 0.08, 0.06, flat(0xf472b6), 0.0, 0.58, -0.45);
+      const monC = document.createElement("canvas"); monC.width = 512; monC.height = 312;
+      const monT = new THREE.CanvasTexture(monC); monT.colorSpace = THREE.SRGBColorSpace;
+      const mon = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.28), new THREE.MeshBasicMaterial({ map: monT })); mon.position.set(-0.32, 0.78, -0.584); scene.add(mon);
+      const mug = box(0.06, 0.08, 0.06, flat(0xf472b6), 0.0, 0.58, -0.45);
       const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.07, 0.16, 7), flat(0xc2410c)); pot.position.set(1.05, 0.08, -0.85); pot.castShadow = true; scene.add(pot);
       for (let i = 0; i < 5; i++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.32, 4), flat(0x16a34a)); l.position.set(1.05 + Math.cos(i * 1.3) * 0.05, 0.3, -0.85 + Math.sin(i * 1.3) * 0.05); l.rotation.set(Math.cos(i) * 0.4, i, Math.sin(i) * 0.4); scene.add(l); }
       // string lights
@@ -214,38 +237,44 @@
       const quill = createBot(THREE);
       quill.group.position.set(0.34, 0.2, 0.05); quill.group.rotation.y = -0.45; quill.group.scale.setScalar(1.05); scene.add(quill.group);
 
-      /* ---------------- direction: beats keyed to words in assets/lines.json ---------------- */
+      /* ---------------- direction: one expression per story beat, changed only when something happens ----------------
+         Arc for Shichi: confused -> shocked -> curious -> impressed -> eager -> amazed -> suspicious -> worried -> horror -> angry.
+         Quill: innocent (busted) -> proud -> excited -> sly -> innocent -> wince -> cheerful. */
+      const VOL0 = E(15) + 0.05, VOL1 = S(16) - 0.05;          // volcano video plays between "Done." and "Whoa."
+      const SLP0 = E(19) + 0.05, SLP1 = S(20) - 0.5;         // the "asleep at your desk" video
       // dev: [time, expression, pose]
       const DEV_BEATS = [
-        [0, "neutral", "idle"], [0.3, "suspicious", "handsHips"], [1.25, "confused", "point"], [3.0, "suspicious", "handsHips"],
-        [6.7, "unimpressed", "idle"], [6.95, "unimpressed", "shrug"], [8.6, "unimpressed", "crossArms"],
-        [10.42, "shock", "recoil"], [12.1, "curious", "idle"], [17.55, "curious", "crossArms"], [18.6, "curious", "idle"],
-        [23.9, "suspicious", "chinThink"], [27.15, "hopeful", "idle"], [27.75, "curious", "chinThink"], [29.4, "curious", "idle"],
-        [31.75, "hopeful", "idle"], [33.2, "happy", "idle"], [35.6, "happy", "point"], [38.3, "happy", "idle"],
-        [39.4, "suspicious", "crossArms"], [40.7, "worried", "crossArms"], [42.0, "worried", "idle"], [43.75, "horror", "recoil"],
-        [45.0, "angry", "angry"], [46.4, "unimpressed", "handsHips"],
+        [0, "neutral", "idle"], [0.4, "confused", "handsHips"], [1.75, "confused", "thumbBack"], [3.0, "suspicious", "handsHips"],
+        [5.25, "unimpressed", "handsHips"], [6.95, "unimpressed", "shrug"], [8.9, "unimpressed", "crossArms"],
+        [10.38, "shock", "recoil"], [12.2, "curious", "idle"], [17.55, "curious", "crossArms"], [18.6, "curious", "idle"],
+        [20.9, "happy", "idle"], [23.95, "suspicious", "chinThink"], [26.6, "hopeful", "idle"],
+        [27.75, "happy", "idle"], [31.75, "hopeful", "idle"], [33.2, "happy", "idle"], [35.6, "happy", "point"],
+        [38.25, "curious", "idle"], [VOL1, "amazed", "amazed"], [S(17) + 0.1, "happy", "idle"], [S(17) + 1.2, "suspicious", "crossArms"],
+        [S(18), "suspicious", "handsHips"], [S(19) + 0.6, "worried", "idle"], [SLP0, "asleep", "sleep"], [SLP1, "horror", "recoil"],
+        [S(20), "angry", "angry"], [S(21) + 0.4, "unimpressed", "handsHips"],
       ];
       // quill: [time, mood, gesture]
       const Q_BEATS = [
-        [0, "neutral", "none"], [1.25, "innocent", "none"], [3.0, "nervous", "none"], [5.25, "innocent", "shrug"], [6.0, "proud", "none"],
-        [6.95, "neutral", "none"], [8.95, "smug", "shrug"], [10.0, "proud", "none"], [10.75, "happy", "none"],
-        [12.6, "proud", "point"], [13.65, "excited", "point"], [17.5, "happy", "none"], [18.6, "excited", "cheer"], [23.9, "neutral", "none"],
-        [26.1, "smug", "shrug"], [26.6, "proud", "none"], [27.7, "happy", "none"], [29.95, "happy", "point"], [31.75, "smug", "none"],
-        [33.15, "proud", "cheer"], [35.6, "excited", "none"], [38.25, "proud", "none"], [38.7, "sly", "none"], [40.7, "innocent", "none"],
-        [42.0, "innocent", "shrug"], [43.75, "sly", "none"], [45.2, "wince", "cover"], [46.05, "happy", "wave"],
+        [0, "innocent", "none"], [3.0, "nervous", "none"], [5.25, "innocent", "shrug"], [6.9, "neutral", "none"],
+        [8.95, "smug", "shrug"], [10.0, "proud", "none"], [10.7, "happy", "none"], [12.6, "proud", "point"], [13.65, "excited", "point"],
+        [17.5, "happy", "none"], [18.6, "excited", "cheer"], [23.9, "neutral", "none"], [26.1, "smug", "shrug"], [26.6, "proud", "none"],
+        [27.7, "happy", "none"], [29.95, "happy", "point"], [31.75, "happy", "none"], [33.15, "proud", "cheer"], [35.6, "happy", "none"],
+        [38.25, "proud", "wave"], [VOL1, "proud", "none"], [S(17), "sly", "none"], [S(19), "innocent", "shrug"], [S(20) + 0.1, "wince", "cover"],
+        [S(21), "happy", "wave"],
       ];
       // shots: [time, shot, hard cut?]
       const SHOTS = [
-        [0, "wide", 0], [1.2, "dev", 0], [3.25, "quillClose", 1], [5.25, "quill", 0], [6.7, "dev", 1], [8.95, "quill", 0],
-        [10.42, "devPunch", 1], [12.05, "quill", 0], [17.55, "dev", 0], [18.6, "quill", 0], [23.95, "dev", 0], [26.1, "quill", 0],
-        [27.15, "dev", 1], [29.95, "quill", 0], [31.75, "devClose", 1], [33.15, "quill", 0], [35.6, "dev", 0], [38.25, "quill", 0],
-        [38.7, "quillClose", 1], [40.3, "devClose", 1], [42.0, "quill", 0], [43.75, "devPunch", 1], [45.0, "devPunch", 1],
-        [45.6, "quillClose", 1], [46.05, "quill", 0],
+        [0, "wide", 0], [1.2, "dev", 0], [3.0, "quillClose", 1], [5.25, "quill", 0], [6.9, "dev", 1], [8.95, "quill", 0],
+        [10.38, "devPunch", 1], [12.05, "quill", 0], [17.55, "dev", 0], [18.6, "quill", 0], [23.95, "dev", 0], [26.1, "quill", 0],
+        [26.6, "dev", 1], [29.95, "quill", 0], [31.75, "devClose", 1], [33.15, "quill", 0], [35.6, "dev", 0], [38.25, "quill", 0],
+        [VOL1, "devClose", 1], [S(17), "quillClose", 1], [S(18) - 0.1, "devClose", 1], [S(19), "quill", 0], [S(19) + 1.7, "devClose", 1],
+        [SLP0, "sleepCam", 1], [SLP1, "devPunch", 1], [S(20), "devPunch", 1], [S(20) + 0.6, "quillClose", 1], [S(21), "quill", 0],
       ];
       // pop-up symbols above heads: [from, to, who, symbol]
-      const EMOTES = [[3.05, 4.7, "dev", "❓"], [3.3, 5.1, "quill", "💦"], [10.05, 10.42, "quill", "✨"], [10.45, 12.0, "dev", "❗"],
-        [24.1, 25.5, "dev", "❓"], [26.65, 27.6, "quill", "✨"], [31.8, 33.1, "dev", "✨"], [39.1, 40.2, "quill", "😏"],
-        [40.35, 41.5, "dev", "❓"], [43.8, 45.0, "dev", "💦"], [45.05, 46.0, "dev", "💢"], [45.6, 46.0, "quill", "❗"]];
+      const EMOTES = [[3.0, 4.7, "dev", "❓"], [3.1, 5.0, "quill", "💦"], [10.0, 10.38, "quill", "✨"], [10.4, 12.0, "dev", "❗"],
+        [24.1, 25.6, "dev", "❓"], [26.65, 27.6, "quill", "✨"], [31.8, 33.1, "dev", "✨"], [VOL1, S(17), "dev", "🤩"],
+        [S(17) + 1.2, S(18), "quill", "😏"], [S(18), S(19), "dev", "❓"], [S(19) + 1.7, SLP0, "dev", "💦"], [SLP1, S(20), "dev", "😱"],
+        [S(20), S(20) + 1.0, "dev", "💢"], [S(20) + 0.6, S(21), "quill", "❗"]];
 
       const beatAt = (B, t) => { let i = 0; while (i < B.length - 1 && t >= B[i + 1][0]) i++; return i; };
       const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.15) i++; return i; };
@@ -257,6 +286,7 @@
         dev: [[0.18, 0.95, 2.15], [-0.3, 0.7, 0]],
         devClose: [[0.08, 0.98, 1.55], [-0.3, 0.82, 0]],
         devPunch: [[0.04, 0.98, 1.45], [-0.31, 0.84, 0]],
+        sleepCam: [[1.25, 1.12, -0.12], [-0.32, 0.6, -0.45]],
         quill: [[-0.08, 0.82, 2.0], [0.34, 0.58, 0]],
         quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],
       };
@@ -267,7 +297,7 @@
         const p = A[0].map((v, j) => v + (B[0][j] - v) * k), l = A[1].map((v, j) => v + (B[1][j] - v) * k);
         // slow push-in on punch shots, gentle drift everywhere, shake on "Quill!"
         const push = now === "devPunch" ? 0.07 * seg(t, t0, t0 + 1.2) : 0;
-        const shake = t >= 45.0 && t < 45.6 ? 0.025 * (1 - (t - 45.0) / 0.6) : 0;
+        const shake = t >= S(20) && t < S(20) + 0.6 ? 0.025 * (1 - (t - S(20)) / 0.6) : 0;
         const drift = 0.03 * Math.sin(t * 0.4);
         return [[p[0] + drift + shake * Math.sin(t * 90), p[1] + 0.01 * Math.sin(t * 0.7) + shake * Math.cos(t * 77), p[2] - push], l];
       }
@@ -276,7 +306,7 @@
 
       /* ---------------- cards ---------------- */
       const CARDS = [["cHtml", S(5), E(5) + 0.15], ["cFeat", S(7), E(7) + 0.1], ["cTerm", S(11), 31.75], ["cGit", S(13) - 0.05, E(13) + 0.1],
-        ["cVolc", S(15), 38.7], ["cPhone", 42.55, 43.75], ["cCta", 46.6, DUR + 1]];
+        ["cCta", S(21) + 0.5, DUR + 1]];
       const CODE = '<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>\n  Hello!\n<span class="k">&lt;/div&gt;</span>\n<span class="k">&lt;script&gt;</span>\n  <span class="t">gsap</span>.from(<span class="s">".title"</span>,\n    { y: 200 })\n<span class="k">&lt;/script&gt;</span>';
       const frames = $("frames");
       for (let i = 0; i < 16; i++) { const f = document.createElement("div"); f.className = "fr"; f.style.left = i * 80 + "px"; frames.appendChild(f); }
@@ -331,9 +361,20 @@
         [gw[0].s, gw[2].s, gw[3].s + 0.2, gw[gw.length - 1].s].forEach((a, i) => { $("tg" + i).style.opacity = t >= a ? 1 : 0; $("tg" + i).style.transform = `scale(${pop(t, a, 0.25)})`; });
 
         // volcano + phone
-        $("lava").style.transform = `translateY(${-160 * ((t * 0.9) % 1)}px) scale(${1 + 0.4 * ((t * 0.9) % 1)})`;
-        $("views").innerHTML = `${fmt(2000000 * Math.pow(seg(t, S(17) + 1.6, E(17)), 2))} <small>views</small>`;
-        $("zzz").style.transform = `translateY(${8 * Math.sin(t * 3)}px)`;
+        volcanoAt(t);
+        // phone video of Shichi asleep: views race to 2.0M
+        const tton = t >= SLP0 && t < SLP1;
+        $("tt").style.opacity = tton ? 1 : 0;
+        if (tton) {
+          const u = (t - SLP0) / (SLP1 - SLP0);
+          $("ttViews").querySelector("b").textContent = fmt(2000000 * Math.pow(seg(t, SLP0 + 0.4, SLP1 - 0.2), 1.6));
+          $("ttLikes").textContent = fmt(340000 * Math.pow(seg(t, SLP0 + 0.6, SLP1 - 0.2), 1.6));
+          $("ttBarF").style.width = (u * 100).toFixed(1) + "%";
+          const zp = dev.rig.head.localToWorld(new THREE.Vector3(0.1, 0.45, 0.0)).project(camera);
+          const zu = ((t - SLP0) * 0.7) % 1;
+          $("ttZ").style.transform = `translate(${((zp.x + 1) / 2 * 1080 + 60 * zu).toFixed(0)}px, ${((1 - zp.y) / 2 * 1920 - 180 * zu).toFixed(0)}px) scale(${(0.6 + 0.6 * zu).toFixed(2)})`;
+          $("ttZ").style.opacity = (1 - zu).toFixed(2);
+        }
 
         // subtitles with speaker tag
         const i = lineAt(t), L = LINES[i], on = t >= L.s - 0.1 && t < L.e + 0.35;
@@ -341,6 +382,59 @@
         $("who").textContent = L.who === "dev" ? "SHICHI" : "QUILL"; $("who").className = L.who;
         $("line").textContent = L.text;
         $("sub").style.top = "1420px";
+      }
+
+      /* volcano mini-video: rumble, eruption, lava arcs, smoke, title slam */
+      const vfx = $("vfx"), LAVA = [], SMOKE = [];
+      let vs = 21; const vr = () => ((vs = (vs * 1664525 + 1013904223) >>> 0) / 4294967296);
+      for (let i = 0; i < 26; i++) { const d = document.createElement("div"); d.className = "lavab"; vfx.appendChild(d); LAVA.push([d, vr() * 2 - 1, 0.8 + vr() * 0.9, vr() * 1.6, 0.5 + vr() * 0.8]); }
+      for (let i = 0; i < 8; i++) { const d = document.createElement("div"); d.className = "smoke"; vfx.appendChild(d); SMOKE.push([d, vr() * 2 - 1, vr() * 1.6]); }
+      function volcanoAt(t) {
+        const on = t >= VOL0 && t < VOL1, el = $("vplayer");
+        el.style.opacity = on ? seg(t, VOL0, VOL0 + 0.15) * (1 - seg(t, VOL1 - 0.15, VOL1)) : 0;
+        $("three").style.filter = on ? "blur(8px) brightness(0.5)" : $("three").style.filter;
+        if (!on) return;
+        const u = t - VOL0, erupt = seg(u, 0.35, 0.6), shake = u < 0.9 ? 6 * Math.sin(u * 70) * (0.9 - u) : 0;
+        el.style.transform = `scale(${0.92 + 0.08 * pop(t, VOL0, 0.3)}) translate(${shake.toFixed(1)}px, 0)`;
+        $("vglow").style.transform = `scale(${0.6 + 0.8 * erupt + 0.1 * Math.sin(u * 9)})`;
+        LAVA.forEach(([d, dir, spd, delay, size]) => {
+          const k = ((u - 0.4 - delay * 0.6) % 1.6 + 1.6) % 1.6, live = u > 0.4 + delay * 0.6;
+          const x = 450 + dir * 420 * k, y = 590 - (700 * spd * k - 820 * k * k);
+          d.style.opacity = live && y < 1060 ? 1 : 0;
+          d.style.transform = `translate(${(x - 17).toFixed(0)}px, ${(y - 17).toFixed(0)}px) scale(${size.toFixed(2)})`;
+        });
+        SMOKE.forEach(([d, dir, delay]) => {
+          const k = ((u - delay) % 2 + 2) % 2 / 2;
+          d.style.opacity = (u > 0.3 ? 0.9 * (1 - k) : 0).toFixed(2);
+          d.style.transform = `translate(${(370 + dir * 160 * k).toFixed(0)}px, ${(480 - 420 * k).toFixed(0)}px) scale(${(0.6 + 1.8 * k).toFixed(2)})`;
+        });
+        $("vtitle").style.transform = `scale(${pop(t, VOL0 + 0.55, 0.3).toFixed(3)})`; $("vtitle").style.opacity = u > 0.55 ? 1 : 0;
+        $("vsub").style.opacity = seg(u, 1.0, 1.3);
+        $("vbarf").style.width = (100 * clamp(u / (VOL1 - VOL0), 0, 1)).toFixed(1) + "%";
+      }
+
+      /* the desk monitor: desktop with the mystery file, then code while Quill explains */
+      const mx = monC.getContext("2d");
+      function monitorAt(t) {
+        const W = 512, H = 312;
+        if (t < 12.4 || t >= S(17)) {
+          const g = mx.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#3b2a7a"); g.addColorStop(1, "#c2507a"); mx.fillStyle = g; mx.fillRect(0, 0, W, H);
+          mx.fillStyle = "rgba(0,0,0,0.35)"; mx.fillRect(0, 0, W, 22);
+          [["notes.txt", 40, 50], ["memes", 40, 140]].forEach(([n, x, y]) => { mx.fillStyle = "#e2e8f0"; mx.fillRect(x, y, 46, 56); mx.fillStyle = "#fff"; mx.font = "bold 16px sans-serif"; mx.fillText(n, x - 6, y + 78); });
+          const glow = 0.5 + 0.5 * Math.sin(t * 6);
+          mx.fillStyle = `rgba(250,204,21,${0.35 + 0.35 * glow})`; mx.fillRect(250, 80, 190, 150);
+          mx.fillStyle = "#111827"; mx.fillRect(300, 95, 90, 70); mx.fillStyle = "#f97316"; mx.beginPath(); mx.moveTo(335, 115); mx.lineTo(335, 145); mx.lineTo(360, 130); mx.fill();
+          mx.fillStyle = "#fff"; mx.font = "bold 20px sans-serif"; mx.fillText("final_final_v3.mp4", 258, 200);
+        } else {
+          mx.fillStyle = "#0b1020"; mx.fillRect(0, 0, W, H);
+          const cols = ["#c084fc", "#60a5fa", "#4ade80", "#f472b6", "#e2e8f0"];
+          const scroll = Math.floor((t - 12.4) * 3);
+          for (let r = 0; r < 12; r++) {
+            const n = (r + scroll) * 7919 % 97;
+            mx.fillStyle = cols[n % 5]; mx.fillRect(20 + (n % 3) * 24, 18 + r * 24, 80 + (n * 37) % 300, 10);
+          }
+        }
+        monT.needsUpdate = true;
       }
 
       function talkOf(who, t) {
@@ -351,6 +445,7 @@
       const emoteEls = EMOTES.map(() => { const d = document.createElement("div"); d.className = "emote"; $("hud").appendChild(d); return d; });
 
       function renderAt(t) {
+        monitorAt(t);
         // dev: pose + expression, both eased between beats
         const di = beatAt(DEV_BEATS, t), [d0, dExpr, dPose] = DEV_BEATS[di], [, pExpr, pPose] = DEV_BEATS[Math.max(0, di - 1)];
         const dk = di === 0 ? 1 : seg(t, d0, d0 + 0.28);
@@ -363,8 +458,13 @@
         dev.pose(pose);
         const hop = dExpr === "shock" || dExpr === "horror" ? 0.025 * Math.max(0, Math.sin(Math.min(1, (t - d0) / 0.25) * Math.PI)) : 0;
         dev.group.position.y = 0.004 * Math.sin(t * 2.4) + hop;
+        // the phone video: Shichi slumped over the desk at 3 a.m., filmed from the side; Quill is behind the camera
+        const sleeping = t >= SLP0 && t < SLP1;
+        dev.group.position.x = sleeping ? -0.32 : -0.32; dev.group.position.z = sleeping ? -0.02 : 0;
+        dev.group.rotation.y = sleeping ? Math.PI : 0.35;
+        quill.group.visible = !sleeping; mug.visible = !sleeping;
         const blink = BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b) / 0.08), 0);
-        dev.face({ expr: pExpr, to: dExpr, k: dk, talk: talkOf("dev", t), blink, t });
+        dev.face({ expr: pExpr, to: dExpr, k: dk, talk: talkOf("dev", t), blink: dExpr === "asleep" ? 1 : blink, t });
 
         // quill: mood + gesture
         const qi = beatAt(Q_BEATS, t), [q0, qMood, qGest] = Q_BEATS[qi];

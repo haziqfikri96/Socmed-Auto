@@ -48,19 +48,23 @@ while b * BEAT * 4 < DUR:
     b += 1
 
 fx = lambda name, at, g: add(load(name), at, g)
-fx("pop", 2.9, 0.3)                                  # file chip
-for i in range(1, len(LINES)): fx("whoosh_soft", L(i)["s"] - 0.12, 0.08)   # camera moves
+fx("pop", 2.9, 0.3)                                   # file chip
+for i in range(1, len(LINES)): fx("whoosh_soft", L(i)["s"] - 0.12, 0.07)   # camera moves
+fx("impact_deep", L(4)["s"] - 0.3, 0.3)               # shock punch-in
 fx("pop", L(5)["s"], 0.35); fx("ding", L(5)["s"] + 3.3, 0.25)            # HTML -> MP4 card
-for k, w in enumerate(L(7)["words"][:9:2]): fx("pop", w["s"], 0.22)      # feature chips
+for w in L(7)["words"][:9:2]: fx("pop", w["s"], 0.22)  # feature chips
 fx("pop", L(11)["s"], 0.35)
-for k in range(30): fx("tick", L(11)["s"] + 0.2 + k * 0.08, 0.09)      # typing the commands
+for k in range(30): fx("tick", L(11)["s"] + 0.2 + k * 0.08, 0.09)       # typing the commands
 fx("ding", L(11)["s"] + 2.7, 0.3)
-fx("pop", L(13)["s"], 0.35)                          # GitHub card
-fx("counter", L(15)["s"] - 0.3, 0.18); fx("ding", L(15)["s"] + 0.3, 0.3)  # volcano render
-fx("riser", L(17)["s"] - 2.4, 0.18)
-fx("pop", L(17)["s"], 0.35); fx("counter", L(17)["s"] + 1.6, 0.25)       # 2M views
-fx("impact_deep", L(18)["s"], 0.45)                  # "Quill!"
-fx("pop", L(19)["s"], 0.35)
+fx("pop", L(13)["s"], 0.35)                           # GitHub card
+fx("counter", L(14)["e"] - 0.1, 0.15); fx("ding", L(15)["s"] + 0.1, 0.3)   # render done
+fx("eruption", L(15)["e"] + 0.15, 0.55)               # volcano video plays
+fx("riser", L(19)["s"] - 2.4, 0.15)
+fx("pop", L(19)["e"] - 0.3, 0.35)                     # the sleep video appears
+fx("snore", L(19)["e"] - 0.1, 0.5)
+fx("counter", L(19)["e"] + 0.6, 0.25)                 # views racing up
+fx("impact_deep", L(20)["s"], 0.5)                    # "Quill!"
+fx("pop", L(21)["s"] + 0.5, 0.35)
 
 # duck the bed under speech, then the dialogue on top
 env = np.convolve(np.abs(dia[:, 0]), np.ones(int(0.25 * SR)) / int(0.25 * SR), mode="same")
