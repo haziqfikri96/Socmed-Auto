@@ -133,7 +133,7 @@ hud = r'''function hud(t) {
         const panAt = (tt) => {
           let col = 0;
           termRows.forEach((r) => { const s = r[3].filter((x) => x <= tt).length; if (s > 0 && s < r[2].length + 1 && tt >= r[3][0]) col = (r[1] === "comment" ? 0 : 2) + s; });
-          return Math.max(0, 64 + col * CW - 990);
+          return Math.max(0, 64 + col * CW - 880);
         };
         let pan = 0; for (let j = 0; j < 8; j++) pan += panAt(t - j * 0.03) / 8;
         const topY = pi === 2 ? 300 : 560 - Math.max(0, cur - 3) * 96;
@@ -171,7 +171,7 @@ hud = r'''function hud(t) {
           const h = R.h * 0.9, w = R.w * 0.92;
           $("face2").style.width = w + "px"; $("face2").style.height = h + "px";
           $("face2").style.fontSize = Math.min(h * 0.34, w / (8 * 0.66)).toFixed(1) + "px";
-          const z = 1.5 - 0.5 * f2;
+          const z = 1.12 - 0.12 * f2;
           $("face2").style.transform = `translate(${(R.x + R.w / 2 - (w * z) / 2).toFixed(1)}px, ${(R.y + R.h / 2 - (h * z) / 2).toFixed(1)}px) scale(${z.toFixed(4)})`;
         }
 
@@ -229,6 +229,7 @@ s = sub(s, '''        const [cp, cl] = camAt(t);
         hud(t);
         if ((window.__portalK || 0) < 0.999) renderer.render(scene, camera);   // fully inside the screen: no 3D draw needed''')
 s = s.replace('const pop = ["vplayer", ...D.cards.map((c) => c[0])].map($)', 'const pop = D.cards.map((c) => c[0]).map($)')
+s = sub(s, "return p < 0.18 || p > 0.88 ? 0.45 : p < 0.3 || p > 0.72 ? 0.62 : 0.95;", "return p < 0.14 || p > 0.9 ? 0.05 : p < 0.32 || p > 0.7 ? 0.45 : 0.95;   // closed / small / wide per syllable")
 s = s.replace("skit-hyperframes", "tutorial-hyperframes")
 s = re.sub(r'data-duration="38\.36"', f'data-duration="{DUR:.2f}"', s)
 s = s.replace("tl.to({}, { duration: 38.36 }, 0);", f"tl.to({{}}, {{ duration: {DUR:.2f} }}, 0);")

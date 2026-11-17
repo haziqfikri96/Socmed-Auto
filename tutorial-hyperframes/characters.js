@@ -200,7 +200,7 @@ export function createDev(THREE, opts = {}) {
     for (const m in mouths) mouths[m].visible = false;
     const shape = talk > 0.12 ? (X.talkShape || "talk") : X.mouth;
     mouths[shape].visible = true;
-    if (talk > 0.12) mouths[shape].scale.set(shape === "shout" ? 1.25 : 1, (shape === "shout" ? 0.8 : 0.35) + talk * 0.9, 1);
+    if (talk > 0.12) mouths[shape].scale.set((shape === "shout" ? 1.25 : 1) + 0.15 * talk, (shape === "shout" ? 0.8 : 0.2) + talk * 1.5, 1);   // clearly open-small vs open-wide
     blush.forEach((b) => { b.visible = X.blush > 0.05; b.material.opacity = 0.6 * X.blush; });
     sweat.visible = X.sweat > 0.5; sweat.position.y = 0.06 - 0.03 * ((t * 0.8) % 1);
     M.skin.emissive.setRGB(0.55 * X.red, 0.02 * X.red, 0.0);
@@ -311,7 +311,7 @@ export function createBot(THREE) {
     for (const m in qMouths) qMouths[m].visible = false;
     const shape = talk > 0.12 ? (X.talkShape || "grin") : X.mouth;
     qMouths[shape].visible = true;
-    qMouths[shape].scale.set(1, talk > 0.12 ? 0.45 + 0.8 * talk : 1, 1);
+    qMouths[shape].scale.set(talk > 0.12 ? 1 + 0.12 * talk : 1, talk > 0.12 ? 0.3 + 1.4 * talk : 1, 1);
     qSweat.visible = !!X.sweat; qSweat.position.y = 0.12 - 0.03 * ((t * 0.8) % 1);
     sparkles.forEach((sp, i) => { sp.visible = !!X.sparkle; const k = Math.abs(Math.sin(t * 4 + i * 2)); sp.scale.setScalar(0.4 + 0.8 * k); sp.rotation.z = t * 2 + i; });
     return api;

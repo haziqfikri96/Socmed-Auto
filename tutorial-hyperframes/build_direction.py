@@ -48,7 +48,7 @@ def typing(text, t0, t1, seed):
 
 # ---- the three dives through Quill's screen: [open, close]
 P1 = [S(2) - 0.02, S(5) - 0.03]
-P2 = [W(6, "using") - 0.25, S(7) - 0.02]
+P2 = [W(6, "using") - 0.25, S(7) + 0.2]
 P3 = [S(8) - 0.04, S(9) - 0.02]
 PORTALS = [P1, P2, P3]
 OPEN, SHUT = 0.45, 0.22          # unmask in (expo-out), pull back (ease-in) before the cut
@@ -62,7 +62,7 @@ rows.append([0, "cmd", "ffmpeg -version", typing("ffmpeg -version", W(2, "comput
 C1 = "claude plugin marketplace add heygen-com/hyperframes"
 rows.append([0, "cmd", C1, typing(C1, W(3, "add"), W(3, "marketplace", True) + 0.15, 4)])
 C2 = "claude plugin install hyperframes@hyperframes"
-rows.append([0, "cmd", C2, typing(C2, W(4, "install"), E(4) + 0.2, 5)])
+rows.append([0, "cmd", C2, typing(C2, S(4) + 0.05, S(5) - 0.03 - 0.22 - 0.12, 5)])
 # the prompt types word by word as Quill says it
 spoken = [("Using", "using"), ("/hyperframes,", "slash", "hyperframes"), ("make", "make"), ("a", ("a", 0)), ("10-second", "ten-second"),
           ("intro", "intro"), ("with", "with"), ("a", ("a", 1)), ("fade-in", "fade-in"), ("title", "title")]
@@ -86,13 +86,13 @@ for item in spoken:
     if prompt:
         prompt += " "; ptimes.append(r(s0 - 0.02))
     prompt += word
-    ptimes += typing(word, s0, max(s0 + 0.08, e1 - 0.04), hash(word) % 997)
+    ptimes += typing(word, s0, max(s0 + 0.08, min(e1 - 0.04, s0 + 0.25)), sum(map(ord, word)))
 rows.append([1, "prompt", prompt, ptimes])
 rows.append([2, "cmd", "npx hyperframes preview", typing("npx hyperframes preview", W(8, "preview") - 0.1, W(8, "browser", True) - 0.2, 6)])
 rows.append([2, "cmd", "npx hyperframes render", typing("npx hyperframes render", W(8, "render") - 0.05, W(8, "mp4") - 0.05, 7)])
 PREVIEW_AT = W(8, "browser")             # the live 9:16 preview opens
 FILE_AT = W(8, "mp4") + 0.05             # my-video.mp4 lands
-WORKING = [W(6, "title", True) + 0.05, P2[1] - SHUT]   # Claude Code's working indicator after the prompt
+WORKING = [W(6, "title") + 0.3, P2[1] - SHUT]   # Claude Code's working indicator after the prompt
 
 # ---- acting
 dev = [
@@ -108,7 +108,7 @@ quill = [
 shots = [[0, "quillPush", 1], [S(1) - 0.03, "devClose", 1], [S(2) - 0.03, "quillClose", 1],
          [S(5) - 0.03, "devClose", 1], [S(6) - 0.03, "quillClose", 1], [S(7) - 0.03, "dev", 1],
          [S(8) - 0.03, "quillClose", 1], [S(9) - 0.03, "devClose", 1], [S(10) - 0.03, "quillEnd", 1]]
-emotes = [[S(5) + 0.45, E(5) + 0.25, "dev", "question"], [S(9), E(9) + 0.25, "dev", "bang"]]
+emotes = [[S(5) + 0.45, S(6) - 0.06, "dev", "question"], [S(9), S(10) - 0.06, "dev", "bang"]]
 GLOW = [W(0, "here"), P1[0]]             # Quill's screen brightens before the first dive
 PART2 = W(10, "part")                    # "part 2 →" appears on Quill's own screen
 
