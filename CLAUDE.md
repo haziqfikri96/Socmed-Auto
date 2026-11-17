@@ -198,6 +198,12 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 - **Cheap paint only**: no `backdrop-filter`, CSS `filter: blur()`/`drop-shadow()` or large blurred `box-shadow` on cards, emotes or the canvas; use solid/semi-transparent fills, borders and radial-gradient halos.
 - Extra render workers don't speed up WebGL projects here (software GPU); measured: 2s clip 108s at full quality, 40s as a draft.
 
+## Blender (MCP for Blender, installed Nov 2026)
+
+- Cloud container: `tools/blender_mcp.sh install` (Blender 4.5.16 LTS into /opt, checksum-verified, plus the addon), `tools/blender_mcp.sh start|status|stop`. Runs Blender headless via `tools/blender_mcp_headless.py` (the addon refuses `blender -b`, so the runner drives its command queue itself) on localhost:9876. Register the MCP once per container: `claude mcp add blender -s local -e DISABLE_TELEMETRY=true -- uvx mcp-for-blender` (tools load in the next session). Cycles CPU renders work; viewport screenshots don't (no GUI). Measured: 540x960, 32 samples in ~5s.
+- The addon socket has no auth and runs arbitrary Python: keep it on localhost. Telemetry off (`DISABLE_TELEMETRY=true`).
+- The user also installed it on their Windows PC for Claude Desktop / VS Code.
+
 ## Host character (use the user's exact art)
 
 The user wants their own character, exactly as in their art, in videos from now on, not a generic dummy and not a re-drawn version.
