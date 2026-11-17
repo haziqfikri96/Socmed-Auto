@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #160f2e; }
+      #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+      #sub { position: absolute; left: 70px; width: 940px; top: 1300px; text-align: center; }
+      #who { display: inline-block; padding: 8px 22px; border-radius: 999px; font-size: 28px; font-weight: 900; letter-spacing: 0.12em; margin-bottom: 14px; }
+      #who.dev { background: #F59E0B; color: #1a1205; }
+      #who.quill { background: #2DD4BF; color: #04211d; }
+      #line { font-size: 52px; line-height: 66px; font-weight: 800; text-shadow: 0 4px 18px rgba(0,0,0,0.85), 0 0 2px #000; }
+
+      .card { position: absolute; left: 70px; top: 330px; width: 940px; border-radius: 40px; background: rgba(10, 14, 32, 0.94); border: 2px solid rgba(148, 163, 184, 0.35);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.5); padding: 46px 48px; opacity: 0; }
+      .card h3 { font-size: 30px; font-weight: 900; letter-spacing: 0.14em; color: #94A3B8; margin-bottom: 26px; }
+      .card h3 b { color: #2DD4BF; }
+
+      #fileChip { position: absolute; left: 50%; top: 250px; transform: translateX(-50%); padding: 18px 30px; border-radius: 24px; background: rgba(10, 14, 32, 0.9); border: 2px solid #F59E0B;
+        font-size: 36px; font-weight: 800; white-space: nowrap; opacity: 0; }
+
+      /* html -> mp4 */
+      #code { width: 470px; height: 380px; border-radius: 22px; background: #0B1020; padding: 26px; font-size: 24px; line-height: 40px; color: #E2E8F0; white-space: pre; display: inline-block; vertical-align: top; }
+      #code .k { color: #C084FC; } #code .s { color: #4ADE80; } #code .t { color: #60A5FA; }
+      #arrow2 { display: inline-block; width: 70px; text-align: center; font-size: 60px; font-weight: 900; color: #2DD4BF; line-height: 380px; vertical-align: top; }
+      #mini { display: inline-block; width: 250px; height: 380px; border-radius: 22px; background: linear-gradient(160deg, #F97316, #7C3AED); vertical-align: top; position: relative; overflow: hidden; }
+      #miniT { position: absolute; left: 0; width: 250px; top: 160px; text-align: center; font-size: 44px; font-weight: 900; }
+      #frames { margin-top: 30px; height: 90px; position: relative; overflow: hidden; }
+      .fr { position: absolute; top: 0; width: 70px; height: 90px; border-radius: 10px; background: linear-gradient(160deg, #F97316, #7C3AED); border: 3px solid #0B1020; }
+      #mp4 { display: inline-block; margin-top: 26px; padding: 12px 26px; border-radius: 999px; background: #16A34A; font-size: 34px; font-weight: 900; opacity: 0; }
+
+      /* features */
+      .feat { display: flex; align-items: center; gap: 22px; margin: 18px 0; padding: 22px 28px; border-radius: 22px; background: #111A33; font-size: 42px; font-weight: 800; opacity: 0; }
+      .feat i { font-style: normal; width: 64px; height: 64px; border-radius: 18px; text-align: center; line-height: 64px; font-size: 36px; }
+      .feat em { margin-left: auto; font-style: normal; color: #4ADE80; font-size: 40px; }
+      #justcode { margin-top: 26px; font-size: 40px; font-weight: 900; color: #2DD4BF; text-align: center; opacity: 0; }
+
+      /* terminal */
+      #termBody { font-size: 22.5px; line-height: 46px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; min-height: 280px; }
+      #termBody .p, .ok { color: #4ADE80; }
+      #termBody .cur { background: #E2E8F0; color: #0B1020; }
+
+      /* github */
+      #repo { font-size: 30px; color: #94A3B8; font-weight: 700; }
+      #repoName { font-size: 54px; white-space: nowrap; font-weight: 900; letter-spacing: -0.03em; margin: 6px 0 16px; }
+      #repoDesc { font-size: 32px; color: #CBD5E1; margin-bottom: 30px; font-weight: 700; }
+      .tag { display: inline-block; margin: 0 12px 14px 0; padding: 12px 24px; border-radius: 999px; font-size: 32px; font-weight: 900; opacity: 0; }
+
+      /* volcano + phone */
+      #vthumb { width: 840px; height: 460px; border-radius: 26px; overflow: hidden; position: relative; background: linear-gradient(180deg, #1E1B4B, #7C2D12); }
+      #volc { position: absolute; left: 270px; bottom: 0; width: 0; height: 0; border-left: 150px solid transparent; border-right: 150px solid transparent; border-bottom: 260px solid #292524; }
+      #lava { position: absolute; left: 380px; bottom: 230px; width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #FDE047, #F97316 55%, rgba(249,115,22,0) 70%); }
+      #vlabel { margin-top: 24px; font-size: 40px; font-weight: 900; }
+      #vlabel b { color: #4ADE80; }
+      #phone { margin: 0 auto; width: 520px; height: 760px; border-radius: 60px; background: #050816; border: 10px solid #1E293B; position: relative; overflow: hidden; }
+      #pvid { position: absolute; inset: 0; background: linear-gradient(180deg, #312E81, #0F172A); }
+      #zzz { position: absolute; left: 0; width: 500px; top: 210px; text-align: center; font-size: 150px; }
+      #pname { position: absolute; left: 30px; bottom: 150px; font-size: 30px; font-weight: 800; }
+      #views { position: absolute; left: 30px; bottom: 70px; font-size: 64px; font-weight: 900; color: #F472B6; }
+      #views small { font-size: 30px; color: #fff; }
+
+      /* cta */
+      #ctaA { text-align: center; font-size: 48px; font-weight: 800; color: #94A3B8; }
+      #ctaB { text-align: center; font-size: 108px; font-weight: 900; letter-spacing: -0.04em; color: #2DD4BF; margin: 4px 0 28px; }
+      #ctaTerm { border-radius: 22px; background: #0B1020; padding: 26px 22px; font-size: 21.5px; line-height: 42px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; }
+      #ctaTerm .p { color: #4ADE80; } #ctaTerm .h { color: #A3B1C6; }
+
+      #mark { position: absolute; left: 0; width: 1080px; top: 1800px; text-align: center; font-size: 26px; font-weight: 800; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="skit-hyperframes" data-start="0" data-duration="50.2" data-width="1080" data-height="1920">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="50.2" data-track-index="0" data-layout-allow-overflow></canvas>
+
+      <div id="hud" class="clip" data-start="0" data-duration="50.2" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div id="fileChip">🎬 final_final_v3.mp4</div>
+
+        <div class="card" id="cHtml"><h3>HTML <b>→ MP4</b></h3>
+          <div id="code" class="mono"></div><div id="arrow2">→</div><div id="mini"><div id="miniT">Hello!</div></div>
+          <div id="frames"></div><div id="mp4">every frame → MP4 ✓</div>
+        </div>
+
+        <div class="card" id="cFeat"><h3>IT'S ALL <b>JUST CODE</b></h3>
+          <div class="feat" id="ft0"><i style="background:#2563EB">Aa</i>Text<em>✓</em></div>
+          <div class="feat" id="ft1"><i style="background:#7C3AED">◐</i>Animation<em>✓</em></div>
+          <div class="feat" id="ft2"><i style="background:#0891B2">⬢</i>Real 3D<em>✓</em></div>
+          <div class="feat" id="ft3"><i style="background:#D97706">“…”</i>Captions synced to voice<em>✓</em></div>
+          <div id="justcode" class="mono">&lt;/&gt; index.html</div>
+        </div>
+
+        <div class="card" id="cTerm"><h3>INSTALL IN <b>CLAUDE CODE</b></h3><div id="termBody" class="mono"></div></div>
+
+        <div class="card" id="cGit">
+          <div id="repo">github.com /</div>
+          <div id="repoName">heygen-com/hyperframes</div>
+          <div id="repoDesc">Write HTML. Render video.</div>
+          <span class="tag" id="tg0" style="background:#16A34A">FREE</span>
+          <span class="tag" id="tg1" style="background:#7C3AED">OPEN SOURCE</span>
+          <span class="tag" id="tg2" style="background:#334155">Apache-2.0</span>
+          <span class="tag" id="tg3" style="background:#0F172A; border:2px solid #94A3B8">by HeyGen</span>
+        </div>
+
+        <div class="card" id="cVolc"><h3>RENDER <b>DONE</b></h3>
+          <div id="vthumb"><div id="volc"></div><div id="lava"></div></div>
+          <div id="vlabel">volcano.mp4 <b>✓</b></div>
+        </div>
+
+        <div class="card" id="cPhone" style="background: transparent; border: none; box-shadow: none;">
+          <div id="phone"><div id="pvid"></div><div id="zzz">😴</div><div id="pname">final_final_v3.mp4</div><div id="views">0 <small>views</small></div></div>
+        </div>
+
+        <div class="card" id="cCta">
+          <div id="ctaA">Comment</div>
+          <div id="ctaB">HYPERFRAMES</div>
+          <div id="ctaTerm" class="mono"><span class="h"># install in Claude Code</span>
+<span class="p">$</span> claude plugin marketplace add heygen-com/hyperframes
+<span class="p">$</span> claude plugin install hyperframes@hyperframes</div>
+        </div>
+
+        <div id="sub"><div id="who" class="dev">SHICHI</div><div id="line"></div></div>
+        <div id="mark">@shichi.ai</div>
+      </div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="50.2" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 50.2 }, 0);
+      window.__timelines["skit-hyperframes"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { createDev, createBot } from "./characters.js";
+
+      const LINES = window.LINES, DUR = window.DUR;
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const outBack = (x) => { x = clamp(x, 0, 1); const c = 1.8; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+      const pop = (t, a, d = 0.35) => outBack((t - a) / d);
+      const $ = (id) => document.getElementById(id);
+      const S = (i) => LINES[i].s, E = (i) => LINES[i].e;
+
+      /* ---------------- renderer + low-poly night balcony ---------------- */
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(1080, 1920, false); renderer.setPixelRatio(1);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      const scene = new THREE.Scene();
+      const sky = document.createElement("canvas"); sky.width = 4; sky.height = 512;
+      const sg = sky.getContext("2d"), gr = sg.createLinearGradient(0, 0, 0, 512);
+      gr.addColorStop(0, "#120c2b"); gr.addColorStop(0.55, "#3d2763"); gr.addColorStop(0.85, "#a85a64"); gr.addColorStop(1, "#e08a5f");
+      sg.fillStyle = gr; sg.fillRect(0, 0, 4, 512);
+      const skyT = new THREE.CanvasTexture(sky); skyT.colorSpace = THREE.SRGBColorSpace; scene.background = skyT;
+      scene.fog = new THREE.Fog(0x3d2763, 6, 16);
+
+      const flat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.85, ...extra });
+      const box = (w, h, d, m, x, y, z, parent = scene) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; parent.add(b); return b; };
+      scene.add(new THREE.HemisphereLight(0xd6ccff, 0x5a3a52, 1.5));
+      const key = new THREE.DirectionalLight(0xffd2a1, 2.3); key.position.set(1.4, 2.6, 2.4); key.castShadow = true;
+      key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+      Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 1.8, bottom: -0.6, near: 0.5, far: 8 }); scene.add(key);
+      const rim = new THREE.DirectionalLight(0x7dd3fc, 1.5); rim.position.set(-2, 1.6, -2.2); scene.add(rim);
+      const screenLight = new THREE.PointLight(0x60a5fa, 1.2, 1.6); screenLight.position.set(-0.35, 0.8, -0.35); scene.add(screenLight);
+
+      // deck, railing
+      const deck = flat(0x6b4a35), rail = flat(0x3b2a33);
+      for (let i = 0; i < 11; i++) box(0.36, 0.06, 6.0, i % 2 ? deck : flat(0x5f4230), -1.8 + i * 0.36, -0.03, 1.8);
+      box(3.4, 0.05, 0.05, rail, 0, 0.62, -1.15); box(3.4, 0.04, 0.04, rail, 0, 0.32, -1.15);
+      for (let i = 0; i < 9; i++) box(0.05, 0.62, 0.05, rail, -1.6 + i * 0.4, 0.31, -1.15);
+      // desk + monitor + mug + plant
+      const wood = flat(0x8a5a3c), dark = flat(0x1f2433);
+      box(0.9, 0.04, 0.45, wood, -0.3, 0.52, -0.5);
+      for (const x of [-0.7, 0.1]) for (const z of [-0.68, -0.32]) box(0.04, 0.5, 0.04, wood, x, 0.25, z);
+      box(0.5, 0.32, 0.03, dark, -0.32, 0.78, -0.6); box(0.05, 0.16, 0.05, dark, -0.32, 0.6, -0.6);
+      const mon = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.28), new THREE.MeshBasicMaterial({ color: 0x3b82f6 })); mon.position.set(-0.32, 0.78, -0.584); scene.add(mon);
+      box(0.06, 0.08, 0.06, flat(0xf472b6), 0.0, 0.58, -0.45);
+      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.07, 0.16, 7), flat(0xc2410c)); pot.position.set(1.05, 0.08, -0.85); pot.castShadow = true; scene.add(pot);
+      for (let i = 0; i < 5; i++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.32, 4), flat(0x16a34a)); l.position.set(1.05 + Math.cos(i * 1.3) * 0.05, 0.3, -0.85 + Math.sin(i * 1.3) * 0.05); l.rotation.set(Math.cos(i) * 0.4, i, Math.sin(i) * 0.4); scene.add(l); }
+      // string lights
+      const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffd27a });
+      for (let i = 0; i <= 18; i++) { const u = i / 18, x = -1.6 + 3.2 * u, y = 1.75 - 0.22 * Math.sin(Math.PI * u); const b = new THREE.Mesh(new THREE.IcosahedronGeometry(0.022, 0), bulbMat); b.position.set(x, y, -1.1); scene.add(b); }
+      // city skyline
+      let sd = 5; const rnd = () => ((sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const winOn = new THREE.MeshBasicMaterial({ color: 0xffd27a }), winOff = new THREE.MeshBasicMaterial({ color: 0x3b2f5c });
+      for (let i = 0; i < 34; i++) {
+        const h = 1.4 + rnd() * 3.2, w = 0.4 + rnd() * 0.6, z = -4 - rnd() * 3, x = -4.5 + i * 0.28 + rnd() * 0.2;
+        box(w, h, 0.5, flat(0x221a3d), x, h / 2 - 0.9, z);
+        for (let k = 0; k < 10; k++) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.08), rnd() > 0.45 ? winOn : winOff); p.position.set(x - w / 2.6 + rnd() * w * 0.77, -0.6 + rnd() * (h - 0.4), z + 0.255); scene.add(p); }
+      }
+
+      /* ---------------- characters ---------------- */
+      const dev = createDev(THREE, { glasses: false });
+      dev.group.position.set(-0.32, 0, 0); dev.group.rotation.y = 0.35; scene.add(dev.group);
+      const quill = createBot(THREE);
+      quill.group.position.set(0.34, 0.2, 0.05); quill.group.rotation.y = -0.45; quill.group.scale.setScalar(1.05); scene.add(quill.group);
+
+      /* per-line acting: [dev pose, dev mood, quill gesture, quill mood] */
+      const ACT = [
+        ["point", "neutral", "none", "neutral"], ["idle", "neutral", "wave", "happy"], ["shrug", "neutral", "none", "neutral"], ["idle", "neutral", "shrug", "sly"],
+        ["idle", "wide", "none", "happy"], ["idle", "neutral", "point", "neutral"], ["point", "neutral", "none", "happy"], ["idle", "happy", "wave", "happy"],
+        ["think", "neutral", "none", "neutral"], ["idle", "neutral", "shrug", "sly"], ["think", "neutral", "none", "neutral"], ["idle", "neutral", "point", "neutral"],
+        ["idle", "wide", "none", "neutral"], ["cheer", "happy", "wave", "happy"], ["point", "happy", "none", "neutral"], ["idle", "neutral", "point", "happy"],
+        ["think", "neutral", "none", "sly"], ["idle", "neutral", "shrug", "sly"], ["facepalm", "wide", "none", "happy"], ["facepalm", "neutral", "wave", "happy"],
+      ];
+      const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.15) i++; return i; };
+      const BLINKS = [2.0, 6.3, 11.5, 16.2, 21.0, 26.8, 31.2, 37.0, 41.6, 47.6];
+
+      /* ---------------- camera shots ---------------- */
+      const SHOT = {
+        wide: [[0.05, 0.85, 3.9], [0.0, 0.5, 0]],
+        dev: [[0.18, 0.95, 2.15], [-0.3, 0.7, 0]],
+        quill: [[-0.08, 0.82, 2.0], [0.34, 0.58, 0]],
+      };
+      const shotFor = (i, t) => (i === 0 && t < 2.2) || i === 18 ? "wide" : LINES[i].who;
+      function camAt(t) {
+        const i = lineAt(t), now = shotFor(i, t);
+        const prevT = i === 0 ? 2.2 : LINES[i].s - 0.15, prev = i === 0 ? "wide" : shotFor(i - 1, prevT - 0.01);
+        const k = (i === 0 && t >= 2.2) ? seg(t, 2.2, 2.75) : seg(t, prevT, prevT + 0.5);
+        const A = SHOT[prev], B = SHOT[now];
+        const p = A[0].map((v, j) => v + (B[0][j] - v) * k), l = A[1].map((v, j) => v + (B[1][j] - v) * k);
+        const drift = 0.03 * Math.sin(t * 0.4);
+        return [[p[0] + drift, p[1] + 0.01 * Math.sin(t * 0.7), p[2]], l];
+      }
+      const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.05, 40);
+      camera.setViewOffset(1080, 1920, 0, 120, 1080, 1920);
+
+      /* ---------------- cards ---------------- */
+      const CARDS = [["cHtml", S(5), E(5) + 0.2], ["cFeat", S(7), E(7) + 0.15], ["cTerm", S(11), S(13) - 0.05], ["cGit", S(13) - 0.05, E(13) + 0.2],
+        ["cVolc", S(15), S(15) + 1.4], ["cPhone", S(17) - 0.05, E(17) + 0.1], ["cCta", S(19) - 0.05, DUR + 1]];
+      const CODE = '<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>\n  Hello!\n<span class="k">&lt;/div&gt;</span>\n<span class="k">&lt;script&gt;</span>\n  <span class="t">gsap</span>.from(<span class="s">".title"</span>,\n    { y: 200 })\n<span class="k">&lt;/script&gt;</span>';
+      const frames = $("frames");
+      for (let i = 0; i < 16; i++) { const f = document.createElement("div"); f.className = "fr"; f.style.left = i * 80 + "px"; frames.appendChild(f); }
+      function typeHTML(html, n) {
+        let out = "", shown = 0, i = 0;
+        while (i < html.length && shown < n) {
+          if (html[i] === "<") { const j = html.indexOf(">", i); out += html.slice(i, j + 1); i = j + 1; continue; }
+          if (html[i] === "&") { const j = html.indexOf(";", i); out += html.slice(i, j + 1); i = j + 1; shown++; continue; }
+          out += html[i++]; shown++;
+        }
+        const open = (out.match(/<span[^>]*>/g) || []).length - (out.match(/<\/span>/g) || []).length;
+        return out + "</span>".repeat(Math.max(0, open));
+      }
+      const fmt = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(Math.round(n)));
+
+      function hud(t) {
+        let blur = 0;
+        for (const [id, a, b] of CARDS) {
+          const v = t >= a && t < b, el = $(id);
+          el.style.opacity = v ? seg(t, a, a + 0.18) * (1 - seg(t, b - 0.18, b)) : 0;
+          el.style.transform = v ? `scale(${0.9 + 0.1 * pop(t, a, 0.3)})` : "";
+          if (v) blur = Math.max(blur, seg(t, a, a + 0.2) * (1 - seg(t, b - 0.2, b)));
+        }
+        $("three").style.filter = blur > 0.01 ? `blur(${(8 * blur).toFixed(2)}px) brightness(${(1 - 0.45 * blur).toFixed(3)})` : "none";
+
+        // file chip during the opening question
+        $("fileChip").style.opacity = t > 2.9 && t < 5.0 ? 1 : 0;
+        $("fileChip").style.transform = `translateX(-50%) scale(${pop(t, 2.9)})`;
+
+        // html -> mp4
+        $("code").innerHTML = typeHTML(CODE, Math.floor(clamp((t - S(5) - 0.2) / 1.6, 0, 1) * 110));
+        const loop = ((t - S(5) - 1.8) % 1.4 + 1.4) % 1.4, u = t < S(5) + 1.8 ? 0 : smooth(loop / 0.8);
+        $("miniT").style.transform = `translateY(${160 * (1 - u)}px)`; $("miniT").style.opacity = u;
+        frames.style.transform = `translateX(${-Math.max(0, t - S(5) - 2.4) * 220}px)`; frames.style.opacity = seg(t, S(5) + 2.3, S(5) + 2.6);
+        $("mp4").style.opacity = t > S(5) + 3.3 ? 1 : 0; $("mp4").style.transform = `scale(${pop(t, S(5) + 3.3)})`;
+
+        // features pop on their words: Text, Animation, Real, Captions
+        const fw = LINES[7].words, at = [fw[0].s, fw[1].s, fw[2].s, fw[4].s];
+        at.forEach((a, i) => { $("ft" + i).style.opacity = t >= a ? 1 : 0; $("ft" + i).style.transform = `translateX(${(1 - pop(t, a, 0.3)) * 60}px)`; });
+        $("justcode").style.opacity = t >= fw[fw.length - 3].s ? 1 : 0;
+
+        // terminal typing
+        const L1 = "claude plugin marketplace add heygen-com/hyperframes", L2 = "claude plugin install hyperframes@hyperframes", t0 = S(11) + 0.2;
+        const n1 = Math.floor(clamp((t - t0) / 1.2, 0, 1) * L1.length), n2 = Math.floor(clamp((t - t0 - 1.35) / 1.1, 0, 1) * L2.length);
+        let term = `<span class="p">$</span> ${L1.slice(0, n1)}`;
+        if (t >= t0 + 1.25) term += `\n<span class="p">$</span> ${L2.slice(0, n2)}`;
+        if (t >= t0 + 2.5) term += `\n<span class="ok">✓ Installed hyperframes</span>`;
+        $("termBody").innerHTML = term + (Math.floor(t * 3) % 2 ? '<span class="cur">&nbsp;</span>' : " ");
+
+        // github tags on "Free", "open source", (licence), "HeyGen"
+        const gw = LINES[13].words;
+        [gw[0].s, gw[2].s, gw[3].s + 0.2, gw[gw.length - 1].s].forEach((a, i) => { $("tg" + i).style.opacity = t >= a ? 1 : 0; $("tg" + i).style.transform = `scale(${pop(t, a, 0.25)})`; });
+
+        // volcano + phone
+        $("lava").style.transform = `translateY(${-160 * ((t * 0.9) % 1)}px) scale(${1 + 0.4 * ((t * 0.9) % 1)})`;
+        $("views").innerHTML = `${fmt(2000000 * Math.pow(seg(t, S(17) + 1.6, E(17)), 2))} <small>views</small>`;
+        $("zzz").style.transform = `translateY(${8 * Math.sin(t * 3)}px)`;
+
+        // subtitles with speaker tag
+        const i = lineAt(t), L = LINES[i], on = t >= L.s - 0.1 && t < L.e + 0.35;
+        $("sub").style.opacity = on ? 1 : 0;
+        $("who").textContent = L.who === "dev" ? "SHICHI" : "QUILL"; $("who").className = L.who;
+        $("line").textContent = L.text;
+        $("sub").style.top = "1420px";
+      }
+
+      function talkOf(who, t) {
+        for (const L of LINES) if (L.who === who && t >= L.s && t < L.e) for (const w of L.words) if (t >= w.s && t < w.e) return 0.3 + 0.6 * Math.abs(Math.sin((t - w.s) * 16));
+        return 0;
+      }
+
+      function renderAt(t) {
+        const i = lineAt(t), [dp, dm, qg, qm] = ACT[i], [pdp] = ACT[Math.max(0, i - 1)];
+        const k = i === 0 ? 1 : seg(t, LINES[i].s - 0.15, LINES[i].s + 0.25);
+        const pose = dev.blend(pdp, dp, k);
+        pose.head = [pose.head?.[0] || 0, (pose.head?.[1] || 0) + 0.05 * Math.sin(t * 1.1), (pose.head?.[2] || 0) + 0.03 * Math.sin(t * 1.7)];
+        if (dp === "point" || dp === "cheer") pose.body = [0, 0, 0.02 * Math.sin(t * 2)];
+        dev.pose(pose);
+        dev.group.position.y = 0.004 * Math.sin(t * 2.4);
+        const blink = BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b) / 0.08), 0);
+        dev.face({ talk: talkOf("dev", t), blink, mood: dm });
+        const qMood = i === 15 && t > LINES[15].words[1].s ? "sly" : qm;
+        quill.face({ mood: qMood, talk: talkOf("quill", t), blink: BLINKS.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b - 0.9) / 0.08), 0) });
+        quill.update(t, qg, seg(t, LINES[i].s - 0.15, LINES[i].s + 0.3));
+        if (i === 18) quill.group.position.x = 0.34 + 0.05 * seg(t, LINES[18].s, LINES[18].s + 0.2); // tiny flinch at "Quill!"
+        else quill.group.position.x = 0.34;
+        const [cp, cl] = camAt(t);
+        camera.position.set(...cp); camera.lookAt(...cl);
+        renderer.render(scene, camera);
+        hud(t);
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["skit-hyperframes"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>

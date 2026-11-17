@@ -1,0 +1,11 @@
+My AI made a video while I was asleep 💀 Turns out it didn't need an editor: HyperFrames turns HTML into video, and the AI writes the HTML. Free and open source.
+
+Install in Claude Code:
+claude plugin marketplace add heygen-com/hyperframes
+claude plugin install hyperframes@hyperframes
+
+Comment HYPERFRAMES for the full tutorial. Would you let your AI post for you? 👇
+
+Source: github.com/heygen-com/hyperframes (official README, Apache 2.0, by HeyGen)
+
+#ai #claudecode #coding #opensource #aitools
