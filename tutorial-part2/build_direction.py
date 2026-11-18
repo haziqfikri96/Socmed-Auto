@@ -84,7 +84,7 @@ shots = [[0, "devPush", 1], [S(1) - 0.03, "quillClose", 1], [S(3) - 0.03, "devCl
          [S(10) - 0.03, "devUnder", 1], [S(11) - 0.03, "quillClose", 1], [S(12) - 0.03, "quillEnd", 1]]
 emotes = [[S(3) + 0.3, S(4) - 0.06, "dev", "question"], [S(6) + 0.25, S(7) - 0.06, "dev", "sweat"],
           [S(10) + 0.25, S(11) - 0.06, "dev", "sparkle"]]
-GLOW = [W(1, "step"), P0[0]]
+GLOW = [W(1, "project") - 0.18, P0[0]]   # ramps in on "project." with the riser
 PART3 = W(12, "comment")
 
 EMOTE_SFX = {"question": ("pop", -10), "sweat": ("gulp", -8), "sparkle": ("sparkle", -10)}

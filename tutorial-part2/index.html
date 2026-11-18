@@ -75,6 +75,10 @@
       .caret { display: inline-block; width: 26px; height: 52px; vertical-align: -10px; background: #5eead4; }
       #ask { position: absolute; left: 80px; width: 860px; top: 440px; }
       .mono, #term, #askBox { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+      #rim { position: absolute; left: 0; top: 0; width: 100px; height: 100px; opacity: 0; pointer-events: none; transform-origin: 0 0;
+        border: 5px solid rgba(94, 234, 212, 0.75); background: radial-gradient(ellipse at 50% 50%, rgba(94,234,212,0) 52%, rgba(94,234,212,0.30) 100%); }
+      #rim::after { content: ""; position: absolute; left: -16%; top: -22%; right: -16%; bottom: -22%; border-radius: 40%;
+        background: radial-gradient(ellipse at 50% 50%, rgba(94,234,212,0) 60%, rgba(94,234,212,0.13) 72%, rgba(94,234,212,0) 86%); }
       #pvFrame { background: #111827; }
       #pvMt { position: absolute; left: 30px; bottom: 0; width: 300px; height: 260px; background: #3f2a2a; clip-path: polygon(0 100%, 42% 8%, 58% 8%, 100% 100%); }
       #tl { position: absolute; left: 140px; top: 1110px; width: 800px; height: 210px; border-radius: 22px; background: #0f172a; border: 2px solid #1e293b; opacity: 0; padding: 22px 26px; }
@@ -120,6 +124,7 @@
           <div id="tl"><div class="trk"><i style="left:0;width:62%"></i><i style="left:64%;width:36%"></i></div><div class="trk"><i style="left:8%;width:40%"></i><i style="left:52%;width:44%"></i></div><div class="trk au"><i style="left:0;width:100%"></i></div><div id="ph"></div></div>
           <div id="file"><div class="fi"><i></i></div><div class="fn mono">my-video.mp4</div></div>
         </div></div></div>
+        <div id="rim"></div>
         <div id="face2" class="mono"><span>your turn →</span></div>
         <div id="vid"><div id="vidMt"></div><div id="vidLava"></div><div id="vidT">HOW VOLCANOES ERUPT</div></div>
         <div id="cap"></div>
@@ -341,6 +346,17 @@
         // a slow push while inside the screen, so a held line still has a living camera
         const HD = D.holds && D.holds[pi] != null ? D.holds[pi] : null;
         if (P) { const tc = HD != null ? Math.min(t, HD) : t, cz = clamp((tc - P[0]) / (P[1] - P[0]), 0, 1); $("pin").style.transform = HD != null ? `scale(${(1 + 0.03 * cz).toFixed(4)})` : `scale(${(1 + 0.06 * cz).toFixed(4)}) translateY(${(-24 * cz).toFixed(1)}px) rotate(${(0.6 * Math.sin(t * 0.9)).toFixed(3)}deg)`; }
+        // ---------- soft cyan edge glow on Quill's screen (no hotspot) ----------
+        const g0 = D.glow[0], g1 = D.glow[1];
+        const ramp = t >= g0 && t < g1 ? smooth((t - g0) / (g1 - g0)) : 0;
+        const gA = Math.max(ramp, P ? (1 - k) * (t >= P[0] - 0.12 ? 1 : 0) : 0) * (P ? 1 - smooth((k - 0.55) / 0.4) : 1);
+        const gb = P && t >= P[0] - 0.12 ? rr : R;
+        $("rim").style.opacity = gA > 0.01 && gb.w > 1 ? gA.toFixed(3) : 0;
+        if (gA > 0.01) {
+          $("rim").style.width = gb.w.toFixed(1) + "px"; $("rim").style.height = gb.h.toFixed(1) + "px";
+          $("rim").style.borderRadius = Math.max(gb.h * 0.235, rad).toFixed(1) + "px";
+          $("rim").style.transform = `translate(${gb.x.toFixed(1)}px, ${gb.y.toFixed(1)}px)`;
+        }
         // ---------- what is on the screen ----------
         const rows = D.rows.filter((r) => r[0] === pi);
         const blink = Math.floor(t * 2.4) % 2 === 0;
@@ -441,6 +457,7 @@
 
       // Quill's screen light: cyan wash that swells before the first dive and during every dive approach
       const qLight = new THREE.PointLight(0x5eead4, 0, 0.7, 2); scene.add(qLight);
+      quill.screen.traverse((o) => { if (o.material && o.material.color && o.material.color.getHex() === 0x0a1220) { o.material.roughness = 0.92; o.material.metalness = 0; } });
       const _n = new THREE.Vector3(), _q = new THREE.Quaternion();
 
       function renderAt(t) {
@@ -484,7 +501,7 @@
         }
         camera.position.set(...cp); camera.lookAt(...cl);
         const glow = (t >= D.glow[0] && t < D.glow[1] + D.OPEN) ? clamp((t - D.glow[0]) / (D.glow[1] - D.glow[0]), 0, 1) : (dp ? 1 : 0);
-        qLight.position.set(_v.x + _n.x * 0.25, _v.y + _n.y * 0.25, _v.z + _n.z * 0.25); qLight.intensity = (dp || D.shots[beatAt(D.shots, t)][1].startsWith("quill")) ? 1.5 * glow : 0;   // only while the camera is on Quill
+        qLight.position.set(_v.x + _n.x * 0.25, _v.y + _n.y * 0.25, _v.z + _n.z * 0.25); qLight.intensity = (dp || D.shots[beatAt(D.shots, t)][1].startsWith("quill")) ? 1.0 * glow : 0;   // only while the camera is on Quill
         hud(t);
         if ((window.__portalK || 0) < 0.999) renderer.render(scene, camera);   // fully inside the screen: no 3D draw needed
 
