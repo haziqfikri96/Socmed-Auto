@@ -55,15 +55,15 @@ PORTALS = [P0, P1, P2, P3]
 OPEN, SHUT = 0.45, 0.18
 
 rows = []
-rows.append([0, "cmd", "npx hyperframes init my-video", typing("npx hyperframes init my-video", W(2, "npx") - 0.1, W(2, "name") + 0.05, 1)])
-rows.append([0, "cmd", "cd my-video", typing("cd my-video", W(2, "name") + 0.12, P0[1] - SHUT - 0.3, 2)])
+rows.append([0, "cmd", "npx hyperframes init my-video", typing("npx hyperframes init my-video", W(2, "npx") - 0.1, W(2, "then"), 1)])
+rows.append([0, "cmd", "cd my-video", typing("cd my-video", W(2, "then") + 0.08, W(2, "name") + 0.05, 2)])
 PROMPT = "Using /hyperframes, make a 20-second vertical video about how volcanoes erupt. Bold text, dark theme."
 rows.append([1, "prompt", PROMPT, typing(PROMPT, W(4, "just"), E(4) - 0.05, 3)])
 C_DRAFT, C_HIGH = "npx hyperframes render --quality draft", "npx hyperframes render --quality high"
 rows.append([2, "cmd", "npx hyperframes preview", typing("npx hyperframes preview", S(7) + 0.1, W(7, "preview", True), 4)])
 rows.append([3, "cmd", C_DRAFT, typing(C_DRAFT, W(9, "draft") - 0.15, W(9, "tweak", True), 5), len("npx hyperframes render")])
 rows.append([3, "cmd", C_HIGH, typing(C_HIGH, W(9, "high"), W(9, "final") - 0.1, 6), len("npx hyperframes render")])
-HOLDS = {0: r(P0[1] - SHUT - 0.28), 3: r(W(9, "final") - 0.05)}     # finished terminals hold still (screenshot moments)
+HOLDS = {0: r(W(2, "name") + 0.08), 3: r(W(9, "final") - 0.05)}     # finished terminals hold still (screenshot moments)
 HL = [["vertical", r(W(5, "vertical"))], ["20-second", r(W(5, "long"))]]   # "be specific": the words light up as she says them
 PREVIEW_AT = W(7, "you")            # Studio opens: preview + timeline
 ORANGE_AT = W(7, "orange")          # the preview turns orange as she says it
@@ -104,4 +104,5 @@ out = {"DUR": DUR, "VOL": [-10, -9], "SLP": [-10, -9], "dev": [[r(t), a, b] for 
        "sfx": [[n, r(t), g] for n, t, g in sfx], "riser": [r(x) for x in RISER], "snore": [], "shakes": []}
 (HERE / "direction.json").write_text(json.dumps(out, indent=1))
 (HERE / "direction.js").write_text("window.D = " + json.dumps(out) + ";\n")
+for _r in rows: assert _r[3] == sorted(_r[3]) and _r[3][0] < _r[3][-1] + 1e-9, ("typing runs backwards", _r[2])
 print(f"{len(rows)} screen rows, {len(sfx)} sfx, portals {out['portals']} · {DUR:.2f}s")
