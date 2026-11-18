@@ -74,6 +74,7 @@
       #term .cm { color: #64748b; } #term .ps { color: #5eead4; } #term .k { color: #5eead4; }
       .caret { display: inline-block; width: 26px; height: 52px; vertical-align: -10px; background: #5eead4; }
       #ask { position: absolute; left: 80px; width: 860px; top: 440px; }
+      .mono, #term, #askBox { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
       #pvFrame { background: #111827; }
       #pvMt { position: absolute; left: 30px; bottom: 0; width: 300px; height: 260px; background: #3f2a2a; clip-path: polygon(0 100%, 42% 8%, 58% 8%, 100% 100%); }
       #tl { position: absolute; left: 140px; top: 1110px; width: 800px; height: 210px; border-radius: 22px; background: #0f172a; border: 2px solid #1e293b; opacity: 0; padding: 22px 26px; }
@@ -82,11 +83,11 @@
       #tl .trk.au i { background: #334155; height: 30px; top: 7px; }
       #ph { position: absolute; top: 12px; width: 4px; height: 186px; background: #5eead4; border-radius: 2px; }
       #askBox .hl { background: #5eead4; color: #0a1220; border-radius: 10px; padding: 0 6px; }
-      #vid { position: absolute; left: 355px; top: 230px; width: 370px; height: 658px; border-radius: 30px; overflow: hidden; opacity: 0; transform-origin: 50% 0;
+      #vid { position: absolute; left: 371px; top: 200px; width: 338px; height: 600px; border-radius: 30px; overflow: hidden; opacity: 0; transform-origin: 50% 0;
         background: linear-gradient(180deg, #0f0a2a 0%, #3b1d4a 50%, #b4472c 88%, #2a1208 100%); border: 3px solid rgba(255,255,255,0.18); }
-      #vidMt { position: absolute; left: 20px; bottom: 0; width: 330px; height: 300px; background: #241a1f; clip-path: polygon(0 100%, 42% 6%, 58% 6%, 100% 100%); }
-      #vidLava { position: absolute; left: 115px; top: 300px; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,0.95), rgba(249,115,22,0.6) 40%, rgba(249,115,22,0) 70%); }
-      #vidT { position: absolute; left: 0; width: 370px; top: 70px; text-align: center; font-size: 46px; line-height: 50px; font-weight: 900; color: #fff; }
+      #vidMt { position: absolute; left: 19px; bottom: 0; width: 300px; height: 270px; background: #241a1f; clip-path: polygon(0 100%, 42% 6%, 58% 6%, 100% 100%); }
+      #vidLava { position: absolute; left: 99px; top: 270px; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,0.95), rgba(249,115,22,0.6) 40%, rgba(249,115,22,0) 70%); }
+      #vidT { position: absolute; left: 0; width: 338px; top: 60px; text-align: center; font-size: 46px; line-height: 50px; font-weight: 900; color: #fff; }
       #askHint { font-size: 44px; color: #64748b; margin: 0 0 22px 10px; }
       #askBox { border: 4px solid #5eead4; border-radius: 30px; padding: 30px 34px; font-size: 56px; line-height: 84px; color: #f1f5f9; white-space: pre-wrap; min-height: 260px; }
       #askBox .gt { color: #5eead4; } #askBox .sl { color: #5eead4; }
@@ -225,6 +226,7 @@
         devLow: [[0.06, 1.3, 1.5], [-0.3, 1.18, 0]],
         quill: [[-0.08, 0.82, 2.0], [0.34, 0.58, 0]],
         quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],
+        devUnder: [[0.08, 0.98, 1.95], [-0.3, 0.93, 0]],
         devPush: [[0.14, 0.98, 2.3], [-0.3, 0.78, 0]],
         quillPush: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],
         quillEnd: [[0.05, 0.76, 1.5], [0.34, 0.62, 0]],
@@ -329,7 +331,8 @@
         const R = screenRect();
         const full = { x: -24, y: -24, w: 1128, h: 1968 };
         const lerpR = (A, B, u) => ({ x: A.x + (B.x - A.x) * u, y: A.y + (B.y - A.y) * u, w: A.w + (B.w - A.w) * u, h: A.h + (B.h - A.h) * u });
-        const rr = lerpR(R, full, k), rad = (1 - k) * R.h * 0.45;
+        const Rc = R.w > full.w || R.h > full.h ? full : R;   // camera pressed against the screen: never pull out from a rect bigger than the frame
+        const rr = lerpR(Rc, full, k), rad = (1 - k) * Math.min(Rc.w, Rc.h) * 0.3;
         const on = P && t >= P[0] - 0.12 && R.w > 1;
         $("portal").style.clipPath = on ? `inset(${rr.y.toFixed(1)}px ${(1080 - rr.x - rr.w).toFixed(1)}px ${(1920 - rr.y - rr.h).toFixed(1)}px ${rr.x.toFixed(1)}px round ${rad.toFixed(1)}px)` : "inset(50% 50% 50% 50%)";
         const sc = on ? Math.max(rr.w / 1080, 0.05) : 1;
@@ -359,7 +362,8 @@
         const still = HD != null && t >= HD;
         if (termRows.length && lastKind === "cmd" && !still) html += blink || !lastDone ? caret : "";
         $("term").innerHTML = html;
-        $("term").style.transform = `translate(0px, ${pi === 2 ? 250 : pi === 0 ? 700 : 560}px)`;
+        const up = pi === 2 && t >= D.previewAt ? expoOut((t - D.previewAt) / 0.45) : 0;
+        $("term").style.transform = `translate(${pi === 0 ? 70 : 0}px, ${(pi === 2 ? 640 - 390 * up : pi === 0 ? 700 : 560).toFixed(1)}px)`;
         $("term").style.opacity = termRows.length ? 1 : 0;
 
         // the prompt (portal 1), typed as Quill says it
@@ -369,6 +373,7 @@
           const shown = pr[3].filter((x) => x <= t).length;
           let txt = pr[2].slice(0, shown).replace("/hyperframes", '<span class="sl">/hyperframes</span>');
           for (const [w, at] of D.hl || []) if (t >= at) txt = txt.replace(w, `<span class="hl">${w}</span>`);
+          $("askBox").style.borderColor = shown >= pr[2].length ? `rgba(94,234,212,${(0.65 + 0.35 * Math.sin(t * 5)).toFixed(3)})` : "#5eead4";
           $("askBox").innerHTML = `<span class="gt">&gt; </span>${txt}${blink || shown < pr[2].length ? caret : ""}`;
           const [w0, w1] = D.working, wOn = t >= w0 && t < w1;
           $("work").style.opacity = wOn ? 1 : 0;
@@ -381,7 +386,7 @@
         $("pv").style.opacity = pvOn && into < 1 ? 1 : 0;
         $("pv").style.transform = `translateY(${(120 * (1 - pvU) + 60 * into).toFixed(1)}px) scale(${((1.12 - 0.12 * pvU) * (1 - 0.7 * into)).toFixed(4)})`;
         $("tl").style.opacity = pvOn ? 1 : 0; $("tl").style.transform = `translateY(${(80 * (1 - pvU)).toFixed(1)}px)`;
-        $("ph").style.left = (26 + 744 * (((t - D.previewAt) / 3.2) % 1 + 1) % 1).toFixed(1) + "px";
+        $("ph").style.left = (26 + 744 * clamp((t - D.previewAt) / (D.portals[2][1] - D.SHUT - D.previewAt), 0, 1)).toFixed(1) + "px";
         const og = t >= D.orangeAt ? clamp((t - D.orangeAt) / 0.35, 0, 1) : 0;
         $("pvFrame").style.background = og > 0 ? `linear-gradient(160deg, rgba(249,115,22,${og}), rgba(234,88,12,${og})), #111827` : "#111827";
         document.querySelectorAll("#tl .trk:not(.au) i").forEach((el) => { el.style.background = og > 0.5 ? "#F97316" : "#475569"; });
@@ -414,6 +419,8 @@
           ws.forEach((w, j) => { chunks[chunks.length - 1].push(j); if (/[.,!?]$/.test(w.w) || chunks[chunks.length - 1].length >= 4) chunks.push([]); });
           const act = Math.max(0, ws.findIndex((w) => t < w.e) === -1 ? ws.length - 1 : ws.findIndex((w) => t < w.e));
           const ch = chunks.find((c) => c.includes(act)) || chunks[0];
+          const c0 = ws[ch[0]].s, c1 = ch[ch.length - 1] === ws.length - 1 ? L.e : ws[ch[ch.length - 1]].e + 0.08;
+          if (t < c0 - 0.02 || t > c1) { $("cap").style.opacity = 0; }
           $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on " + L.who : ""}">${ws[j].w}</span>`).join(" ") + "</span>";
         }
       }
@@ -483,7 +490,7 @@
 
         // emotes ride above the heads, springing in with back.out(1.7)
         D.emotes.forEach(([a, b, who], n) => {
-          const el = emoteEls[n], on = t >= a && t < b;
+          const el = emoteEls[n], on = t >= a && t < b && (window.__portalK || 0) < 0.01 && !D.portals.some(([pa, pb]) => t >= pa - 0.12 && t < pb) && shotNow.startsWith(who === "dev" ? "dev" : "quill");
           el.style.opacity = on ? 1 - seg(t, b - 0.12, b) : 0;
           if (!on) return;
           const anchor = who === "dev" ? dev.rig.head.localToWorld(new THREE.Vector3(0.17, 0.42, 0)) : quill.group.localToWorld(new THREE.Vector3(-0.22, 0.72, 0));

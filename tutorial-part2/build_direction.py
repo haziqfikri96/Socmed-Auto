@@ -20,7 +20,11 @@ for l in L:
     k = hashlib.sha1(f"{l['who']}|{l['text']}".encode()).hexdigest()[:12]
     a, sr = sf.read(HERE / f"assets/lines/{k}.wav"); a = np.abs(a if a.ndim == 1 else a.mean(1))
     env = np.convolve(a, np.ones(int(0.02 * sr)) / int(0.02 * sr), "same")
-    end = round(l["s"] + np.where(env > env.max() * 0.05)[0][-1] / sr + 0.03, 3)
+    on = np.where(env > env.max() * 0.05)[0]
+    end = round(l["s"] + on[-1] / sr + 0.03, 3)
+    start = round(l["s"] + on[0] / sr, 3)
+    if start > l["words"][0]["s"]:
+        l["words"][0]["s"] = min(start, l["words"][0]["e"] - 0.05)
     if end < l["e"]:
         l["e"] = end; l["words"][-1]["e"] = max(l["words"][-1]["s"] + 0.1, end)
 (HERE / "lines.js").write_text("window.LINES = " + json.dumps(L) + ";\nwindow.DUR = " + str(DUR) + ";\n")
@@ -55,8 +59,8 @@ PORTALS = [P0, P1, P2, P3]
 OPEN, SHUT = 0.45, 0.18
 
 rows = []
-rows.append([0, "cmd", "npx hyperframes init my-video", typing("npx hyperframes init my-video", W(2, "npx") - 0.1, W(2, "then"), 1)])
-rows.append([0, "cmd", "cd my-video", typing("cd my-video", W(2, "then") + 0.08, W(2, "name") + 0.05, 2)])
+rows.append([0, "cmd", "npx hyperframes init my-video", typing("npx hyperframes init my-video", W(2, "npx") - 0.1, W(2, "init") - 0.05, 1)])
+rows.append([0, "cmd", "cd my-video", typing("cd my-video", W(2, "init") + 0.05, W(2, "name") + 0.05, 2)])
 PROMPT = "Using /hyperframes, make a 20-second vertical video about how volcanoes erupt. Bold text, dark theme."
 rows.append([1, "prompt", PROMPT, typing(PROMPT, W(4, "just"), E(4) - 0.05, 3)])
 C_DRAFT, C_HIGH = "npx hyperframes render --quality draft", "npx hyperframes render --quality high"
@@ -77,7 +81,7 @@ quill = [[0, "happy", "none"], [S(1), "proud", "point"], [S(2), "proud", "none"]
          [S(9), "proud", "point"], [S(11), "cheeky", "none"], [S(12), "excited", "wave"]]
 shots = [[0, "devPush", 1], [S(1) - 0.03, "quillClose", 1], [S(3) - 0.03, "devClose", 1], [S(4) - 0.03, "quillClose", 1],
          [S(6) - 0.03, "devClose", 1], [S(7) - 0.03, "quillClose", 1], [S(8) - 0.03, "dev", 1], [S(9) - 0.03, "quillClose", 1],
-         [S(10) - 0.03, "devLow", 1], [S(11) - 0.03, "quillClose", 1], [S(12) - 0.03, "quillEnd", 1]]
+         [S(10) - 0.03, "devUnder", 1], [S(11) - 0.03, "quillClose", 1], [S(12) - 0.03, "quillEnd", 1]]
 emotes = [[S(3) + 0.3, S(4) - 0.06, "dev", "question"], [S(6) + 0.25, S(7) - 0.06, "dev", "sweat"],
           [S(10) + 0.25, S(11) - 0.06, "dev", "sparkle"]]
 GLOW = [W(1, "step"), P0[0]]
