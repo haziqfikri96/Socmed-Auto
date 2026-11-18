@@ -1,0 +1,21 @@
+Part 2: your first real HyperFrames video 🌋
+
+1. Start a project:
+npx hyperframes init my-video
+cd my-video
+
+2. In Claude Code, describe it: "Using /hyperframes, make a 20-second vertical video about how volcanoes erupt. Bold text, dark theme."
+Be specific: say vertical and how long.
+
+3. Preview and edit on the timeline:
+npx hyperframes preview
+
+4. Render: draft while you tweak, high quality for the final:
+npx hyperframes render --quality draft
+npx hyperframes render --quality high
+
+Part 3: adding your own voice. Follow!
+
+Source: github.com/heygen-com/hyperframes (official README and CLI help, Apache 2.0, by HeyGen)
+
+#claudecode #ai #coding #tutorial #opensource
