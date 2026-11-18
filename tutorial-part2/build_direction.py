@@ -81,7 +81,7 @@ shots = [[0, "devPush", 1], [S(1) - 0.03, "quillClose", 1], [S(3) - 0.03, "devCl
 emotes = [[S(3) + 0.3, S(4) - 0.06, "dev", "question"], [S(6) + 0.25, S(7) - 0.06, "dev", "sweat"],
           [S(10) + 0.25, S(11) - 0.06, "dev", "sparkle"]]
 GLOW = [W(1, "step"), P0[0]]
-PART3 = W(12, "part")
+PART3 = W(12, "comment")
 
 EMOTE_SFX = {"question": ("pop", -10), "sweat": ("gulp", -8), "sparkle": ("sparkle", -10)}
 sfx = [["impact_deep", P0[0] + 0.37, -6], ["sparkle", P0[0] + 0.55, -14],

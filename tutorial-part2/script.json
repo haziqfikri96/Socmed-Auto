@@ -1,15 +1,54 @@
 [
- ["dev", "Part two! I installed HyperFrames. Now what?"],
- ["quill", "Now we make a real video. Step one: start a project."],
- ["quill", "Type npx hyperframes init, then a name."],
- ["dev", "Then I write code?"],
- ["quill", "Nope. Just describe it. Topic, length, style."],
- ["quill", "Be specific. Vertical for TikTok, and say how long."],
- ["dev", "And if I hate the colours?"],
- ["quill", "Open the preview. You can edit anything on the timeline, or just tell me: make it orange."],
- ["dev", "Rendering takes forever though."],
- ["quill", "Render a draft while you tweak. High quality only for the final."],
- ["dev", "Wait... that's my first video?"],
- ["quill", "Made on your own computer. Free."],
- ["quill", "Part three: adding your own voice. Follow!"]
+ [
+  "dev",
+  "Part two! I installed HyperFrames. Now what?"
+ ],
+ [
+  "quill",
+  "Now we make a real video. Step one: start a project."
+ ],
+ [
+  "quill",
+  "Type npx hyperframes init, then a name."
+ ],
+ [
+  "dev",
+  "Then I write code?"
+ ],
+ [
+  "quill",
+  "Nope. Just describe it. Topic, length, style."
+ ],
+ [
+  "quill",
+  "Be specific. Vertical for TikTok, and say how long."
+ ],
+ [
+  "dev",
+  "And if I hate the colours?"
+ ],
+ [
+  "quill",
+  "Open the preview. You can edit anything on the timeline, or just tell me: make it orange."
+ ],
+ [
+  "dev",
+  "Rendering takes forever though."
+ ],
+ [
+  "quill",
+  "Render a draft while you tweak. High quality only for the final."
+ ],
+ [
+  "dev",
+  "Wait... that's my first video?"
+ ],
+ [
+  "quill",
+  "Made on your own computer. Free."
+ ],
+ [
+  "quill",
+  "Comment what you made, I'll react to the best ones!"
+ ]
 ]

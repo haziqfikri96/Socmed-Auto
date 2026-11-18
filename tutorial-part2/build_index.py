@@ -31,7 +31,7 @@ html = '''<div id="portal"><div id="pscreen" data-ui="terminal"><div id="pin">
           <div id="tl"><div class="trk"><i style="left:0;width:62%"></i><i style="left:64%;width:36%"></i></div><div class="trk"><i style="left:8%;width:40%"></i><i style="left:52%;width:44%"></i></div><div class="trk au"><i style="left:0;width:100%"></i></div><div id="ph"></div></div>
           <div id="file"><div class="fi"><i></i></div><div class="fn mono">my-video.mp4</div></div>
         </div></div></div>
-        <div id="face2" class="mono"><span>part 3 →</span></div>
+        <div id="face2" class="mono"><span>your turn →</span></div>
         <div id="vid"><div id="vidMt"></div><div id="vidLava"></div><div id="vidT">HOW VOLCANOES ERUPT</div></div>
         <div id="cap"></div>
       </div>
@@ -53,7 +53,7 @@ css = '''
       #term { position: absolute; left: 80px; top: 0; font-size: 44px; line-height: 68px; color: #e2e8f0; white-space: pre; }
       #term .cm { color: #64748b; } #term .ps { color: #5eead4; } #term .k { color: #5eead4; }
       .caret { display: inline-block; width: 26px; height: 52px; vertical-align: -10px; background: #5eead4; }
-      #ask { position: absolute; left: 50px; width: 980px; top: 440px; }
+      #ask { position: absolute; left: 80px; width: 860px; top: 440px; }
       #pvFrame { background: #111827; }
       #pvMt { position: absolute; left: 30px; bottom: 0; width: 300px; height: 260px; background: #3f2a2a; clip-path: polygon(0 100%, 42% 8%, 58% 8%, 100% 100%); }
       #tl { position: absolute; left: 140px; top: 1110px; width: 800px; height: 210px; border-radius: 22px; background: #0f172a; border: 2px solid #1e293b; opacity: 0; padding: 22px 26px; }
@@ -68,7 +68,7 @@ css = '''
       #vidLava { position: absolute; left: 115px; top: 300px; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(253,224,71,0.95), rgba(249,115,22,0.6) 40%, rgba(249,115,22,0) 70%); }
       #vidT { position: absolute; left: 0; width: 370px; top: 70px; text-align: center; font-size: 46px; line-height: 50px; font-weight: 900; color: #fff; }
       #askHint { font-size: 44px; color: #64748b; margin: 0 0 22px 10px; }
-      #askBox { border: 4px solid #5eead4; border-radius: 30px; padding: 36px 40px; font-size: 64px; line-height: 94px; color: #f1f5f9; white-space: pre-wrap; min-height: 260px; }
+      #askBox { border: 4px solid #5eead4; border-radius: 30px; padding: 30px 34px; font-size: 56px; line-height: 84px; color: #f1f5f9; white-space: pre-wrap; min-height: 260px; }
       #askBox .gt { color: #5eead4; } #askBox .sl { color: #5eead4; }
       #work { margin-top: 44px; font-size: 54px; color: #5eead4; opacity: 0; }
       #pv { position: absolute; left: 360px; top: 430px; width: 360px; height: 640px; border-radius: 34px; overflow: hidden; background: #F4F1EA; opacity: 0; transform-origin: 50% 50%; }
@@ -190,7 +190,7 @@ hud = r'''function hud(t) {
         if (t >= D.part2) {
           const h = R.h * 0.9, w = R.w * 0.92;
           $("face2").style.width = w + "px"; $("face2").style.height = h + "px";
-          $("face2").style.fontSize = Math.min(h * 0.34, w / (8 * 0.66)).toFixed(1) + "px";
+          $("face2").style.fontSize = Math.min(h * 0.34, w / (11 * 0.66)).toFixed(1) + "px";
           const z = 1.12 - 0.12 * f2;
           $("face2").style.transform = `translate(${(R.x + R.w / 2 - (w * z) / 2).toFixed(1)}px, ${(R.y + R.h / 2 - (h * z) / 2).toFixed(1)}px) scale(${z.toFixed(4)})`;
         }

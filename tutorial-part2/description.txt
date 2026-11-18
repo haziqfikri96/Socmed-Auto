@@ -14,7 +14,7 @@ npx hyperframes preview
 npx hyperframes render --quality draft
 npx hyperframes render --quality high
 
-Part 3: adding your own voice. Follow!
+Comment what you made, I'll react to the best ones! 👇
 
 Source: github.com/heygen-com/hyperframes (official README and CLI help, Apache 2.0, by HeyGen)
 
