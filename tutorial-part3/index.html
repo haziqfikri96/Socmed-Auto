@@ -83,6 +83,7 @@
       #pvScene { position: absolute; inset: 0; transform-origin: 50% 62%; }
       #pvSky { position: absolute; inset: 0; background: linear-gradient(180deg, #0f0a2a 0%, #2a1638 55%, #4a2318 100%); }
       #pvLava { position: absolute; left: 105px; top: 330px; width: 150px; height: 150px; border-radius: 50%; opacity: 0; background: radial-gradient(circle, rgba(253,224,71,0.95), rgba(249,115,22,0.6) 40%, rgba(249,115,22,0) 70%); }
+      .emb { position: absolute; left: 172px; top: 400px; width: 16px; height: 16px; border-radius: 50%; opacity: 0; background: radial-gradient(circle, #fef08a, #f97316 60%, #b91c1c); }
       #pvBadge { position: absolute; left: 18px; top: 18px; padding: 6px 16px; border-radius: 999px; font-size: 24px; font-weight: 900; letter-spacing: 0.08em; background: #334155; color: #cbd5e1; }
       #pvMt { position: absolute; left: 30px; bottom: 0; width: 300px; height: 260px; background: #2a1d22; clip-path: polygon(0 100%, 42% 8%, 58% 8%, 100% 100%); }
       #tl { position: absolute; left: 140px; top: 1110px; width: 800px; height: 210px; border-radius: 22px; background: #0f172a; border: 2px solid #1e293b; opacity: 0; padding: 22px 26px; }
@@ -124,7 +125,7 @@
         <div id="portal"><div id="pscreen" data-ui="terminal"><div id="pin">
           <div id="term" class="mono"></div>
           <div id="ask"><div id="askHint" class="mono"># in Claude Code</div><div id="askBox" class="mono"></div><div id="work" class="mono"></div></div>
-          <div id="pv"><div id="pvFrame"><div id="pvScene"><div id="pvSky"></div><div id="pvLava"></div><div id="pvMt"></div></div><div id="pvTitle">HOW VOLCANOES ERUPT</div><div id="pvBadge">BEFORE</div></div></div>
+          <div id="pv"><div id="pvFrame"><div id="pvScene"><div id="pvSky"></div><div id="pvLava"></div><i class="emb" id="emb0"></i><i class="emb" id="emb1"></i><i class="emb" id="emb2"></i><i class="emb" id="emb3"></i><i class="emb" id="emb4"></i><i class="emb" id="emb5"></i><i class="emb" id="emb6"></i><i class="emb" id="emb7"></i><div id="pvMt"></div></div><div id="pvTitle">HOW VOLCANOES ERUPT</div><div id="pvBadge">BEFORE</div></div></div>
           <div id="tl"><div class="trk vt"><i style="left:0;width:48%"></i><i style="left:50%;width:50%"></i></div><div class="trk sx"><b style="left:2%;height:14px"></b><b style="left:4%;height:26px"></b><b style="left:6%;height:10px"></b><b style="left:30%;height:30px"></b><b style="left:32%;height:18px"></b><b style="left:34%;height:34px"></b><b style="left:36%;height:12px"></b><b style="left:58%;height:22px"></b><b style="left:60%;height:30px"></b><b style="left:62%;height:14px"></b><b style="left:80%;height:34px"></b><b style="left:82%;height:20px"></b><b style="left:84%;height:28px"></b><b style="left:86%;height:10px"></b></div><div id="ph"></div></div>
           <div id="file"><div class="fi"><i></i></div><div class="fn mono">my-video.mp4</div></div>
         </div></div></div>
@@ -404,7 +405,8 @@
         const pvU = pvOn ? expoOut((t - D.previewAt) / 0.5) : 0;
         const into = t >= D.fileAt - 0.2 ? easeIn((t - (D.fileAt - 0.2)) / 0.2) : 0;     // the preview collapses into the file
         $("pv").style.opacity = pvOn && into < 1 ? 1 : 0;
-        $("pv").style.transform = `translateY(${(120 * (1 - pvU) + 60 * into).toFixed(1)}px) scale(${((1.12 - 0.12 * pvU) * (1 - 0.7 * into)).toFixed(4)})`;
+        const push = t >= D.afterAt ? 0.14 * expoOut((t - D.afterAt) / 0.8) + 0.04 * Math.sin((t - D.afterAt) * 3) * clamp((t - D.afterAt) / 0.8, 0, 1) : 0;   // AFTER: the camera pushes in on the preview
+        $("pv").style.transform = `translateY(${(120 * (1 - pvU) + 60 * into).toFixed(1)}px) scale(${((1.12 - 0.12 * pvU) * (1 - 0.7 * into) * (1 + push)).toFixed(4)})`;
         $("tl").style.opacity = pvOn ? 1 : 0; $("tl").style.transform = `translateY(${(80 * (1 - pvU)).toFixed(1)}px)`;
         $("ph").style.left = (26 + 744 * clamp((t - D.previewAt) / (D.portals[D.pvPortal][1] - D.SHUT - D.previewAt), 0, 1)).toFixed(1) + "px";
         // BEFORE (flat, silent) -> AFTER (camera push, spring title, lava, sound)
@@ -413,7 +415,13 @@
         $("pvBadge").style.background = aOn ? "#5eead4" : "#334155"; $("pvBadge").style.color = aOn ? "#0a1220" : "#cbd5e1";
         $("pvBadge").style.transform = `scale(${aOn ? (1.25 - 0.25 * au).toFixed(3) : 1})`;
         const pEnd = D.portals[D.pvPortal][1];
-        $("pvScene").style.transform = aOn ? `scale(${(1 + 0.32 * smooth((t - D.afterAt) / (pEnd - D.afterAt))).toFixed(4)})` : "none";
+        $("pvScene").style.transform = aOn ? `scale(${(1 + 0.22 * expoOut((t - D.afterAt) / 0.9) + 0.14 * smooth((t - D.afterAt) / (pEnd - D.afterAt))).toFixed(4)})` : "none";
+        for (let k = 0; k < 8; k++) {   // lava embers: deterministic arcs, a new one every 0.18 s after the flip
+          const e = $("emb" + k), ph = ((t - D.afterAt - k * 0.18) % 1.4 + 1.4) % 1.4, live = aOn && t - D.afterAt > k * 0.18;
+          const dir = [-1, 0.6, -0.4, 1, -0.8, 0.3, 0.9, -0.2][k];
+          e.style.opacity = live ? (1 - ph / 1.4).toFixed(3) : 0;
+          e.style.transform = `translate(${(dir * 90 * ph).toFixed(1)}px, ${(-260 * ph + 160 * ph * ph).toFixed(1)}px) scale(${(1.3 - 0.6 * ph / 1.4).toFixed(3)})`;
+        }
         $("pvLava").style.opacity = aOn ? au.toFixed(3) : 0;
         $("pvLava").style.transform = `scale(${(0.8 + 0.4 * Math.abs(Math.sin(t * 5))).toFixed(3)})`;
         document.querySelectorAll("#tl .trk.sx b").forEach((el) => { el.style.background = aOn ? "#5eead4" : "#334155"; });
