@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="direction.js"></script>
+    <script src="render-mode.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      /* TikTok safe zone: all labels/badges/captions inside x 80–940, y 180–1600 */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #05070c; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; }
+      #bg { position: absolute; inset: 0; background: #05070c; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+      #heat, #cold { position: absolute; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+      #heat { background: radial-gradient(circle, rgba(255,120,40,0.42) 0%, rgba(255,80,20,0.16) 38%, rgba(255,80,20,0) 70%); }
+      #cold { background: radial-gradient(circle, rgba(40,170,255,0.38) 0%, rgba(20,120,255,0.14) 38%, rgba(20,120,255,0) 70%); }
+      .tag { position: absolute; left: 0; top: 0; padding: 10px 22px; border-radius: 14px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 40px; opacity: 0; white-space: nowrap; transform-origin: 50% 50%; }
+      .tag.hot { background: rgba(60,18,6,0.78); border: 3px solid #FF9F1C; color: #FFD29A; }
+      .tag.cold { background: rgba(4,24,48,0.78); border: 3px solid #00E5FF; color: #B6F6FF; }
+      .tag.ice { background: rgba(6,20,36,0.82); border: 3px solid #E6F6FF; color: #fff; }
+      .tag.small { font-size: 30px; padding: 6px 14px; }
+      #title { position: absolute; left: 80px; width: 860px; top: 300px; text-align: center; font-weight: 900; font-size: 96px; line-height: 96px; letter-spacing: -0.03em; opacity: 0;
+        color: #fff; -webkit-text-stroke: 3px rgba(0,229,255,0.9); paint-order: stroke fill; }
+      .badge { position: absolute; left: 50%; top: 220px; padding: 14px 28px; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 34px; letter-spacing: 0.04em;
+        background: rgba(4,12,24,0.8); border: 3px solid #00E5FF; color: #00E5FF; opacity: 0; white-space: nowrap; transform-origin: 50% 50%; }
+      #stamp { position: absolute; left: 50%; top: 380px; padding: 18px 30px; border-radius: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 40px;
+        background: rgba(4,12,24,0.85); border: 4px solid #E6F6FF; color: #E6F6FF; opacity: 0; white-space: nowrap; transform-origin: 50% 50%; }
+      #stamp b { color: #FF9F1C; }
+      #smear { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+        background: repeating-linear-gradient(0deg, rgba(200,230,255,0.10) 0 3px, rgba(0,0,0,0) 3px 17px), linear-gradient(90deg, rgba(5,7,12,0.55), rgba(5,7,12,0) 30%, rgba(5,7,12,0) 70%, rgba(5,7,12,0.55)); }
+      #cap { position: absolute; left: 80px; width: 860px; top: 1372px; text-align: center; }
+      #cap .ch { display: inline-block; padding: 8px 24px 12px; border-radius: 20px; background: rgba(2,6,14,0.72); font-size: 58px; line-height: 70px; font-weight: 900; color: #fff; }
+      #cap .on { color: #00E5FF; } #cap .on.warm { color: #FF9F1C; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="mpemba-effect" data-start="0" data-duration="30.03" data-width="1080" data-height="1920" data-fps="30">
+      <div id="bg"></div>
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="30.03" data-track-index="0" data-layout-allow-overflow></canvas>
+      <div id="hud" class="clip" data-start="0" data-duration="30.03" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div id="heat"></div><div id="cold"></div>
+        <div class="tag hot" id="tHot">90°C</div><div class="tag cold" id="tCold">20°C</div>
+        <div class="tag hot small" id="g90">90°C</div><div class="tag cold small" id="g20">20°C</div>
+        <div class="tag ice small" id="g0">0°C</div><div class="tag ice small" id="gm5">−5°C</div><div class="tag ice" id="gIce">ICE?</div>
+        <div class="tag hot small" id="mHot">−2°C · freezing</div><div class="tag cold small" id="mCold">−6°C · still liquid</div>
+        <div id="title">THE MPEMBA EFFECT</div>
+        <div class="badge" id="b0"></div><div class="badge" id="b1"></div><div class="badge" id="b2"></div>
+        <div id="stamp">OBSERVED — <b>STILL DEBATED</b></div>
+        <div id="smear"></div>
+        <div id="cap"></div>
+      </div>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="30.03" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 30.03 }, 0);
+      window.__timelines["mpemba-effect"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+      const LINES = window.LINES, D = window.D, DUR = D.DUR, C = D.cues, DRAFT = !!window.HF_DRAFT;
+      const $ = (id) => document.getElementById(id);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
+      const backOut = (x, c1 = 1.7) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const lerp3 = (A, B, k) => A.map((v, i) => lerp(v, B[i], k));
+      const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);   // deterministic
+
+      /* ---------------- renderer, environment, post ---------------- */
+      const W = DRAFT ? 540 : 1080, H = DRAFT ? 960 : 1920;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.82;
+      renderer.localClippingEnabled = true;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b12);
+      scene.fog = new THREE.FogExp2(0x0a1420, 0.22);
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      const camera = new THREE.PerspectiveCamera(34, 1080 / 1920, 0.02, 60);
+      const composer = new EffectComposer(renderer);
+      composer.setSize(W, H);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W / 2, H / 2), 0.32, 0.45, 0.92);
+      composer.addPass(bloom);
+      composer.addPass(new OutputPass());
+
+      /* ---------------- procedural textures (canvas, seeded) ---------------- */
+      function canvasTex(w, h, draw, repeat) {
+        const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h);
+        const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace;
+        if (repeat) { tx.wrapS = tx.wrapT = THREE.RepeatWrapping; tx.repeat.set(...repeat); }
+        return tx;
+      }
+      const R0 = rng(7);
+      const steelTex = canvasTex(512, 512, (g, w, h) => {      // brushed stainless with frost speckle
+        g.fillStyle = "#8c96a3"; g.fillRect(0, 0, w, h);
+        for (let i = 0; i < 900; i++) { const y = R0() * h; g.fillStyle = `rgba(${R0() < 0.5 ? "255,255,255" : "40,48,60"},${0.015 + R0() * 0.03})`; g.fillRect(0, y, w, 1 + R0() * 1.5); }
+        for (let i = 0; i < 900; i++) { const x = R0() * w, y = R0() * h, a = Math.pow(R0(), 3) * 0.25; g.fillStyle = `rgba(235,245,255,${a})`; g.beginPath(); g.arc(x, y, R0() * 2.2, 0, 7); g.fill(); }
+      }, [3, 2]);
+      const frostTex = canvasTex(512, 512, (g, w, h) => {      // frost buildup for the shelf/walls
+        g.clearRect(0, 0, w, h);
+        for (let i = 0; i < 1200; i++) { const x = R0() * w, y = R0() * h; g.fillStyle = `rgba(230,244,255,${0.03 + R0() * 0.08})`; g.fillRect(x, y, 1 + R0() * 2, 1 + R0() * 2); }
+      }, [4, 4]);
+      const softTex = canvasTex(128, 128, (g, w, h) => {       // steam puff
+        const gr = g.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, "rgba(255,255,255,0.9)"); gr.addColorStop(0.45, "rgba(255,255,255,0.35)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+        g.fillStyle = gr; g.fillRect(0, 0, w, h);
+        for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(255,255,255,${R0() * 0.08})`; g.beginPath(); g.arc(20 + R0() * 88, 20 + R0() * 88, 6 + R0() * 16, 0, 7); g.fill(); }
+      });
+
+      /* ---------------- freezer interior ---------------- */
+      const steel = new THREE.MeshStandardMaterial({ color: 0x8e99a6, map: steelTex, metalness: 0.9, roughness: 0.38, envMapIntensity: 0.55 });
+      const frosted = new THREE.MeshStandardMaterial({ color: 0xdfeaf5, map: frostTex, transparent: true, opacity: 0.55, roughness: 0.9, metalness: 0, depthWrite: false });
+      const room = new THREE.Group(); scene.add(room);
+      const wall = (w, h, pos, rot) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), steel); m.position.set(...pos); m.rotation.set(...rot); room.add(m); const f = new THREE.Mesh(new THREE.PlaneGeometry(w, h), frosted); f.position.copy(m.position); f.rotation.copy(m.rotation); f.translateZ(0.002); room.add(f); };
+      wall(4.6, 2.2, [0.6, 0.6, -0.7], [0, 0, 0]);                       // back
+      wall(2.4, 2.2, [-1.4, 0.6, 0.4], [0, Math.PI / 2, 0]);             // left
+      wall(2.4, 2.2, [2.6, 0.6, 0.4], [0, -Math.PI / 2, 0]);             // right
+      wall(4.6, 2.4, [0.6, -0.02, 0.4], [-Math.PI / 2, 0, 0]);          // floor/shelf base
+      wall(4.6, 2.4, [0.6, 1.4, 0.4], [Math.PI / 2, 0, 0]);             // ceiling
+      const rodMat = new THREE.MeshStandardMaterial({ color: 0x55606c, metalness: 0.9, roughness: 0.55, envMapIntensity: 0.2 });
+      for (let i = 0; i < 9; i++) { const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 4.4, 8), rodMat); rod.rotation.z = Math.PI / 2; rod.position.set(0.6, 0.002, -0.55 + i * 0.15); room.add(rod); }
+      const lightStrip = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.03, 0.02), new THREE.MeshBasicMaterial({ color: 0xbfe9ff })); lightStrip.position.set(0.6, 1.25, -0.66); room.add(lightStrip);
+      scene.add(new THREE.HemisphereLight(0xcfe8ff, 0x203040, 0.35));
+      const key = new THREE.DirectionalLight(0xe8f4ff, 1.1); key.position.set(0.8, 2.2, 1.6); scene.add(key);
+      const rim = new THREE.DirectionalLight(0x6ec8ff, 1.1); rim.position.set(-1.5, 1.2, -1.4); scene.add(rim);
+      const warm = new THREE.PointLight(0xff7a2a, 0, 0.32, 2); scene.add(warm);
+      const cool = new THREE.PointLight(0x33b7ff, 0, 0.32, 2); scene.add(cool);
+
+      /* ---------------- beakers: glass, water, ice ---------------- */
+      const BR = 0.15, BH = 0.36;
+      const glassMat = () => new THREE.MeshPhysicalMaterial({ color: 0xdfefff, metalness: 0, roughness: 0.03, transparent: true, opacity: 0.16, depthWrite: false, ior: 1.5, envMapIntensity: 1.8, clearcoat: 1, clearcoatRoughness: 0.03, specularIntensity: 1, side: THREE.DoubleSide });
+      const prof = [[0, 0], [BR - 0.012, 0], [BR, 0.012], [BR, BH], [BR + 0.012, BH + 0.008], [BR - 0.004, BH + 0.008], [BR - 0.006, 0.014], [0, 0.008]].map(([x, y]) => new THREE.Vector2(x, y));
+      const glassGeo = new THREE.LatheGeometry(prof, 64);
+      function makeIceTex(seed) {     // spiderweb frost: seeded branching cracks, revealed in birth order
+        const c = document.createElement("canvas"); c.width = 512; c.height = 512; const g = c.getContext("2d");
+        const rr = rng(seed), segs = [];
+        const grow = (x, y, a, len, depth, birth) => {
+          for (let s = 0; s < len; s++) {
+            const nx = x + Math.cos(a) * 9, ny = y + Math.sin(a) * 9;
+            segs.push([x, y, nx, ny, birth + s, depth]);
+            if (depth < 3 && rr() < 0.16) grow(nx, ny, a + (rr() < 0.5 ? -1 : 1) * (0.5 + rr() * 0.6), Math.floor(len * 0.6), depth + 1, birth + s);
+            x = nx; y = ny; a += (rr() - 0.5) * 0.5;
+          }
+        };
+        for (let k = 0; k < 14; k++) grow(rr() * 512, 500 - rr() * 60, -Math.PI / 2 + (rr() - 0.5) * 1.2, 34 + Math.floor(rr() * 20), 0, Math.floor(rr() * 10));
+        segs.sort((p, q) => p[4] - q[4]);
+        const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.wrapS = THREE.RepeatWrapping;
+        let drawn = -1;
+        const draw = (k) => {
+          const n = Math.floor(clamp(k, 0, 1) * segs.length); if (n === drawn) return; drawn = n;
+          g.clearRect(0, 0, 512, 512);
+          g.fillStyle = `rgba(205,232,250,${0.32 * clamp(k * 1.3 - 0.25, 0, 1)})`; g.fillRect(0, 0, 512, 512);
+          g.lineCap = "round";
+          for (let i = 0; i < n; i++) { const [x0, y0, x1, y1, , d] = segs[i]; g.strokeStyle = `rgba(250,253,255,${1 - d * 0.15})`; g.lineWidth = 9 - d * 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); }
+          tx.needsUpdate = true;
+        };
+        draw(0);
+        return { tx, draw };
+      }
+      function beaker(x, tint, seed) {
+        const grp = new THREE.Group(); grp.position.set(x, 0.004, 0); scene.add(grp);
+        const gm = glassMat(); const glass = new THREE.Mesh(glassGeo, gm); glass.renderOrder = 3; grp.add(glass);
+        const wm = new THREE.MeshPhysicalMaterial({ color: tint, emissive: tint, emissiveIntensity: 0.18, metalness: 0, roughness: 0.08, transparent: true, opacity: 0.5, depthWrite: false, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.2 });
+        const water = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.008, BR - 0.008, 1, 48), wm); water.renderOrder = 1; grp.add(water);
+        const ice = makeIceTex(seed);
+        const im = new THREE.MeshStandardMaterial({ map: ice.tx, transparent: true, roughness: 0.4, metalness: 0, emissive: 0xbfe6ff, emissiveMap: ice.tx, emissiveIntensity: 0.9, depthWrite: false, side: THREE.DoubleSide });
+        const shell = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.004, BR - 0.004, 1, 48, 1, true), im); shell.renderOrder = 2; grp.add(shell);
+        const crust = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.009, BR - 0.009, 0.018, 48), new THREE.MeshStandardMaterial({ color: 0xeaf6ff, roughness: 0.5, emissive: 0x6fb8e8, emissiveIntensity: 0.25 })); grp.add(crust);
+        const shadow = new THREE.Mesh(new THREE.CircleGeometry(BR * 1.5, 32), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45, depthWrite: false }));
+        shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.001; grp.add(shadow);
+        return { grp, gm, glass, water, wm, shell, ice, crust, x };
+      }
+      const hot = beaker(-0.18, 0xff8a3c, 11), cold = beaker(0.18, 0x5cc4ff, 23);
+      const refRing = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 65 }, (_, i) => new THREE.Vector3(Math.cos(i / 64 * Math.PI * 2) * (BR + 0.004), 0, Math.sin(i / 64 * Math.PI * 2) * (BR + 0.004)))),
+        new THREE.LineDashedMaterial({ color: 0xffffff, dashSize: 0.012, gapSize: 0.01, transparent: true })); refRing.computeLineDistances(); hot.grp.add(refRing);
+
+      /* ---------------- steam (layered soft sprites, deterministic) ---------------- */
+      const steam = [];
+      const R1 = rng(99);
+      for (let i = 0; i < 70; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTex, transparent: true, depthWrite: false, color: 0xf2f7ff })); scene.add(s); steam.push([s, R1(), R1() * 6.28, 0.6 + R1() * 0.7, (R1() - 0.5) * 2]); }
+      function steamAt(t, amount, surfaceY, x) {
+        steam.forEach(([s, off, ph, speed, side]) => {
+          const p = ((t * 0.32 * speed + off) % 1 + 1) % 1;
+          s.visible = amount > 0.01;
+          s.position.set(x + side * 0.05 * (0.3 + p) + Math.sin(t * 1.3 + ph) * 0.03 * p, surfaceY + 0.02 + p * 0.42, Math.cos(t * 0.9 + ph) * 0.03 * p);
+          const sc = 0.05 + 0.2 * p; s.scale.set(sc * 0.8, sc, 1);
+          s.material.opacity = amount * Math.sin(Math.PI * p) * 0.16; s.material.rotation = ph + p * 1.4;
+        });
+      }
+
+      /* ---------------- thermometers (shot 2) ---------------- */
+      const gauge = new THREE.Group(); gauge.position.set(1.55, 0, -0.2); scene.add(gauge);
+      const TMIN = -10, TMAX = 100, TH = 0.9, tY = (T) => 0.12 + (T - TMIN) / (TMAX - TMIN) * TH;
+      function tube(x, color) {
+        const g = new THREE.Group(); g.position.x = x; gauge.add(g);
+        const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, TH + 0.06, 32, 1, true), glassMat()); glass.position.y = 0.12 + TH / 2; g.add(glass);
+        const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.07, 32, 16), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 1.4, roughness: 0.2 })); bulb.position.y = 0.07; g.add(bulb);
+        const col = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1, 24), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 1.6, roughness: 0.25 })); g.add(col);
+        return col;
+      }
+      const colHot = tube(-0.2, 0xff6a1f), colCold = tube(0.2, 0x18c8ff);
+      const band = new THREE.Mesh(new THREE.BoxGeometry(0.62, 1, 0.004), new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.18, depthWrite: false })); gauge.add(band);
+      const setCol = (m, T) => { const top = tY(T), base = 0.08; m.scale.y = Math.max(0.001, top - base); m.position.y = base + (top - base) / 2; };
+      function temps(t) {      // illustrative cooling curves; they converge in the 0…−5 °C band where the outcome is debated
+        const k = clamp((t - C.gaugeDrop[0]) / (C.gaugeDrop[1] - C.gaugeDrop[0]), 0, 1);
+        const flick = 0.9 * Math.sin(t * 23) * Math.sin(t * 7.3) * seg(t, C.gaugeDrop[0] + 2.4, C.gaugeDrop[0] + 3.0);
+        return [lerp(90, -2.5, 1 - Math.pow(1 - k, 2.2)) + flick, lerp(20, -4.5, smooth(k)) - flick];
+      }
+
+      /* ---------------- convection arrows (shot 4) ---------------- */
+      function flowTube(points, color) {
+        const curve = new THREE.CatmullRomCurve3(points.map((p) => new THREE.Vector3(...p)), true);
+        const tx = canvasTex(256, 16, (g, w, h) => { for (let i = 0; i < 8; i++) { const gr = g.createLinearGradient(i * 32, 0, i * 32 + 32, 0); gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(0.8, "rgba(255,255,255,1)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(i * 32, 0, 32, h); } });
+        tx.wrapS = THREE.RepeatWrapping; tx.repeat.set(3, 1);
+        const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 96, 0.008, 8, true), new THREE.MeshBasicMaterial({ color, map: tx, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+        return { m, tx };
+      }
+      const flows = [];
+      for (const s of [-1, 1]) {
+        const loop = [[0, 0.05, 0], [0.01 * s, 0.17, 0], [0, 0.29, 0], [0.06 * s, 0.31, 0], [0.12 * s, 0.25, 0], [0.13 * s, 0.13, 0], [0.11 * s, 0.05, 0], [0.05 * s, 0.03, 0]];
+        const up = flowTube(loop, 0xff7a2a); up.m.visible = false; hot.grp.add(up.m); flows.push(up);
+      }
+      const coldFlowHalo = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.02, BR - 0.02, 0.2, 32, 1, true), new THREE.MeshBasicMaterial({ color: 0x1e7cff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+      coldFlowHalo.position.y = 0.13; hot.grp.add(coldFlowHalo);
+      const ventPuffs = [];
+      for (let i = 0; i < 10; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTex, color: 0xff8a3d, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); s.visible = false; scene.add(s); ventPuffs.push(s); }
+      const trapped = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.03, BR - 0.03, 0.1, 32), new THREE.MeshBasicMaterial({ color: 0xff5a2a, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+      trapped.position.y = 0.2; cold.grp.add(trapped);
+      const cutPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.0);   // keep z <= 0: the back half (cutaway)
+
+      /* ---------------- molecules (shot 5) ---------------- */
+      const mol = new THREE.Group(); mol.position.set(0, 10, 0); mol.scale.setScalar(0.72); scene.add(mol);
+      const oMat = new THREE.MeshPhysicalMaterial({ color: 0xe5484d, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.1 });
+      const hMat = new THREE.MeshPhysicalMaterial({ color: 0xf4f7fb, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.1 });
+      const oGeo = new THREE.SphereGeometry(0.05, 24, 16), hGeo = new THREE.SphereGeometry(0.032, 16, 12);
+      function h2o() {
+        const g = new THREE.Group(); g.add(new THREE.Mesh(oGeo, oMat));
+        for (const s of [-1, 1]) { const h = new THREE.Mesh(hGeo, hMat); const a = s * 52.25 * Math.PI / 180; h.position.set(Math.sin(a) * 0.065, -Math.cos(a) * 0.065, 0); g.add(h); }
+        return g;
+      }
+      const R2 = rng(5), lattice = [], left = [], right = [];
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 4; c++) {     // honeycomb (hexagonal) sites
+        const x = c * 0.2 + (r % 2) * 0.1 - 0.3, y = r * 0.173 - 0.35, z = (((r + c) % 2) ? 0.025 : -0.025);
+        lattice.push([x, y, z]);
+      }
+      const order = lattice.map((p, i) => [i, Math.hypot(p[0] + 0.3, p[1] + 0.35)]).sort((a, b) => a[1] - b[1]).map((q) => q[0]);
+      lattice.forEach((p, i) => { const m = h2o(); m.position.set(-0.55, 0, 0); mol.add(m); left.push([m, [(R2() - 0.5) * 0.9, (R2() - 0.5) * 1.0, (R2() - 0.5) * 0.4], R2() * 6.28, order.indexOf(i), p]); });
+      for (let i = 0; i < 20; i++) { const m = h2o(); mol.add(m); right.push([m, [(R2() - 0.5) * 0.9, (R2() - 0.5) * 1.0, (R2() - 0.5) * 0.4], R2() * 6.28]); }
+      const bondMat = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true });
+      const bonds = new THREE.LineSegments(new THREE.BufferGeometry(), bondMat); mol.add(bonds);
+      const pairs = []; lattice.forEach((a, i) => lattice.forEach((b, j) => { if (j > i && Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.215) pairs.push([i, j]); }));
+      const glowSprites = left.map(() => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTex, color: 0x7fe9ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); mol.add(s); return s; });
+
+      /* ---------------- camera direction ---------------- */
+      const P = {
+        race: [[0, 0.42, 2.25], [0, 0.26, 0]], race2: [[0, 0.38, 1.95], [0, 0.25, 0]],
+        gauge: [[1.55, 0.5, 2.75], [1.55, 0.44, -0.2]],
+        evap: [[-0.2, 0.42, 1.3], [-0.18, 0.26, 0]], evap2: [[-0.2, 0.4, 1.12], [-0.18, 0.27, 0]],
+        xray: [[0, 0.3, 1.95], [0, 0.2, 0]],
+        dive: [[-0.18, 0.34, 0.25], [-0.18, 0.2, 0]],
+        mol: [[0, 10, 5.2], [0, 10, 0]], mol2: [[0.05, 10.02, 4.6], [0, 10, 0]],
+        pay: [[-0.16, 0.3, 0.95], [-0.18, 0.22, 0]], pay2: [[0, 0.4, 2.1], [0, 0.25, 0]],
+      };
+      const shotAt = (t) => { let i = 0; while (i < D.shots.length - 1 && t >= D.shots[i + 1][0]) i++; return [i, D.shots[i][0], D.shots[i + 1] ? D.shots[i + 1][0] : DUR]; };
+      function cam(t) {
+        const [i, a, b] = shotAt(t), u = (t - a) / (b - a), name = D.shots[i][1];
+        let pos, tgt, whip = 0;
+        if (name === "race") { const k = smooth(u); pos = lerp3(P.race[0], P.race2[0], k); tgt = P.race[1]; whip = 1 - seg(t, 0, 0.16); }
+        else if (name === "gauge") { const w = expoOut((t - a) / 0.35); pos = lerp3(P.race2[0], P.gauge[0], w); tgt = lerp3(P.race2[1], P.gauge[1], w); whip = Math.sin(Math.PI * clamp((t - a) / 0.35, 0, 1)); pos = lerp3(pos, [P.gauge[0][0], P.gauge[0][1] - 0.03, P.gauge[0][2] - 0.25], smooth((t - a - 0.4) / (b - a - 0.4))); }
+        else if (name === "evap") { const k = expoOut((t - a) / 0.5); pos = lerp3(P.evap[0], P.evap2[0], smooth(u)); tgt = P.evap[1]; pos = lerp3([pos[0] - 0.25 * (1 - k), pos[1] + 0.1 * (1 - k), pos[2] + 0.3 * (1 - k)], pos, 1); }
+        else if (name === "xray") { pos = lerp3(P.xray[0], [0, 0.28, 1.75], smooth(u)); tgt = P.xray[1]; }
+        else if (name === "molecules") {
+          if (t - a < 0.32) { const k = (t - a) / 0.32; pos = lerp3(P.xray[0], P.dive[0], k * k); tgt = lerp3(P.xray[1], P.dive[1], k); }
+          else { const k = smooth((t - a - 0.32) / (b - a - 0.32)); pos = lerp3([0, 10, 5.0], P.mol2[0], expoOut(clamp((t - a - 0.32) / 0.8, 0, 1)) * 0.6 + k * 0.4); tgt = P.mol[1]; }
+        }
+        else { const pull = smooth((t - a) / 2.6); pos = lerp3(P.pay[0], P.pay2[0], pull); tgt = lerp3(P.pay[1], P.pay2[1], pull);
+          if (t >= C.whipOut) { const w = smooth((t - C.whipOut) / (DUR - C.whipOut)); pos = lerp3(pos, P.race[0], w); tgt = lerp3(tgt, P.race[1], w); whip = Math.sin(Math.PI * w * 0.9); } }
+        return [pos, tgt, whip, name];
+      }
+
+      /* ---------------- HUD helpers ---------------- */
+      const _v = new THREE.Vector3();
+      const proj = (x, y, z) => { _v.set(x, y, z).project(camera); return [(_v.x + 1) / 2 * 1080, (1 - _v.y) / 2 * 1920, _v.z < 1]; };
+      const place = (id, x, y, op, sc = 1) => { const el = $(id), w = el.offsetWidth, h = el.offsetHeight; const cx = clamp(x, 80 + w / 2, 940 - w / 2), cy = clamp(y, 180 + h / 2, 1600 - h / 2);
+        el.style.opacity = op; el.style.transform = `translate(${(cx - w / 2).toFixed(1)}px, ${(cy - h / 2).toFixed(1)}px) scale(${sc.toFixed(3)})`; };
+      const WARM = /^(hot|warmer|heat|evaporates)/i;
+      const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.05) i++; return i; };
+
+      function renderAt(t) {
+        const [pos, tgt, whip, shot] = cam(t);
+        camera.position.set(...pos); camera.lookAt(...tgt);
+        if (whip > 0.02) camera.rotateZ(whip * 0.06);
+        camera.updateMatrixWorld();
+
+        // ---- beaker state per shot
+        const raceFreeze = seg(t, C.freezeL[0], C.freezeL[1]);
+        let fL = 0, fR = 0, levelL = 0.3, steamAmt = 0, xr = 0, warmI = 0, coolI = 0;
+        if (shot === "race") { fL = raceFreeze; fR = 0; steamAmt = 1 - raceFreeze; warmI = 1.2 * (1 - raceFreeze); coolI = 1.0; }
+        else if (shot === "evap") { steamAmt = 0.55; levelL = 0.3 - 0.3 * 0.045 * seg(t, C.evap[0] + 0.6, C.evap[1] - 0.6); warmI = 0.45; }
+        else if (shot === "xray") { xr = 1; steamAmt = 0.4; warmI = 1.8; coolI = 1.2; fR = 0; }
+        else if (shot === "payoff") { const back = t >= C.whipOut + 0.25; fL = back ? 0 : 1; fR = 0; steamAmt = back ? 1 : 0; warmI = back ? 1.2 : 0.2; coolI = 0.9; }
+        for (const [b, f, lvl] of [[hot, fL, levelL], [cold, fR, 0.3]]) {
+          b.water.scale.y = lvl; b.water.position.y = 0.012 + lvl / 2;
+          b.shell.scale.y = lvl * 0.98; b.shell.position.y = 0.012 + lvl * 0.49; b.ice.draw(f); b.shell.visible = f > 0.01;
+          b.wm.roughness = lerp(0.08, 0.55, f); b.wm.opacity = lerp(0.5, 0.8, f); b.wm.emissiveIntensity = lerp(0.18, 0.05, f);
+          b.wm.color.set(b === hot ? 0xff8a3c : 0x5cc4ff).lerp(new THREE.Color(0xa9cbe4), f); b.wm.emissive.set(b === hot ? 0xff8a3c : 0x5cc4ff).lerp(new THREE.Color(0x9fd8ff), f);
+          b.crust.visible = (b === cold && (shot === "xray" || shot === "payoff" && t < C.whipOut + 0.25)) ; b.crust.position.y = 0.012 + lvl - 0.009;
+          const clip = xr ? [cutPlane] : [];
+          b.gm.clippingPlanes = clip; b.wm.clippingPlanes = clip;
+        }
+        refRing.visible = shot === "evap"; refRing.position.y = 0.012 + 0.3; refRing.material.opacity = 2 * seg(t, C.evap[0] + 0.2, C.evap[0] + 0.6);
+        steamAt(t, steamAmt * (shot === "gauge" || shot === "molecules" ? 0 : 1), 0.012 + levelL, hot.x);
+        warm.position.set(hot.x, 0.14, 0); warm.intensity = warmI * 0.5; cool.position.set(cold.x, 0.14, 0); cool.intensity = coolI * 0.5;
+        scene.fog.density = xr ? 0.55 : 0.32; steel.envMapIntensity = xr ? 0.35 : 0.9;
+
+        // convection (x-ray)
+        flows.forEach((f, k) => { f.m.visible = !!xr; f.tx.offset.x = -t * 0.9 - k * 0.2; f.m.material.opacity = seg(t, C.xray[0] + 0.2, C.xray[0] + 0.7); });
+        coldFlowHalo.material.opacity = xr ? 0.12 * seg(t, C.xray[0] + 0.2, C.xray[0] + 0.7) : 0;
+        ventPuffs.forEach((s, k) => { const p = ((t * 0.7 + k / 10) % 1); s.visible = !!xr; s.position.set(hot.x + (k % 2 ? 1 : -1) * 0.04 * p, 0.32 + p * 0.25, -0.01); const sc = 0.04 + 0.12 * p; s.scale.set(sc, sc, 1); s.material.opacity = xr ? 0.5 * Math.sin(Math.PI * p) : 0; });
+        trapped.material.opacity = xr ? 0.16 + 0.04 * Math.sin(t * 4) : 0;
+
+        // gauge
+        const [Th, Tc] = temps(t); setCol(colHot, Th); setCol(colCold, Tc);
+        band.position.y = (tY(0) + tY(-5)) / 2; band.scale.y = tY(0) - tY(-5);
+        band.material.opacity = 0.12 + 0.12 * Math.abs(Math.sin(t * 9)) * seg(t, C.gaugeDrop[0] + 2.2, C.gaugeDrop[0] + 2.8);
+
+        // molecules
+        mol.visible = shot === "molecules";
+        if (mol.visible) {
+          const snapped = [];
+          left.forEach(([m, rp, ph, k, site]) => {
+            const ts = C.nucleate + k * 0.07, s = ts <= t ? expoOut((t - ts) / 0.22) : 0;
+            const jig = [Math.sin(t * 3.1 + ph) * 0.035, Math.cos(t * 2.7 + ph) * 0.035, Math.sin(t * 2.2 + ph * 2) * 0.03];
+            m.position.set(...lerp3(rp.map((v, i) => v + jig[i]), site, s).map((v, i) => v + (i === 0 ? -0.44 : 0)));
+            m.rotation.set(lerp(ph + t * 1.3, 0, s), lerp(ph * 0.7 + t, 0, s), lerp(t * 0.6 + ph, (k % 2) * Math.PI, s));
+            snapped.push(s > 0.9);
+          });
+          right.forEach(([m, rp, ph]) => { m.position.set(rp[0] + 0.42 + Math.sin(t * 3.4 + ph) * 0.04, rp[1] + Math.cos(t * 2.9 + ph) * 0.04, rp[2] + Math.sin(t * 2.1 + ph) * 0.03); m.rotation.set(ph + t * 1.5, ph + t * 1.1, t * 0.8); });
+          const pts = []; pairs.forEach(([i, j]) => { if (snapped[i] && snapped[j]) { const a = left[i][0].position, b = left[j][0].position; pts.push(a.x, a.y, a.z, b.x, b.y, b.z); } });
+          bonds.geometry.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3)); bonds.geometry.computeBoundingSphere();
+          glowSprites.forEach((g, i) => { g.position.copy(left[i][0].position); const on = snapped[i] ? 1 : 0; g.scale.set(0.18, 0.18, 1); g.material.opacity = on * (0.35 + 0.15 * Math.sin(t * 6 + i)); });
+          scene.background.set(0x040a16); scene.fog.density = 0.05;
+        } else scene.background.set(0x070b12);
+
+        composer.render();
+        hud(t, shot, whip, [Th, Tc]);
+      }
+
+      function hud(t, shot, whip, [Th, Tc]) {
+        // thermal glow + beaker labels (race / evap / payoff)
+        const showBeakers = shot === "race" || shot === "evap" || shot === "xray" || shot === "payoff";
+        const [hx, hy, hv] = proj(hot.x, 0.2, 0), [cx, cy, cv] = proj(cold.x, 0.2, 0);
+        const hotGlow = shot === "race" ? 1 - seg(t, C.freezeL[0], C.freezeL[1]) * 0.7 : shot === "evap" ? 0.4 : shot === "xray" ? 0.9 : shot === "payoff" ? (t >= C.whipOut + 0.25 ? 1 : 0.15) : 0;
+        $("heat").style.opacity = showBeakers && hv ? (0.9 * hotGlow).toFixed(3) : 0; $("heat").style.transform = `translate(${hx.toFixed(0)}px, ${hy.toFixed(0)}px)`;
+        $("cold").style.opacity = showBeakers && cv && shot !== "evap" ? 0.85 : 0; $("cold").style.transform = `translate(${cx.toFixed(0)}px, ${cy.toFixed(0)}px)`;
+        const [lx, ly] = proj(hot.x, 0.46, 0), [rx, ry] = proj(cold.x, 0.46, 0);
+        const tagOn = shot === "race" || shot === "payoff" || shot === "xray";
+        place("tHot", lx, ly, tagOn ? 1 : 0, 1); place("tCold", rx, ry, tagOn ? 1 : 0, 1);
+        $("tHot").textContent = shot === "payoff" && t < C.whipOut + 0.25 ? "FROZEN" : "90°C";
+
+        // gauge labels
+        const gOn = shot === "gauge" && t > D.shots[1][0] + 0.3 ? 1 : 0;
+        const gp = (dx, T) => proj(gauge.position.x + dx, tY(T), gauge.position.z);
+        const [a1, b1] = gp(-0.2, Math.max(Th, -10)), [a2, b2] = gp(0.2, Math.max(Tc, -10));
+        $("g90").textContent = `${Math.round(Th)}°C`; $("g20").textContent = `${Math.round(Tc)}°C`;
+        place("g90", a1 - 150, b1, gOn); place("g20", a2 + 150, b2, gOn);
+        const [z0x, z0y] = gp(0.42, 0), [z5x, z5y] = gp(0.42, -5), [ix, iy] = gp(0, 12);
+        place("g0", (a1 + a2) / 2, z0y, gOn * 0.9, 1); place("gm5", (a1 + a2) / 2, z5y, gOn * 0.9, 1);
+        const iceOn = gOn * seg(t, C.gaugeDrop[0] + 2.4, C.gaugeDrop[0] + 2.8);
+        place("gIce", ix, iy - 120, iceOn * (0.75 + 0.25 * Math.abs(Math.sin(t * 9))), 1);
+        const ti = t >= C.mpemba && shot === "gauge" ? 1 : 0;
+        $("title").style.opacity = ti * (1 - seg(t, D.shots[2][0] - 0.2, D.shots[2][0])); $("title").style.transform = `scale(${(0.6 + 0.4 * backOut((t - C.mpemba) / 0.4)).toFixed(3)})`;
+
+        // molecule labels
+        const mOn = shot === "molecules" && t > D.shots[4][0] + 0.6 ? 1 : 0;
+        const [mlx, mly] = [300, 360], [mrx, mry] = [780, 360];
+        $("mHot").textContent = t >= C.nucleate + 0.3 ? "−2°C · crystallising" : "−2°C · started warm";
+        $("mCold").textContent = "−6°C · still liquid";
+        place("mHot", mlx, mly, mOn); place("mCold", mrx, mry, mOn);
+
+        // theory badges
+        D.badges.forEach(([txt, a, b], i) => { const el = $("b" + i); el.textContent = txt; const on = t >= a && t < b; el.style.opacity = on ? 1 - seg(t, b - 0.15, b) : 0;
+          el.style.transform = `translateX(-50%) scale(${on ? (1.2 - 0.2 * expoOut((t - a) / 0.3)).toFixed(3) : 1})`; });
+        const st = shot === "payoff" && t >= C.stamp && t < C.whipOut;
+        $("stamp").style.opacity = st ? 1 - seg(t, C.whipOut - 0.15, C.whipOut) : 0;
+        $("stamp").style.transform = `translateX(-50%) scale(${st ? (1.5 - 0.5 * expoOut((t - C.stamp) / 0.25)).toFixed(3) : 1}) rotate(-3deg)`;
+        $("smear").style.opacity = clamp(whip, 0, 1).toFixed(3);
+
+        // captions: word by word, cyan/amber active word, gone when the voice stops
+        const L = LINES[lineAt(t)], on = t >= L.s - 0.03 && t < L.e;
+        $("cap").style.opacity = on ? 1 : 0;
+        if (on) {
+          const ws = L.words, chunks = [[]];
+          ws.forEach((w, j) => { chunks[chunks.length - 1].push(j); if (/[.,!?:]$/.test(w.w) || chunks[chunks.length - 1].length >= 3) chunks.push([]); });
+          let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
+          const ch = chunks.find((c) => c.includes(act)) || chunks[0];
+          $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" + (WARM.test(ws[j].w) ? " warm" : "") : ""}">${ws[j].w}</span>`).join(" ") + "</span>";
+        }
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["mpemba-effect"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>

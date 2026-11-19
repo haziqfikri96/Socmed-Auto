@@ -33,6 +33,13 @@ KIT = {
     "snore": (3.0, "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"),
     "sparkle": (1.0, "Bright magical sparkle chime, short twinkling anime shine sound, clean, no music"),
     "gulp": (0.8, "Cartoon nervous gulp swallow with a tiny water-drop plink, anime sweat drop sound effect"),
+    "ice_crackle": (2.0, "Crisp ice crystals crackling and spreading across a glass surface, close macro frost forming, sharp tiny cracks, no music"),
+    "steam_hiss": (3.0, "Soft continuous hot steam hiss rising from boiling water, gentle airy, no bubbling, no music"),
+    "fluid_swirl": (4.0, "Deep slow underwater fluid swirl whoosh, liquid churning in a closed glass vessel, smooth low rumble, no music"),
+    "ice_lock": (2.0, "Rapid sequence of tiny crystalline ice clicks locking into place like dominoes, glassy and bright, no music"),
+    "ice_thud": (1.2, "Solid block of ice dropped onto a metal shelf, heavy dull thud with a short icy crack, no reverb"),
+    "timer_tick": (3.0, "Fast mechanical stopwatch ticking, crisp clock ticks speeding up slightly, close and dry, no music"),
+    "science_pulse": (30.0, "Dark minimal science documentary underscore, slow deep sub pulse every second with a cold airy synth pad, mysterious, no melody, no drums, no voices"),
     "sting": (1.2, "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"),
 }
 
