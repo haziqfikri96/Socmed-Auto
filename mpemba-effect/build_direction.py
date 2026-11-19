@@ -38,7 +38,7 @@ sfx = [["impact_deep", 0.0, -4], ["timer_tick", 0.35, -15], ["ice_crackle", 1.6,
        ["whoosh_soft", r(S(2) - 0.08), -9], ["steam_hiss", r(S(2)), -11],
        ["whoosh_soft", r(S(3) - 0.08), -9], ["fluid_swirl", r(S(3) + 0.3), -10], ["fluid_swirl", r(S(3) + 2.5), -12],
        ["whoosh_fast", r(S(4) - 0.1), -7], ["sparkle", r(cues["nucleate"]), -8], ["ice_lock", r(cues["nucleate"] + 0.05), -7],
-       ["ice_thud", r(S(5)), -5], ["pop", r(cues["stamp"]), -7], ["riser", r(DUR - 2.5), -14], ["whoosh_fast", r(cues["whipOut"]), -7]]
+       ["ice_thud", r(S(5)), -5], ["pop", r(cues["stamp"]), -7], ["riser", r(DUR - 2.5), -23], ["whoosh_fast", r(cues["whipOut"]), -16]]
 tones = [["down", r(W(2, "evaporates")), 1.1, -17]]           # subtle downward tone as the level drops
 
 out = {"DUR": DUR, "shots": [[r(a), b] for a, b in shots], "cues": cues, "badges": badges, "sfx": sfx, "tones": tones}

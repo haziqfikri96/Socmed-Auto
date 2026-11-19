@@ -312,7 +312,7 @@
         xray: [[0, 0.5, 1.9], [0, 0.2, 0]],
         dive: [[-0.18, 0.34, 0.25], [-0.18, 0.2, 0]],
         mol: [[0, 10, 5.2], [0, 10, 0]], mol2: [[0.05, 10.02, 4.6], [0, 10, 0]],
-        pay: [[-0.16, 0.3, 0.95], [-0.18, 0.22, 0]], pay2: [[0, 0.4, 2.1], [0, 0.25, 0]],
+        pay: [[-0.04, 0.36, 1.55], [-0.02, 0.22, 0]], pay2: [[0, 0.4, 2.1], [0, 0.25, 0]],
       };
       const DIVE = 0.45;   // dive into the water, cut hidden under a blue wash, then the camera keeps moving through the water
       const shotAt = (t) => { let i = 0; while (i < D.shots.length - 1 && t >= D.shots[i + 1][0]) i++; return [i, D.shots[i][0], D.shots[i + 1] ? D.shots[i + 1][0] : DUR]; };
@@ -413,10 +413,17 @@
         $("cold").style.opacity = showBeakers && cv && shot !== "evap" ? 0.85 : 0; $("cold").style.transform = `translate(${cx.toFixed(0)}px, ${cy.toFixed(0)}px)`;
         const [lx, ly] = proj(hot.x, 0.46, 0), [rx, ry] = proj(cold.x, 0.46, 0);
         const tagOn = shot === "race" || shot === "payoff" || shot === "xray";
-        place("tHot", lx, ly, tagOn ? 1 : 0, 1); place("tCold", rx, ry, tagOn ? 1 : 0, 1);
         const fin = shot === "payoff" && t < C.whipOut + 0.25;
         $("tHot").textContent = fin ? "90°C → FROZEN" : "90°C"; $("tCold").textContent = fin ? "20°C → LIQUID" : "20°C";
         $("tHot").style.fontSize = $("tCold").style.fontSize = fin ? "34px" : "";
+        // keep the two badges apart (≥ 48 px gap) inside the safe zone, whatever the camera does
+        const w1 = $("tHot").offsetWidth, w2 = $("tCold").offsetWidth, need = (w1 + w2) / 2 + 48;
+        let c1 = clamp(lx, 80 + w1 / 2, 940 - w1 / 2), c2 = clamp(rx, 80 + w2 / 2, 940 - w2 / 2);
+        if (c2 - c1 < need) { const mid = (c1 + c2) / 2; c1 = mid - need / 2; c2 = mid + need / 2;
+          if (c1 < 80 + w1 / 2) { const d = 80 + w1 / 2 - c1; c1 += d; c2 += d; }
+          if (c2 > 940 - w2 / 2) { const d = c2 - (940 - w2 / 2); c1 -= d; c2 -= d; } }
+        const ty = fin ? Math.min(ly, ry) : null;
+        place("tHot", c1, ty ?? ly, tagOn ? 1 : 0, 1); place("tCold", c2, ty ?? ry, tagOn ? 1 : 0, 1);
 
         // gauge labels
         const gOn = shot === "gauge" && t > D.shots[1][0] + 0.3 ? 1 : 0;

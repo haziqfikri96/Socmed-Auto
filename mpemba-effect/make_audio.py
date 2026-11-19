@@ -44,7 +44,8 @@ for kind, at, length, g in D["tones"]:   # subtle downward sine glide
     add(fx, np.stack([s, s], 1), at, db(g))
 mix = bed * db(-17) * duck[:, None] + fx + dia * 1.0
 mix = mix / np.abs(mix).max() * 0.89
-fade = int(0.02 * SR); mix[-fade:] *= np.linspace(1, 0, fade)[:, None]; mix[:fade] *= np.linspace(0, 1, fade)[:, None]
+fade = int(0.02 * SR); mix[:fade] *= np.linspace(0, 1, fade)[:, None]
+f0 = int(29.85 * SR); f1 = min(N, f0 + int(0.15 * SR)); mix[f0:f1] *= np.linspace(1, 0, f1 - f0)[:, None]; mix[f1:] = 0   # loop-safe tail, after the last word (29.73 s)
 sf.write(sys.argv[1], mix, SR, subtype="PCM_16")
 if shutil.which("ffmpeg"):
     m = subprocess.run(["ffmpeg", "-hide_banner", "-i", sys.argv[1], "-af", "loudnorm=I=-14:TP=-1:LRA=9:print_format=json", "-f", "null", "-"], capture_output=True, text=True).stderr
