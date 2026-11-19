@@ -80,6 +80,11 @@
    26.828,
    "excited",
    "wave"
+  ],
+  [
+   28.69,
+   "neutral",
+   "none"
   ]
  ],
  "shots": [
@@ -95,7 +100,7 @@
   ],
   [
    12.503,
-   "devClose",
+   "devFace",
    1
   ],
   [
@@ -105,7 +110,7 @@
   ],
   [
    20.489,
-   "devClose",
+   "devFace",
    1
   ],
   [
@@ -152,9 +157,9 @@
    "prompt",
    "Add camera zoom, spring text physics, and whoosh + impact SFX",
    [
-    8.185,
-    8.185,
-    8.185,
+    8.783,
+    8.783,
+    8.783,
     8.953,
     8.963,
     8.963,
@@ -234,7 +239,7 @@
  ],
  "pvPortal": 1,
  "previewAt": 14.725,
- "flatAt": 15.192,
+ "flatAt": 15.2,
  "afterAt": 17.021,
  "springAt": 18.609,
  "mute": [
@@ -244,7 +249,7 @@
  "fileAt": 999,
  "orangeAt": 999,
  "working": [
-  11.855,
+  11.803,
   12.343
  ],
  "vid": [
@@ -301,22 +306,22 @@
   [
    "impact_deep",
    17.071,
-   -5
+   -1
   ],
   [
    "pop",
    18.609,
-   -8
+   -4
   ],
   [
    "sparkle",
    19.573,
-   -9
+   -5
   ],
   [
    "impact_deep",
    19.852,
-   -9
+   -4
   ],
   [
    "pop",
@@ -335,7 +340,7 @@
   ],
   [
    "tick",
-   8.185,
+   8.783,
    -19
   ],
   [

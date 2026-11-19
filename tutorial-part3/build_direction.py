@@ -21,7 +21,7 @@ for l in L:
     a, sr = sf.read(HERE / f"assets/lines/{k}.wav"); a = np.abs(a if a.ndim == 1 else a.mean(1))
     env = np.convolve(a, np.ones(int(0.02 * sr)) / int(0.02 * sr), "same")
     on = np.where(env > env.max() * 0.05)[0]
-    end = round(l["s"] + on[-1] / sr + 0.03, 3)
+    end = round(l["s"] + np.where(env > env.max() * 0.10)[0][-1] / sr, 3)
     start = round(l["s"] + on[0] / sr, 3)
     if start > l["words"][0]["s"]:
         l["words"][0]["s"] = min(start, l["words"][0]["e"] - 0.05)
@@ -58,7 +58,7 @@ OPEN, SHUT = 0.45, 0.18
 
 PROMPT = "Add camera zoom, spring text physics, and whoosh + impact SFX"
 # each prompt word appears whole on the matching spoken word
-spoken = [("Add", W(2, "three")), ("camera", W(2, "camera")), ("zoom,", W(2, "zoom")), ("spring", W(2, "spring")),
+spoken = [("Add", W(2, "camera") - 0.18), ("camera", W(2, "camera")), ("zoom,", W(2, "zoom")), ("spring", W(2, "spring")),
           ("text", W(2, "text")), ("physics,", W(2, "physics")), ("and", W(2, "and")), ("whoosh", W(2, "sound")),
           ("+", W(2, "sound") + 0.12), ("impact", W(2, "effects")), ("SFX", W(2, "effects") + 0.16)]
 ptimes, built = [], ""
@@ -72,7 +72,7 @@ WORKING = [r(E(2) + 0.05), r(P0[1] - SHUT + 0.02)]
 HOLDS = {}
 
 PREVIEW_AT = P1[0] + OPEN * 0.6              # preview + timeline slide in as the dive opens
-FLAT_AT = W(5, "flat")                       # BEFORE: the title just fades in, no sound
+FLAT_AT = max(W(5, "flat"), 15.2)                       # BEFORE: the title just fades in, no sound
 AFTER_AT = S(6) - 0.05                       # riser + whoosh flip the badge to AFTER and light the SFX track
 SPRING_AT = W(6, "snappy")                   # AFTER: the title springs in (the film's one visible spring)
 MUTE = [r(PREVIEW_AT), r(AFTER_AT)]          # the music bed drops away during BEFORE: flat and silent
@@ -80,9 +80,9 @@ MUTE = [r(PREVIEW_AT), r(AFTER_AT)]          # the music bed drops away during B
 dev = [[0, "unimpressed", "shrug"], [S(1), "curious", "idle"], [S(3), "curious", "chinThink"], [S(4), "curious", "idle"],
        [S(7), "starstruck", "amazed"], [S(8), "happy", "idle"]]
 quill = [[0, "happy", "none"], [S(1), "smug", "shrug"], [W(1, "watch"), "proud", "point"], [S(2), "proud", "none"],
-         [S(4), "sly", "none"], [S(5), "proud", "none"], [S(8), "proud", "point"], [S(9), "excited", "wave"]]
-shots = [[0, "devPush", 1], [S(1) - 0.03, "quillClose", 1], [S(3) - 0.03, "devClose", 1], [S(4) - 0.03, "quillClose", 1],
-         [S(7) - 0.03, "devClose", 1], [S(8) - 0.03, "quillClose", 1], [S(9) - 0.03, "quillEnd", 1]]
+         [S(4), "sly", "none"], [S(5), "proud", "none"], [S(8), "proud", "point"], [S(9), "excited", "wave"], [DUR - 0.25, "neutral", "none"]]
+shots = [[0, "devPush", 1], [S(1) - 0.03, "quillClose", 1], [S(3) - 0.03, "devFace", 1], [S(4) - 0.03, "quillClose", 1],
+         [S(7) - 0.03, "devFace", 1], [S(8) - 0.03, "quillClose", 1], [S(9) - 0.03, "quillEnd", 1]]
 emotes = [[S(3) + 0.25, S(4) - 0.06, "dev", "question"], [S(7) + 0.05, S(8) - 0.06, "dev", "bang"]]
 GLOW = [W(1, "watch") - 0.15, P0[0]]         # soft cyan edge glow + riser into dive 1
 SAVE = S(9)                                  # "save & try →" on Quill's face
@@ -90,8 +90,8 @@ LOOP = DUR - 0.25
 
 sfx = [["impact_deep", P0[0] + 0.37, -6], ["sparkle", P0[0] + 0.55, -14], ["whoosh_soft", P1[0], -10],
        ["pop", emotes[0][0], -10], ["ding", emotes[1][0], -6], ["sparkle", SAVE, -10],
-       ["riser", AFTER_AT - 2.48 + 0.1, -18], ["whoosh_fast", AFTER_AT - 0.2, -8], ["impact_deep", AFTER_AT + 0.05, -5],
-       ["pop", SPRING_AT, -8], ["sparkle", W(6, "sound"), -9], ["impact_deep", W(6, "hits"), -9]]
+       ["riser", AFTER_AT - 2.48 + 0.1, -18], ["whoosh_fast", AFTER_AT - 0.2, -8], ["impact_deep", AFTER_AT + 0.05, -1],
+       ["pop", SPRING_AT, -4], ["sparkle", W(6, "sound"), -5], ["impact_deep", W(6, "hits"), -4]]
 sfx += [["pop", t, -15] for _, t in HL]
 for n, (w, at) in enumerate(spoken):
     sfx.append(["tick", at, -19])

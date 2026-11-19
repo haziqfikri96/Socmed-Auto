@@ -57,7 +57,7 @@ css = '''
       #ask { position: absolute; left: 80px; width: 860px; top: 440px; }
       .mono, #term, #askBox { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
       #rim { position: absolute; left: 0; top: 0; width: 100px; height: 100px; opacity: 0; pointer-events: none; transform-origin: 0 0;
-        border: 5px solid rgba(94, 234, 212, 0.75); background: radial-gradient(ellipse at 50% 50%, rgba(94,234,212,0) 52%, rgba(94,234,212,0.30) 100%); }
+        border: 6px solid rgba(94, 234, 212, 0.95); background: radial-gradient(ellipse at 50% 50%, rgba(94,234,212,0) 48%, rgba(94,234,212,0.42) 100%); }
       #rim::after { content: ""; position: absolute; left: -16%; top: -22%; right: -16%; bottom: -22%; border-radius: 40%;
         background: radial-gradient(ellipse at 50% 50%, rgba(94,234,212,0) 60%, rgba(94,234,212,0.13) 72%, rgba(94,234,212,0) 86%); }
       #pvFrame { background: #111827; }
@@ -72,7 +72,8 @@ css = '''
       #tl .trk i { position: absolute; top: 0; height: 44px; border-radius: 10px; background: #475569; }
       #tl .trk.sx b { position: absolute; bottom: 4px; width: 10px; border-radius: 3px; background: #334155; }
       #ph { position: absolute; top: 12px; width: 4px; height: 186px; background: #5eead4; border-radius: 2px; }
-      #askBox .hl { background: #5eead4; color: #0a1220; border-radius: 10px; padding: 0 6px; }
+      #askBox .hl { background: #5eead4; color: #0a1220; border-radius: 8px; padding: 0 1px; }
+      #work .spin { display: inline-block; }
       #vid { position: absolute; left: 371px; top: 200px; width: 338px; height: 600px; border-radius: 30px; overflow: hidden; opacity: 0; transform-origin: 50% 0;
         background: linear-gradient(180deg, #0f0a2a 0%, #3b1d4a 50%, #b4472c 88%, #2a1208 100%); border: 3px solid rgba(255,255,255,0.18); }
       #vidMt { position: absolute; left: 19px; bottom: 0; width: 300px; height: 270px; background: #241a1f; clip-path: polygon(0 100%, 42% 6%, 58% 6%, 100% 100%); }
@@ -109,9 +110,9 @@ s = s.replace('mx.fillText("final_final_v3.mp4", 258, 200);', 'mx.fillText("hype
 
 # camera: a dolly that is already moving at frame 0, and a slightly tighter ending
 s = sub(s, "        quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],",
-        "        quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],\n        devUnder: [[0.08, 0.98, 1.95], [-0.3, 0.93, 0]],\n        devPush: [[0.14, 0.98, 2.3], [-0.3, 0.78, 0]],\n        quillPush: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],\n        quillEnd: [[0.05, 0.76, 1.5], [0.34, 0.62, 0]],\n        quillLoop: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],")
+        "        quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],\n        devFace: [[0.08, 0.97, 1.4], [-0.3, 0.85, 0]],\n        devUnder: [[0.08, 0.98, 1.95], [-0.3, 0.93, 0]],\n        devPush: [[0.14, 0.97, 1.85], [-0.3, 0.85, 0]],\n        quillPush: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],\n        quillEnd: [[0.05, 0.76, 1.5], [0.34, 0.62, 0]],\n        quillLoop: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],")
 s = sub(s, '        if (now === "hookPunch")',
-        '        if (now === "devPush") { const u = 1 - Math.pow(1 - clamp(t / 3.0, 0, 1), 2); p = [0.14 - 0.04 * u, 0.98, 2.3 - 0.55 * u]; }\n        if (now === "quillPush") { const u = 1 - Math.pow(1 - clamp(t / 4.0, 0, 1), 2); p = [0.02, 0.8 - 0.02 * u, 1.75 - 0.4 * u]; }\n        if (now === "hookPunch")')
+        '        if (now === "devPush") { const u = 1 - Math.pow(1 - clamp(t / 3.0, 0, 1), 2); p = [0.14 - 0.06 * u, 0.97, 1.85 - 0.42 * u]; }\n        if (now === "quillPush") { const u = 1 - Math.pow(1 - clamp(t / 4.0, 0, 1), 2); p = [0.02, 0.8 - 0.02 * u, 1.75 - 0.4 * u]; }\n        if (now === "hookPunch")')
 
 hud = r'''function hud(t) {
         $("dim").style.opacity = 0;
@@ -186,7 +187,7 @@ hud = r'''function hud(t) {
           $("askBox").innerHTML = `<span class="gt">&gt; </span>${txt}${blink || shown < pr[2].length ? caret : ""}`;
           const [w0, w1] = D.working, wOn = t >= w0 && t < w1;
           $("work").style.opacity = wOn ? 1 : 0;
-          $("work").textContent = "✻ " + ["Working", "Working.", "Working..", "Working..."][Math.floor((t - w0) * 4) % 4 < 0 ? 0 : Math.floor((t - w0) * 4) % 4];
+          $("work").innerHTML = `<span class="spin" style="transform: rotate(${((t - w0) * 360).toFixed(1)}deg)">✻</span> Working…`;
         }
         // preview -> render -> file (portal 2)
         const pvOn = pi === D.pvPortal && t >= D.previewAt;
@@ -235,7 +236,7 @@ hud = r'''function hud(t) {
         }
 
         // ---------- captions: word by word, chunked, speaker colour on the active word ----------
-        const li = lineAt(t), L = LINES[li], capOn = t >= L.s - 0.05 && t < L.e + 0.02;
+        const li = lineAt(t), L = LINES[li], capOn = t >= L.s - 0.05 && t < L.e;
         $("cap").style.opacity = capOn ? 1 : 0;
         if (capOn) {
           const ws = L.words, chunks = [[]];
