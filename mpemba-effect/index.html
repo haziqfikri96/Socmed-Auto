@@ -39,8 +39,16 @@
       #stamp b { color: #FF9F1C; }
       #smear { position: absolute; inset: 0; opacity: 0; pointer-events: none;
         background: repeating-linear-gradient(0deg, rgba(200,230,255,0.10) 0 3px, rgba(0,0,0,0) 3px 17px), linear-gradient(90deg, rgba(5,7,12,0.55), rgba(5,7,12,0) 30%, rgba(5,7,12,0) 70%, rgba(5,7,12,0.55)); }
-      #cap { position: absolute; left: 80px; width: 860px; top: 1372px; text-align: center; }
-      #cap .ch { display: inline-block; padding: 8px 24px 12px; border-radius: 20px; background: rgba(2,6,14,0.72); font-size: 58px; line-height: 70px; font-weight: 900; color: #fff; }
+      /* caption pill: same box and the same centre line (y = 1450) in every shot */
+      #cap { position: absolute; left: 80px; width: 860px; top: 1405px; height: 90px; text-align: center; }
+      #cap .ch { display: inline-block; padding: 8px 26px 12px; border-radius: 20px; background: rgba(6,12,24,0.78); border: 2px solid rgba(255,255,255,0.16); white-space: nowrap; font-size: 58px; line-height: 70px; font-weight: 900; color: #fff; }
+      #wash { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 38%, #2f8fd0 0%, #0d4c86 45%, #05213f 100%); }
+      #heatArrows { position: absolute; left: 0; top: 0; width: 220px; height: 200px; opacity: 0; overflow: visible; pointer-events: none; }
+      #vol { position: absolute; left: 0; top: 0; width: 40px; opacity: 0; border: 5px solid #FF9F1C; border-left: none; border-radius: 0 8px 8px 0; }
+      #vol::after { content: ""; position: absolute; right: 8px; bottom: -4px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 14px solid #FF9F1C; transform: translateX(50%); }
+      #gBand { position: absolute; left: 0; top: 0; opacity: 0; border: 4px solid #00E5FF; border-radius: 10px; background: rgba(0,229,255,0.16);
+        display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 26px; color: #E6FDFF; white-space: nowrap; }
+      #gBand::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 4px; height: 34px; margin-left: -2px; background: #00E5FF; }
       #cap .on { color: #00E5FF; } #cap .on.warm { color: #FF9F1C; }
     </style>
   </head>
@@ -50,14 +58,21 @@
       <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="30.03" data-track-index="0" data-layout-allow-overflow></canvas>
       <div id="hud" class="clip" data-start="0" data-duration="30.03" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
         <div id="heat"></div><div id="cold"></div>
+        <svg id="heatArrows" viewBox="-110 -20 220 200"><defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#FF9F1C"/></marker></defs>
+          <path id="ha0" d="M-62,170 C-78,140 -46,115 -62,85 C-76,60 -50,40 -62,15" fill="none" stroke="#FF9F1C" stroke-width="8" stroke-linecap="round" marker-end="url(#ah)"/>
+          <path id="ha1" d="M0,170 C-16,140 16,115 0,85 C-14,60 12,40 0,15" fill="none" stroke="#FFB54D" stroke-width="8" stroke-linecap="round" marker-end="url(#ah)"/>
+          <path id="ha2" d="M62,170 C46,140 78,115 62,85 C48,60 74,40 62,15" fill="none" stroke="#FF9F1C" stroke-width="8" stroke-linecap="round" marker-end="url(#ah)"/></svg>
+        <div id="vol"></div><div class="tag hot" id="volTag">−4% VOLUME</div>
+        <div id="gBand">0 to −5°C</div>
         <div class="tag hot" id="tHot">90°C</div><div class="tag cold" id="tCold">20°C</div>
         <div class="tag hot small" id="g90">90°C</div><div class="tag cold small" id="g20">20°C</div>
-        <div class="tag ice small" id="g0">0°C</div><div class="tag ice small" id="gm5">−5°C</div><div class="tag ice" id="gIce">ICE?</div>
+        <div class="tag ice" id="gIce">ICE?</div>
         <div class="tag hot small" id="mHot">−2°C · freezing</div><div class="tag cold small" id="mCold">−6°C · still liquid</div>
         <div id="title">THE MPEMBA EFFECT</div>
         <div class="badge" id="b0"></div><div class="badge" id="b1"></div><div class="badge" id="b2"></div>
         <div id="stamp">OBSERVED — <b>STILL DEBATED</b></div>
         <div id="smear"></div>
+        <div id="wash"></div>
         <div id="cap"></div>
       </div>
       <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="30.03" data-track-index="10" data-volume="1"></audio>
@@ -190,7 +205,7 @@
         const ice = makeIceTex(seed);
         const im = new THREE.MeshStandardMaterial({ map: ice.tx, transparent: true, roughness: 0.4, metalness: 0, emissive: 0xbfe6ff, emissiveMap: ice.tx, emissiveIntensity: 0.9, depthWrite: false, side: THREE.DoubleSide });
         const shell = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.004, BR - 0.004, 1, 48, 1, true), im); shell.renderOrder = 2; grp.add(shell);
-        const crust = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.009, BR - 0.009, 0.018, 48), new THREE.MeshStandardMaterial({ color: 0xeaf6ff, roughness: 0.5, emissive: 0x6fb8e8, emissiveIntensity: 0.25 })); grp.add(crust);
+        const crust = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.009, BR - 0.009, 0.04, 48), new THREE.MeshStandardMaterial({ color: 0xe4f4ff, map: frostTex, roughness: 0.75, emissive: 0x9fd6ff, emissiveIntensity: 0.45, transparent: true, opacity: 0.74, depthWrite: false })); crust.renderOrder = 2; grp.add(crust);
         const shadow = new THREE.Mesh(new THREE.CircleGeometry(BR * 1.5, 32), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45, depthWrite: false }));
         shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.001; grp.add(shadow);
         return { grp, gm, glass, water, wm, shell, ice, crust, x };
@@ -198,6 +213,7 @@
       const hot = beaker(-0.18, 0xff8a3c, 11), cold = beaker(0.18, 0x5cc4ff, 23);
       const refRing = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 65 }, (_, i) => new THREE.Vector3(Math.cos(i / 64 * Math.PI * 2) * (BR + 0.004), 0, Math.sin(i / 64 * Math.PI * 2) * (BR + 0.004)))),
         new THREE.LineDashedMaterial({ color: 0xffffff, dashSize: 0.012, gapSize: 0.01, transparent: true })); refRing.computeLineDistances(); hot.grp.add(refRing);
+      const menRing = new THREE.Line(refRing.geometry, new THREE.LineBasicMaterial({ color: 0xffd9a8, transparent: true })); menRing.renderOrder = 4; hot.grp.add(menRing);
 
       /* ---------------- steam (layered soft sprites, deterministic) ---------------- */
       const steam = [];
@@ -250,7 +266,7 @@
       const ventPuffs = [];
       for (let i = 0; i < 10; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTex, color: 0xff8a3d, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); s.visible = false; scene.add(s); ventPuffs.push(s); }
       const trapped = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.03, BR - 0.03, 0.1, 32), new THREE.MeshBasicMaterial({ color: 0xff5a2a, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
-      trapped.position.y = 0.2; cold.grp.add(trapped);
+      trapped.position.y = 0.2; trapped.visible = false; cold.grp.add(trapped);
       const cutPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0.0);   // keep z <= 0: the back half (cutaway)
 
       /* ---------------- molecules (shot 5) ---------------- */
@@ -276,27 +292,40 @@
       const pairs = []; lattice.forEach((a, i) => lattice.forEach((b, j) => { if (j > i && Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.215) pairs.push([i, j]); }));
       const glowSprites = left.map(() => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: softTex, color: 0x7fe9ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); mol.add(s); return s; });
 
+      const waterEnv = new THREE.Group(); waterEnv.position.set(0, 10, 0); scene.add(waterEnv);
+      const backTex = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#2b8ad0"); gr.addColorStop(0.35, "#0f5596"); gr.addColorStop(1, "#04182f"); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+      const back = new THREE.Mesh(new THREE.PlaneGeometry(12, 16), new THREE.MeshBasicMaterial({ map: backTex, fog: false })); back.position.set(0, 0.6, -3); waterEnv.add(back);
+      const shaftTex = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(0.5, "rgba(255,255,255,1)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+        g.globalCompositeOperation = "destination-in"; const v = g.createLinearGradient(0, 0, 0, h); v.addColorStop(0, "rgba(0,0,0,1)"); v.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = v; g.fillRect(0, 0, w, h); });
+      const shafts = [-1.1, -0.4, 0.3, 1.0].map((x, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 4.5), new THREE.MeshBasicMaterial({ map: shaftTex, color: 0x9fe0ff, transparent: true, opacity: 0.1, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+        m.position.set(x, 1.0, -1.6 + i * 0.2); m.rotation.z = 0.18 - i * 0.05; waterEnv.add(m); return m; });
+      const bubbleTex = canvasTex(64, 64, (g) => { g.strokeStyle = "rgba(220,245,255,0.9)"; g.lineWidth = 4; g.beginPath(); g.arc(32, 32, 26, 0, 7); g.stroke(); g.fillStyle = "rgba(200,240,255,0.15)"; g.fill(); g.fillStyle = "rgba(255,255,255,0.95)"; g.beginPath(); g.arc(22, 21, 6, 0, 7); g.fill(); });
+      const RB = rng(31), bubbles = [];
+      for (let i = 0; i < 46; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: bubbleTex, transparent: true, depthWrite: false, opacity: 0.55 })); waterEnv.add(s); bubbles.push([s, (RB() - 0.5) * 3.0, (RB() - 0.5) * 3.0 - 0.3, RB(), 0.35 + RB() * 0.5, 0.025 + RB() * 0.05]); }
+      waterEnv.visible = false;
+
       /* ---------------- camera direction ---------------- */
       const P = {
         race: [[0, 0.42, 2.25], [0, 0.26, 0]], race2: [[0, 0.38, 1.95], [0, 0.25, 0]],
         gauge: [[1.55, 0.5, 2.75], [1.55, 0.44, -0.2]],
-        evap: [[-0.2, 0.42, 1.3], [-0.18, 0.26, 0]], evap2: [[-0.2, 0.4, 1.12], [-0.18, 0.27, 0]],
-        xray: [[0, 0.3, 1.95], [0, 0.2, 0]],
+        evap: [[-0.2, 0.42, 1.3], [-0.18, 0.27, 0]], evap2: [[-0.14, 0.322, 0.6], [-0.15, 0.302, 0]],
+        xray: [[0, 0.5, 1.9], [0, 0.2, 0]],
         dive: [[-0.18, 0.34, 0.25], [-0.18, 0.2, 0]],
         mol: [[0, 10, 5.2], [0, 10, 0]], mol2: [[0.05, 10.02, 4.6], [0, 10, 0]],
         pay: [[-0.16, 0.3, 0.95], [-0.18, 0.22, 0]], pay2: [[0, 0.4, 2.1], [0, 0.25, 0]],
       };
+      const DIVE = 0.45;   // dive into the water, cut hidden under a blue wash, then the camera keeps moving through the water
       const shotAt = (t) => { let i = 0; while (i < D.shots.length - 1 && t >= D.shots[i + 1][0]) i++; return [i, D.shots[i][0], D.shots[i + 1] ? D.shots[i + 1][0] : DUR]; };
       function cam(t) {
         const [i, a, b] = shotAt(t), u = (t - a) / (b - a), name = D.shots[i][1];
         let pos, tgt, whip = 0;
         if (name === "race") { const k = smooth(u); pos = lerp3(P.race[0], P.race2[0], k); tgt = P.race[1]; whip = 1 - seg(t, 0, 0.16); }
         else if (name === "gauge") { const w = expoOut((t - a) / 0.35); pos = lerp3(P.race2[0], P.gauge[0], w); tgt = lerp3(P.race2[1], P.gauge[1], w); whip = Math.sin(Math.PI * clamp((t - a) / 0.35, 0, 1)); pos = lerp3(pos, [P.gauge[0][0], P.gauge[0][1] - 0.03, P.gauge[0][2] - 0.25], smooth((t - a - 0.4) / (b - a - 0.4))); }
-        else if (name === "evap") { const k = expoOut((t - a) / 0.5); pos = lerp3(P.evap[0], P.evap2[0], smooth(u)); tgt = P.evap[1]; pos = lerp3([pos[0] - 0.25 * (1 - k), pos[1] + 0.1 * (1 - k), pos[2] + 0.3 * (1 - k)], pos, 1); }
-        else if (name === "xray") { pos = lerp3(P.xray[0], [0, 0.28, 1.75], smooth(u)); tgt = P.xray[1]; }
+        else if (name === "evap") { const k = expoOut((t - a) / 0.5); pos = lerp3(P.evap[0], P.evap2[0], smooth(u)); tgt = lerp3(P.evap[1], P.evap2[1], smooth(u)); pos = lerp3([pos[0] - 0.25 * (1 - k), pos[1] + 0.1 * (1 - k), pos[2] + 0.3 * (1 - k)], pos, 1); }
+        else if (name === "xray") { pos = lerp3(P.xray[0], [0, 0.46, 1.7], smooth(u)); tgt = P.xray[1]; }
         else if (name === "molecules") {
-          if (t - a < 0.32) { const k = (t - a) / 0.32; pos = lerp3(P.xray[0], P.dive[0], k * k); tgt = lerp3(P.xray[1], P.dive[1], k); }
-          else { const k = smooth((t - a - 0.32) / (b - a - 0.32)); pos = lerp3([0, 10, 5.0], P.mol2[0], expoOut(clamp((t - a - 0.32) / 0.8, 0, 1)) * 0.6 + k * 0.4); tgt = P.mol[1]; }
+          if (t - a < DIVE) { const k = (t - a) / DIVE; pos = lerp3(P.xray[0], P.dive[0], k * k); tgt = lerp3(P.xray[1], P.dive[1], k); }
+          else { const k = smooth((t - a - DIVE) / (b - a - DIVE)); pos = lerp3([0, 10.25, 6.6], P.mol2[0], expoOut(clamp((t - a - DIVE) / 1.0, 0, 1)) * 0.65 + k * 0.35); tgt = P.mol[1]; }
         }
         else { const pull = smooth((t - a) / 2.6); pos = lerp3(P.pay[0], P.pay2[0], pull); tgt = lerp3(P.pay[1], P.pay2[1], pull);
           if (t >= C.whipOut) { const w = smooth((t - C.whipOut) / (DUR - C.whipOut)); pos = lerp3(pos, P.race[0], w); tgt = lerp3(tgt, P.race[1], w); whip = Math.sin(Math.PI * w * 0.9); } }
@@ -321,7 +350,7 @@
         const raceFreeze = seg(t, C.freezeL[0], C.freezeL[1]);
         let fL = 0, fR = 0, levelL = 0.3, steamAmt = 0, xr = 0, warmI = 0, coolI = 0;
         if (shot === "race") { fL = raceFreeze; fR = 0; steamAmt = 1 - raceFreeze; warmI = 1.2 * (1 - raceFreeze); coolI = 1.0; }
-        else if (shot === "evap") { steamAmt = 0.55; levelL = 0.3 - 0.3 * 0.045 * seg(t, C.evap[0] + 0.6, C.evap[1] - 0.6); warmI = 0.45; }
+        else if (shot === "evap") { steamAmt = 0.55; levelL = 0.3 - 0.3 * 0.04 * seg(t, C.evap[0] + 0.6, C.evap[1] - 0.9); warmI = 0.45; }
         else if (shot === "xray") { xr = 1; steamAmt = 0.4; warmI = 1.8; coolI = 1.2; fR = 0; }
         else if (shot === "payoff") { const back = t >= C.whipOut + 0.25; fL = back ? 0 : 1; fR = 0; steamAmt = back ? 1 : 0; warmI = back ? 1.2 : 0.2; coolI = 0.9; }
         for (const [b, f, lvl] of [[hot, fL, levelL], [cold, fR, 0.3]]) {
@@ -333,6 +362,7 @@
           const clip = xr ? [cutPlane] : [];
           b.gm.clippingPlanes = clip; b.wm.clippingPlanes = clip;
         }
+        menRing.visible = shot === "evap"; menRing.position.y = 0.012 + levelL + 0.001; menRing.material.opacity = 0.9;
         refRing.visible = shot === "evap"; refRing.position.y = 0.012 + 0.3; refRing.material.opacity = 2 * seg(t, C.evap[0] + 0.2, C.evap[0] + 0.6);
         steamAt(t, steamAmt * (shot === "gauge" || shot === "molecules" ? 0 : 1), 0.012 + levelL, hot.x);
         warm.position.set(hot.x, 0.14, 0); warm.intensity = warmI * 0.5; cool.position.set(cold.x, 0.14, 0); cool.intensity = coolI * 0.5;
@@ -364,14 +394,17 @@
           const pts = []; pairs.forEach(([i, j]) => { if (snapped[i] && snapped[j]) { const a = left[i][0].position, b = left[j][0].position; pts.push(a.x, a.y, a.z, b.x, b.y, b.z); } });
           bonds.geometry.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3)); bonds.geometry.computeBoundingSphere();
           glowSprites.forEach((g, i) => { g.position.copy(left[i][0].position); const on = snapped[i] ? 1 : 0; g.scale.set(0.18, 0.18, 1); g.material.opacity = on * (0.35 + 0.15 * Math.sin(t * 6 + i)); });
-          scene.background.set(0x040a16); scene.fog.density = 0.05;
-        } else scene.background.set(0x070b12);
+          scene.background.set(0x05213f); scene.fog.color.set(0x0b3d6b); scene.fog.density = 0.085;
+          bubbles.forEach(([s, x, z, off, sp, sz], i) => { const p = ((t * sp * 0.35 + off) % 1); s.position.set(x + Math.sin(t * 1.7 + i) * 0.04, -1.6 + p * 3.4, z); s.scale.set(sz, sz, 1); s.material.opacity = 0.55 * Math.sin(Math.PI * p); });
+          shafts.forEach((m, i) => { m.material.opacity = 0.07 + 0.04 * Math.sin(t * 0.9 + i * 1.7); m.rotation.z = 0.18 - i * 0.05 + 0.03 * Math.sin(t * 0.5 + i); });
+        } else { scene.background.set(0x070b12); scene.fog.color.set(0x0a1420); }
+        waterEnv.visible = mol.visible;
 
         composer.render();
-        hud(t, shot, whip, [Th, Tc]);
+        hud(t, shot, whip, [Th, Tc], levelL);
       }
 
-      function hud(t, shot, whip, [Th, Tc]) {
+      function hud(t, shot, whip, [Th, Tc], levelNow) {
         // thermal glow + beaker labels (race / evap / payoff)
         const showBeakers = shot === "race" || shot === "evap" || shot === "xray" || shot === "payoff";
         const [hx, hy, hv] = proj(hot.x, 0.2, 0), [cx, cy, cv] = proj(cold.x, 0.2, 0);
@@ -381,7 +414,9 @@
         const [lx, ly] = proj(hot.x, 0.46, 0), [rx, ry] = proj(cold.x, 0.46, 0);
         const tagOn = shot === "race" || shot === "payoff" || shot === "xray";
         place("tHot", lx, ly, tagOn ? 1 : 0, 1); place("tCold", rx, ry, tagOn ? 1 : 0, 1);
-        $("tHot").textContent = shot === "payoff" && t < C.whipOut + 0.25 ? "FROZEN" : "90°C";
+        const fin = shot === "payoff" && t < C.whipOut + 0.25;
+        $("tHot").textContent = fin ? "90°C → FROZEN" : "90°C"; $("tCold").textContent = fin ? "20°C → LIQUID" : "20°C";
+        $("tHot").style.fontSize = $("tCold").style.fontSize = fin ? "34px" : "";
 
         // gauge labels
         const gOn = shot === "gauge" && t > D.shots[1][0] + 0.3 ? 1 : 0;
@@ -389,12 +424,28 @@
         const [a1, b1] = gp(-0.2, Math.max(Th, -10)), [a2, b2] = gp(0.2, Math.max(Tc, -10));
         $("g90").textContent = `${Math.round(Th)}°C`; $("g20").textContent = `${Math.round(Tc)}°C`;
         place("g90", a1 - 150, b1, gOn); place("g20", a2 + 150, b2, gOn);
-        const [z0x, z0y] = gp(0.42, 0), [z5x, z5y] = gp(0.42, -5), [ix, iy] = gp(0, 12);
-        place("g0", (a1 + a2) / 2, z0y, gOn * 0.9, 1); place("gm5", (a1 + a2) / 2, z5y, gOn * 0.9, 1);
+        // crossover bracket hugging the 0…−5 °C band, with ICE? pinned on top of it
+        const [hx0] = gp(-0.2, 0), [cx0] = gp(0.2, 0), [, y0] = gp(0, 0), [, y5] = gp(0, -5);
+        const bandOn = gOn * seg(t, C.gaugeDrop[0] + 1.6, C.gaugeDrop[0] + 2.0), pulse = Math.abs(Math.sin(t * 6));
+        const gb = $("gBand"), bl = hx0 + 46, bw = Math.max(120, cx0 - 46 - bl), bh = Math.max(44, y5 - y0 + 16);
+        gb.style.width = bw.toFixed(0) + "px"; gb.style.height = bh.toFixed(0) + "px"; gb.style.opacity = bandOn;
+        gb.style.borderColor = `rgba(0,229,255,${(0.55 + 0.45 * pulse).toFixed(3)})`; gb.style.background = `rgba(0,229,255,${(0.1 + 0.16 * pulse).toFixed(3)})`;
+        gb.style.transform = `translate(${bl.toFixed(1)}px, ${((y0 + y5) / 2 - bh / 2).toFixed(1)}px) scale(${(1 + 0.03 * pulse * bandOn).toFixed(3)})`;
         const iceOn = gOn * seg(t, C.gaugeDrop[0] + 2.4, C.gaugeDrop[0] + 2.8);
-        place("gIce", ix, iy - 120, iceOn * (0.75 + 0.25 * Math.abs(Math.sin(t * 9))), 1);
+        place("gIce", (hx0 + cx0) / 2, (y0 + y5) / 2 - bh / 2 - 34 - 30, iceOn, 1 + 0.06 * pulse);
         const ti = t >= C.mpemba && shot === "gauge" ? 1 : 0;
         $("title").style.opacity = ti * (1 - seg(t, D.shots[2][0] - 0.2, D.shots[2][0])); $("title").style.transform = `scale(${(0.6 + 0.4 * backOut((t - C.mpemba) / 0.4)).toFixed(3)})`;
+
+        // x-ray: wavy heat-escape arrows rising off the 90 °C surface
+        const ha = $("heatArrows"), [sx, sy] = proj(hot.x, 0.32, 0), haOn = shot === "xray" ? seg(t, C.xray[0] + 0.3, C.xray[0] + 0.7) * (1 - seg(t, D.shots[4][0] - 0.15, D.shots[4][0])) : 0;
+        ha.style.opacity = haOn.toFixed(3); ha.style.transform = `translate(${(sx - 110).toFixed(1)}px, ${(sy - 190).toFixed(1)}px)`;
+        [0, 1, 2].forEach((k) => { const q = ((t * 0.8 + k / 3) % 1); const el = $("ha" + k); el.setAttribute("transform", `translate(0 ${(-q * 46).toFixed(1)})`); el.style.opacity = Math.sin(Math.PI * q).toFixed(3); });
+        // evaporation: bracket from the dashed reference line down to the meniscus
+        const vOn = shot === "evap" ? seg(t, C.evap[0] + 1.0, C.evap[0] + 1.4) * (1 - seg(t, D.shots[3][0] - 0.15, D.shots[3][0])) : 0;
+        const zf = Math.sqrt(BR * BR - 0.05 * 0.05) + 0.004, [vx, vy0] = proj(hot.x + 0.05, 0.012 + 0.3, zf), [, vy1] = proj(hot.x + 0.05, 0.012 + levelNow, zf);
+        const vh = Math.max(6, vy1 - vy0), vol = $("vol"); vol.style.height = vh.toFixed(1) + "px"; vol.style.opacity = vOn.toFixed(3);
+        vol.style.transform = `translate(${clamp(vx, 80, 860).toFixed(1)}px, ${vy0.toFixed(1)}px)`;
+        place("volTag", clamp(vx, 80, 860) - 175, (vy0 + vy1) / 2, vOn * seg(t, C.evap[0] + 1.4, C.evap[0] + 1.8), 1);
 
         // molecule labels
         const mOn = shot === "molecules" && t > D.shots[4][0] + 0.6 ? 1 : 0;
@@ -410,13 +461,17 @@
         $("stamp").style.opacity = st ? 1 - seg(t, C.whipOut - 0.15, C.whipOut) : 0;
         $("stamp").style.transform = `translateX(-50%) scale(${st ? (1.5 - 0.5 * expoOut((t - C.stamp) / 0.25)).toFixed(3) : 1}) rotate(-3deg)`;
         $("smear").style.opacity = clamp(whip, 0, 1).toFixed(3);
+        const ds = D.shots[4][0], wash = t < ds + DIVE ? seg(t, ds + DIVE - 0.22, ds + DIVE) : 1 - seg(t, ds + DIVE + 0.05, ds + DIVE + 0.6);
+        $("wash").style.opacity = (shot === "molecules" ? wash : 0).toFixed(3);
 
         // captions: word by word, cyan/amber active word, gone when the voice stops
         const L = LINES[lineAt(t)], on = t >= L.s - 0.03 && t < L.e;
         $("cap").style.opacity = on ? 1 : 0;
         if (on) {
           const ws = L.words, chunks = [[]];
-          ws.forEach((w, j) => { chunks[chunks.length - 1].push(j); if (/[.,!?:]$/.test(w.w) || chunks[chunks.length - 1].length >= 3) chunks.push([]); });
+          ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
+            if (cur.length && len + w.w.length > 20) { chunks.push([]); cur = chunks[chunks.length - 1]; }
+            cur.push(j); if (/[.,!?:]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
           let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
           const ch = chunks.find((c) => c.includes(act)) || chunks[0];
           $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" + (WARM.test(ws[j].w) ? " warm" : "") : ""}">${ws[j].w}</span>`).join(" ") + "</span>";
