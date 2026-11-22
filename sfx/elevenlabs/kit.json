@@ -103,6 +103,22 @@
     "seconds": 3.0,
     "prompt": "Fast mechanical stopwatch ticking, crisp clock ticks speeding up slightly, close and dry, no music"
   },
+  "tech_pulse": {
+    "seconds": 20.0,
+    "prompt": "Upbeat minimal tech creator background loop, punchy electronic kick and sub pulse at 118 bpm, bright plucky synth arpeggio, clean modern, no vocals, no melody lead"
+  },
+  "scan_sweep": {
+    "seconds": 1.5,
+    "prompt": "Digital scanner sweep, futuristic laser scan passing left to right, clean sci-fi UI sound, short"
+  },
+  "key_typing": {
+    "seconds": 2.0,
+    "prompt": "Fast mechanical keyboard typing, crisp clicky keys, a burst of quick keystrokes then enter key, close and dry"
+  },
+  "ui_click": {
+    "seconds": 0.5,
+    "prompt": "Crisp modern UI click pop, short clean digital tap, satisfying"
+  },
   "science_pulse": {
     "seconds": 30.0,
     "prompt": "Dark minimal science documentary underscore, slow deep sub pulse every second with a cold airy synth pad, mysterious, no melody, no drums, no voices"

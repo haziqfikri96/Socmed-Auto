@@ -39,6 +39,10 @@ KIT = {
     "ice_lock": (2.0, "Rapid sequence of tiny crystalline ice clicks locking into place like dominoes, glassy and bright, no music"),
     "ice_thud": (1.2, "Solid block of ice dropped onto a metal shelf, heavy dull thud with a short icy crack, no reverb"),
     "timer_tick": (3.0, "Fast mechanical stopwatch ticking, crisp clock ticks speeding up slightly, close and dry, no music"),
+    "tech_pulse": (20.0, "Upbeat minimal tech creator background loop, punchy electronic kick and sub pulse at 118 bpm, bright plucky synth arpeggio, clean modern, no vocals, no melody lead"),
+    "scan_sweep": (1.5, "Digital scanner sweep, futuristic laser scan passing left to right, clean sci-fi UI sound, short"),
+    "key_typing": (2.0, "Fast mechanical keyboard typing, crisp clicky keys, a burst of quick keystrokes then enter key, close and dry"),
+    "ui_click": (0.5, "Crisp modern UI click pop, short clean digital tap, satisfying"),
     "science_pulse": (30.0, "Dark minimal science documentary underscore, slow deep sub pulse every second with a cold airy synth pad, mysterious, no melody, no drums, no voices"),
     "sting": (1.2, "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"),
 }

@@ -1,0 +1,7 @@
+Claude Code built this 3D science video. Zero AI video generators 🤯 Three.js for the 3D, ElevenLabs for the voice, HyperFrames to render HTML → MP4, all on my own machine.
+
+Comment "PROMPT" and I'll send you the template 👇
+
+#claudecode #threejs #aivideo #hyperframes #motiondesign #coding #shichiai
+
+Full video: "Can HOT water freeze before COLD water?" on my profile.
