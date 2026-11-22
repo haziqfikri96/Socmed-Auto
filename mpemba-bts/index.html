@@ -45,7 +45,7 @@
         padding: 30px 34px 0 150px; opacity: 0; transform-origin: 50% 50%; }
       .card .num { position: absolute; left: 34px; top: 50px; width: 90px; height: 90px; border-radius: 22px; background: rgba(0,229,255,0.14); border: 3px solid #00E5FF;
         font: 900 50px/84px 'Montserrat'; text-align: center; color: #00E5FF; }
-      .card h3 { font-size: 56px; font-weight: 900; letter-spacing: -0.02em; }
+      .card h3 { font-size: 50px; white-space: nowrap; font-weight: 900; letter-spacing: -0.02em; }
       .card p { margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 25px; color: #9fc3e6; }
       .arrow { position: absolute; left: 50%; width: 8px; margin-left: -4px; height: 0; background: #00E5FF; border-radius: 4px; }
       .arrow::after { content: ""; position: absolute; left: 50%; bottom: -14px; margin-left: -13px; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 18px solid #00E5FF; }
@@ -76,11 +76,11 @@
       #ph::before { content: ""; position: absolute; left: 50%; top: -14px; margin-left: -14px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 18px solid #00E5FF; }
       #ring { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 5px solid #00E5FF; opacity: 0; }
       /* step 3 terminal */
-      #term { left: 80px; top: 560px; width: 860px; height: 700px; opacity: 0; }
+      #term { left: 80px; top: 620px; width: 860px; height: 460px; opacity: 0; }
       #tbody { padding: 26px 28px; font: 700 27px/48px 'JetBrains Mono'; color: #cfe3f7; white-space: pre-wrap; }
       #tbody .p { color: #28c840; } #tbody .dim { color: #6c86a6; } #tbody .ok { color: #7dffa1; }
       #prog { margin-top: 10px; height: 26px; border-radius: 13px; background: #142338; overflow: hidden; } #progFill { height: 100%; width: 0; background: linear-gradient(90deg, #00b8d4, #00E5FF); }
-      #cta { position: absolute; left: 50%; top: 1210px; padding: 18px 34px; border-radius: 999px; background: #00E5FF; color: #04121c; font-weight: 900; font-size: 46px; white-space: nowrap;
+      #cta { position: absolute; left: 50%; top: 1260px; padding: 16px 30px; border-radius: 999px; background: #00E5FF; color: #04121c; font-weight: 900; font-size: 38px; white-space: nowrap;
         opacity: 0; transform-origin: 50% 50%; z-index: 7; border: 4px solid #e8fdff; }
       #smear { position: absolute; inset: 0; opacity: 0; z-index: 8; pointer-events: none;
         background: repeating-linear-gradient(0deg, rgba(200,230,255,0.12) 0 3px, rgba(0,0,0,0) 3px 17px), linear-gradient(90deg, rgba(5,7,12,0.6), rgba(5,7,12,0) 30%, rgba(5,7,12,0) 70%, rgba(5,7,12,0.6)); }
@@ -223,10 +223,10 @@
       function renderAt(t) {
         // ===== shot 1: result-first hook, then shrink into the IDE preview =====
         const sh = seg(t, C.shrink[0], C.shrink[1]);
-        const pS = 834 / 1920, pX = 420 + (520 - 1080 * pS) / 2, pY = 566;
+        const pS = 834 / 1920, pX = 80 + 340 + (520 - 1080 * pS) / 2, pY = 566;   // preview pane, absolute px
         const wp = seg(t, C.whipPipe - 0.05, C.whipPipe + 0.25);            // whip: everything slides left
         const shiftOut = -1300 * wp;
-        vid("vHook", lerp(0, pX + 80, sh) + shiftOut, lerp(0, pY + 520 - 566 + 46, sh), lerp(1, pS, sh));
+        vid("vHook", lerp(0, pX, sh) + shiftOut, lerp(0, pY, sh), lerp(1, pS, sh));
         const ide = $("ide"); ide.style.opacity = sh > 0.01 ? Math.min(1, sh * 1.4) : 0; ide.style.transform = `translateX(${shiftOut.toFixed(1)}px) scale(${lerp(1.08, 1, sh).toFixed(3)})`;
         const nCode = Math.floor(clamp((t - C.shrink[0] - 0.2) / 1.5, 0, 1) * CODE.length);
         $("code").innerHTML = CODE.slice(0, nCode).map((l) => l[0]).join("\n") + (t % 0.5 < 0.25 ? "▍" : " ");
@@ -287,10 +287,10 @@
         const rv = expoOut((t - C.reveal + 0.3) / 0.45), rs = lerp(0.3, 1, rv);
         vid("vPay", lerp(540 - 540 * 0.3, 0, rv), lerp(910 - 960 * 0.3, 0, rv), rs, `inset(0 round ${lerp(40, 0, rv).toFixed(1)}px)`);
         const lw = seg(t, C.loop - 0.02, DUR);                               // loop whip back to frame 1
-        $("vPay").style.transform += ` translateX(${(-1400 * lw).toFixed(1)}px)`;
+        $("vPay").style.transform += ` translateX(${(-1080 * lw).toFixed(1)}px)`;
         vid("vLoop", 1080 * (1 - lw), 0, 1);
         const cta = $("cta"), con = t >= C.cta && t < C.loop + 0.05;
-        cta.style.opacity = con ? 1 : 0; cta.style.transform = `translateX(-50%) scale(${con ? (1.4 - 0.4 * backOut((t - C.cta) / 0.3, 2.4)).toFixed(3) : 1})`;
+        cta.style.opacity = con ? 1 : 0; cta.style.transform = `translate(-50%, -50%) scale(${con ? (1.4 - 0.4 * backOut((t - C.cta) / 0.3, 2.4)).toFixed(3) : 1})`;
 
         // whip smears on every hard move
         const sm = Math.max(bell(t, C.whipPipe - 0.05, C.whipPipe + 0.25), bell(t, C.step1 - 0.05, C.step1 + 0.25), bell(t, C.step2 - 0.05, C.step2 + 0.25),
