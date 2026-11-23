@@ -1,4 +1,32 @@
 {
+  "foley_ui_pop": {
+    "seconds": 0.5,
+    "prompt": "Subtle soft matte button click, clean modern UI tap, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "foley_whoosh": {
+    "seconds": 0.9,
+    "prompt": "Fast soft air sweep transition, smooth wind movement, clean modern broadcast whoosh, no metallic resonance, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "foley_ice_crack": {
+    "seconds": 0.8,
+    "prompt": "Sharp brittle ice cube cracking in a glass, crisp high-frequency crystalline fracture, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "foley_sub_impact": {
+    "seconds": 0.8,
+    "prompt": "Clean warm low-end cinematic thud, tight punchy sub bass drop, no distortion, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "whoosh_soft": {
     "seconds": 0.8,
     "prompt": "Short soft cinematic whoosh, air swish passing left to right, clean, no reverb tail"
