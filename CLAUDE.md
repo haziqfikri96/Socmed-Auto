@@ -174,7 +174,7 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 - `fun-facts-ocean/` — 60s, five ocean facts
 - `earth-hole/` — 37.5s, one-question 3D short with word-by-word captions
 
-**Audio**: narration and sound effects come from ElevenLabs (key stored as a network secret for `api.elevenlabs.io`; send header `xi-api-key: proxy-injected`). Tools: `tools/make_voiceover_elevenlabs.py`, `tools/make_voiceover_timed.py`, `tools/make_sfx_elevenlabs.py`; reusable effects are in `sfx/elevenlabs/`. Each project's `make_audio.py` builds its `assets/mix.wav` (run with any Python that has numpy and soundfile (`pip install numpy soundfile`)).
+**Audio**: narration and sound effects come from ElevenLabs (key stored as a network secret for `api.elevenlabs.io`; send header `xi-api-key: proxy-injected`). Tools: `tools/make_voiceover_elevenlabs.py`, `tools/make_voiceover_timed.py`, `tools/make_sfx_elevenlabs.py`; reusable effects are in `sfx/elevenlabs/`. Voice model: `eleven_v4` by default since 23 Nov 2026 (ElevenLabs Starter plan, commercial licence; set `ELEVEN_TTS_MODEL` or pass a model to `make_voiceover_timed.py` to override); videos made before then used `eleven_multilingual_v2` and keep their cached takes. New effects follow the clean-Foley rules in `.claude/skills/sfx-foley/SKILL.md` (model `eleven_text_to_sound_v3`, prompt_influence 0.7, short explicit durations, detailed foley prompts, leading silence trimmed, -16 LUFS, mixed about -10 dB under the voice). Each project's `make_audio.py` builds its `assets/mix.wav` (run with any Python that has numpy and soundfile (`pip install numpy soundfile`)).
 
 **Posting to TikTok — drafts only**:
 - The user reviews every video first. Only after they approve, send it with `python tiktok_draft.py videos/<file>.mp4`. This puts a draft in their TikTok inbox; they add the caption and post it in the app. Never use direct posting.
@@ -191,12 +191,18 @@ Work lives on branch `claude/showcase-video` until it is merged into `main`.
 ## Render workflow (set by the user, Nov 2026)
 
 - **Drafts by default.** Every intermediate render is a draft: `tools/hf_render.sh <project>` runs `npx hyperframes@0.9.30 render --quality draft --fps 30 --output review.mp4` in the project folder (1080x1920; `review.mp4` is gitignored). Always pin `@0.9.30`. Master quality (`tools/hf_render.sh <project> --final`) only when the user explicitly asks for the final export.
-- Projects with a 3D scene have `render-mode.js` (`window.HF_DRAFT`); the script sets it during drafts, so WebGL draws at half resolution without AA and with cheaper shadows. The output is still 1080x1920. The script restores it afterwards.
+- Projects with a 3D scene have a committed `render-mode.js` (`window.HF_DRAFT = false`). For drafts the script renders from a temporary copy with it set to true, so WebGL draws at half resolution without AA and with cheaper shadows; the output is still 1080x1920 and the tracked file never changes.
 - **Test clips only on request**: `tools/hf_render.sh <project> <start> <end>` renders just that span to `review-<start>-<end>.mp4`.
 - **Preview**: `npx hyperframes@0.9.30 preview --background --no-open --port 3002` from the project folder; `--status` / `--stop`.
 - **Never regenerate audio that exists.** `make_dialogue.py` reuses takes by hash of speaker+text (only changed lines are voiced); `tools/make_sfx_elevenlabs.py` skips existing effects. Rebuilding `assets/mix.wav` with `make_audio.py` is local and free.
 - **Cheap paint only**: no `backdrop-filter`, CSS `filter: blur()`/`drop-shadow()` or large blurred `box-shadow` on cards, emotes or the canvas; use solid/semi-transparent fills, borders and radial-gradient halos.
 - Extra render workers don't speed up WebGL projects here (software GPU); measured: 2s clip 108s at full quality, 40s as a draft.
+
+## Blender (MCP for Blender, installed Nov 2026)
+
+- Cloud container: `tools/blender_mcp.sh install` (Blender 4.5.16 LTS into /opt, checksum-verified, plus the addon), `tools/blender_mcp.sh start|status|stop`. Runs Blender headless via `tools/blender_mcp_headless.py` (the addon refuses `blender -b`, so the runner drives its command queue itself) on localhost:9876. Register the MCP once per container: `claude mcp add blender -s local -e DISABLE_TELEMETRY=true -- uvx mcp-for-blender` (tools load in the next session). Cycles CPU renders work; viewport screenshots don't (no GUI). Measured: 540x960, 32 samples in ~5s.
+- The addon socket has no auth and runs arbitrary Python: keep it on localhost. Telemetry off (`DISABLE_TELEMETRY=true`).
+- The user also installed it on their Windows PC for Claude Desktop / VS Code.
 
 ## Host character (use the user's exact art)
 

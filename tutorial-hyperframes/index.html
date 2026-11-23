@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="direction.js"></script>
+    <script src="render-mode.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      /* TikTok safe zone for UI: top >= 180px, bottom <= 1600px (320px reserved), right <= 960px (120px reserved) */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0d0920; }
+      #root { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; background: radial-gradient(circle at 50% 40%, #241a45, #0d0920 75%); }
+      #dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #0b0820; opacity: 0; pointer-events: none; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; transform-origin: 50% 50%; }
+      .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+      #sub { position: absolute; left: 90px; width: 840px; top: 1360px; text-align: center; }
+      #who { display: table; margin: 0 auto 10px; padding: 8px 22px; border-radius: 999px; font-size: 26px; font-weight: 900; letter-spacing: 0.12em; }
+      #who.dev { background: #F59E0B; color: #1a1205; }
+      #who.quill { background: #2DD4BF; color: #04211d; }
+      #line { display: inline-block; padding: 10px 26px 14px; border-radius: 26px; background: rgba(8, 6, 20, 0.66); font-size: 46px; line-height: 60px; font-weight: 800; }
+
+      .card { position: absolute; left: 90px; top: 300px; width: 840px; border-radius: 40px; background: rgba(10, 14, 32, 0.78); border: 2px solid rgba(148, 163, 184, 0.35);
+        padding: 40px 42px; opacity: 0; transform-origin: 50% 40%; }
+      .card h3 { font-size: 28px; font-weight: 900; letter-spacing: 0.14em; color: #94A3B8; margin-bottom: 22px; }
+      .card h3 b { color: #2DD4BF; }
+
+      /* html -> mp4 */
+      #code { width: 430px; height: 360px; border-radius: 22px; background: #0B1020; padding: 24px; font-size: 22px; line-height: 38px; color: #E2E8F0; white-space: pre; display: inline-block; vertical-align: top; }
+      #code .k { color: #C084FC; } #code .s { color: #4ADE80; } #code .t { color: #60A5FA; }
+      #arrow2 { display: inline-block; width: 66px; text-align: center; font-size: 56px; font-weight: 900; color: #2DD4BF; line-height: 360px; vertical-align: top; }
+      #mini { display: inline-block; width: 240px; height: 360px; border-radius: 22px; background: linear-gradient(160deg, #F97316, #7C3AED); vertical-align: top; position: relative; overflow: hidden; }
+      #miniT { position: absolute; left: 0; width: 240px; top: 150px; text-align: center; font-size: 42px; font-weight: 900; }
+      #frames { margin-top: 26px; height: 86px; position: relative; overflow: hidden; }
+      .fr { position: absolute; top: 0; width: 66px; height: 86px; border-radius: 10px; background: linear-gradient(160deg, #F97316, #7C3AED); border: 3px solid #0B1020; }
+      #mp4 { display: inline-block; margin-top: 22px; padding: 12px 26px; border-radius: 999px; background: #16A34A; font-size: 32px; font-weight: 900; opacity: 0; }
+
+      .feat { display: flex; align-items: center; gap: 22px; margin: 16px 0; padding: 20px 26px; border-radius: 22px; background: rgba(17, 26, 51, 0.9); font-size: 40px; font-weight: 800; opacity: 0; }
+      .feat i { font-style: normal; width: 62px; height: 62px; border-radius: 18px; text-align: center; line-height: 62px; font-size: 34px; }
+      .feat em { margin-left: auto; font-style: normal; color: #4ADE80; font-size: 40px; }
+
+      #termBody { font-size: 20.5px; line-height: 44px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; min-height: 240px; }
+      #termBody .p, .ok { color: #4ADE80; }
+      #termBody .cur { background: #E2E8F0; color: #0B1020; }
+
+      #repo { font-size: 28px; color: #94A3B8; font-weight: 700; }
+      #repoName { font-size: 50px; font-weight: 900; letter-spacing: -0.03em; margin: 6px 0 14px; white-space: nowrap; }
+      #repoDesc { font-size: 30px; color: #CBD5E1; margin-bottom: 26px; font-weight: 700; }
+      .tag { display: inline-block; margin: 0 10px 12px 0; padding: 12px 22px; border-radius: 999px; font-size: 30px; font-weight: 900; opacity: 0; }
+
+      #ctaA { text-align: center; font-size: 44px; font-weight: 800; color: #94A3B8; }
+      #ctaB { text-align: center; font-size: 100px; font-weight: 900; letter-spacing: -0.04em; color: #2DD4BF; margin: 4px 0 24px; }
+      #ctaTerm { border-radius: 22px; background: #0B1020; padding: 24px 20px; font-size: 20px; line-height: 40px; color: #E2E8F0; white-space: pre-wrap; word-break: break-all; }
+      #ctaTerm .p { color: #4ADE80; } #ctaTerm .h { color: #A3B1C6; }
+
+      .emote { position: absolute; left: 0; top: 0; width: 150px; height: 150px; margin: -75px 0 0 -75px; opacity: 0; }
+      /* Quill's screen, full frame: same navy as his face, cyan = Quill acting */
+      #portal { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; clip-path: inset(50% 50% 50% 50%); }
+      #pscreen { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0;
+        background: radial-gradient(ellipse 120% 70% at 50% 38%, #142540 0%, #0a1220 62%, #060b14 100%); }
+      #pscreen::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 2px, rgba(0,0,0,0) 2px 6px); }
+      #pin { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 50% 40%; }
+      #term { position: absolute; left: 80px; top: 0; font-size: 44px; line-height: 68px; color: #e2e8f0; white-space: pre; }
+      #term .cm { color: #64748b; } #term .ps { color: #5eead4; } #term .k { color: #5eead4; }
+      .caret { display: inline-block; width: 26px; height: 52px; vertical-align: -10px; background: #5eead4; }
+      #ask { position: absolute; left: 50px; width: 980px; top: 440px; }
+      #askHint { font-size: 44px; color: #64748b; margin: 0 0 22px 10px; }
+      #askBox { border: 4px solid #5eead4; border-radius: 30px; padding: 36px 40px; font-size: 64px; line-height: 94px; color: #f1f5f9; white-space: pre-wrap; min-height: 260px; }
+      #askBox .gt { color: #5eead4; } #askBox .sl { color: #5eead4; }
+      #work { margin-top: 44px; font-size: 54px; color: #5eead4; opacity: 0; }
+      #pv { position: absolute; left: 315px; top: 520px; width: 450px; height: 800px; border-radius: 34px; overflow: hidden; background: #F4F1EA; opacity: 0; transform-origin: 50% 50%; }
+      #pvFrame { position: absolute; inset: 0; }
+      #pvTitle { position: absolute; left: 0; width: 450px; top: 330px; text-align: center; font-size: 66px; font-weight: 900; color: #0F0F0F; letter-spacing: -0.03em; }
+      #pvSub { position: absolute; left: 0; width: 450px; top: 420px; text-align: center; font-size: 28px; font-weight: 700; color: #2563EB; }
+      #file { position: absolute; left: 240px; top: 790px; width: 600px; text-align: center; opacity: 0; }
+      #file .fi { width: 190px; height: 230px; margin: 0 auto; border-radius: 22px; background: #5eead4; position: relative; }
+      #file .fi i { position: absolute; left: 72px; top: 78px; border-left: 64px solid #0a1220; border-top: 38px solid transparent; border-bottom: 38px solid transparent; }
+      #file .fn { margin-top: 26px; font-size: 52px; color: #f1f5f9; }
+      #face2 { position: absolute; left: 0; top: 0; width: 100px; height: 60px; opacity: 0; background: #0a1220; border-radius: 30%; display: flex; align-items: center; justify-content: center; color: #5eead4; white-space: nowrap; transform-origin: 0 0; }
+      /* captions: word by word, speaker colour on the active word, inside the TikTok safe zone */
+      #cap { position: absolute; left: 90px; width: 840px; top: 1430px; text-align: center; }
+      #cap .ch { display: inline-block; padding: 12px 28px 16px; border-radius: 26px; background: rgba(6, 9, 20, 0.72); font-size: 56px; line-height: 70px; font-weight: 800; color: rgba(255,255,255,0.9); }
+      #cap .on.quill { color: #5eead4; } #cap .on.dev { color: #F59E0B; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="tutorial-hyperframes" data-start="0" data-duration="29.72" data-width="1080" data-height="1920" data-fps="30">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="29.72" data-track-index="0" data-layout-allow-overflow></canvas>
+
+      <div id="dim"></div>
+      <div id="hud" class="clip" data-start="0" data-duration="29.72" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div id="portal"><div id="pscreen" data-ui="terminal"><div id="pin">
+          <div id="term" class="mono"></div>
+          <div id="ask"><div id="askHint" class="mono"># run "claude" in terminal</div><div id="askBox" class="mono"></div><div id="work" class="mono"></div></div>
+          <div id="pv"><div id="pvFrame"><div id="pvTitle">Your Intro</div></div></div>
+          <div id="file"><div class="fi"><i></i></div><div class="fn mono">my-video.mp4</div></div>
+        </div></div></div>
+        <div id="face2" class="mono"><span>part 2 →</span></div>
+        <div id="cap"></div>
+      </div>
+
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="29.72" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 29.72 }, 0);
+      window.__timelines["tutorial-hyperframes"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { createDev, createBot } from "./characters.js";
+
+      const LINES = window.LINES, D = window.D, DUR = D.DUR;
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      // GSAP back.out(1.7): spring overshoot used for every card and pop-in
+      const backOut = (x, c1 = 1.7) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const springIn = (t, a, d = 0.4) => backOut((t - a) / d);
+      const pop = springIn;
+      const $ = (id) => document.getElementById(id);
+      const S = (i) => LINES[i].s, E = (i) => LINES[i].e;
+      const [VOL0, VOL1] = D.VOL, [SLP0, SLP1] = D.SLP;
+
+      /* ---------------- renderer + low-poly night balcony ---------------- */
+      // draft renders draw the 3D at half resolution (no AA, cheaper shadows); the page and output stay 1080x1920
+      const DRAFT = !!window.HF_DRAFT;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setSize(DRAFT ? 540 : 1080, DRAFT ? 960 : 1920, false); renderer.setPixelRatio(1);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true; renderer.shadowMap.type = DRAFT ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+      const scene = new THREE.Scene();
+      const sky = document.createElement("canvas"); sky.width = 4; sky.height = 512;
+      const sg = sky.getContext("2d"), gr = sg.createLinearGradient(0, 0, 0, 512);
+      gr.addColorStop(0, "#120c2b"); gr.addColorStop(0.55, "#3d2763"); gr.addColorStop(0.85, "#a85a64"); gr.addColorStop(1, "#e08a5f");
+      sg.fillStyle = gr; sg.fillRect(0, 0, 4, 512);
+      const skyT = new THREE.CanvasTexture(sky); skyT.colorSpace = THREE.SRGBColorSpace; scene.background = skyT;
+      scene.fog = new THREE.Fog(0x3d2763, 6, 16);
+
+      const flat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.85, ...extra });
+      const box = (w, h, d, m, x, y, z, parent = scene) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; parent.add(b); return b; };
+      scene.add(new THREE.HemisphereLight(0xd6ccff, 0x5a3a52, 1.5));
+      const key = new THREE.DirectionalLight(0xffd2a1, 2.3); key.position.set(1.4, 2.6, 2.4); key.castShadow = true;
+      key.shadow.mapSize.set(DRAFT ? 1024 : 2048, DRAFT ? 1024 : 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+      Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 1.8, bottom: -0.6, near: 0.5, far: 8 }); scene.add(key);
+      const rim = new THREE.DirectionalLight(0x7dd3fc, 1.5); rim.position.set(-2, 1.6, -2.2); scene.add(rim);
+      const screenLight = new THREE.PointLight(0x60a5fa, 1.2, 1.6); screenLight.position.set(-0.35, 0.8, -0.35); scene.add(screenLight);
+
+      // deck, railing
+      const deck = flat(0x6b4a35), rail = flat(0x3b2a33);
+      for (let i = 0; i < 11; i++) box(0.36, 0.06, 6.0, i % 2 ? deck : flat(0x5f4230), -1.8 + i * 0.36, -0.03, 1.8);
+      box(3.4, 0.05, 0.05, rail, 0, 0.62, -1.15); box(3.4, 0.04, 0.04, rail, 0, 0.32, -1.15);
+      for (let i = 0; i < 9; i++) box(0.05, 0.62, 0.05, rail, -1.6 + i * 0.4, 0.31, -1.15);
+      // desk + monitor + mug + plant
+      const wood = flat(0x8a5a3c), dark = flat(0x1f2433);
+      box(0.9, 0.04, 0.45, wood, -0.3, 0.52, -0.5);
+      for (const x of [-0.7, 0.1]) for (const z of [-0.68, -0.32]) box(0.04, 0.5, 0.04, wood, x, 0.25, z);
+      const monBox = box(0.5, 0.32, 0.03, dark, -0.32, 0.78, -0.6), monStand = box(0.05, 0.16, 0.05, dark, -0.32, 0.6, -0.6);
+      const monC = document.createElement("canvas"); monC.width = 512; monC.height = 312;
+      const monT = new THREE.CanvasTexture(monC); monT.colorSpace = THREE.SRGBColorSpace;
+      const mon = new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.28), new THREE.MeshBasicMaterial({ map: monT })); mon.position.set(-0.32, 0.78, -0.584); scene.add(mon);
+      const mug = box(0.06, 0.08, 0.06, flat(0xf472b6), 0.0, 0.58, -0.45);
+      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.07, 0.16, 7), flat(0xc2410c)); pot.position.set(1.05, 0.08, -0.85); pot.castShadow = true; scene.add(pot);
+      for (let i = 0; i < 5; i++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.32, 4), flat(0x16a34a)); l.position.set(1.05 + Math.cos(i * 1.3) * 0.05, 0.3, -0.85 + Math.sin(i * 1.3) * 0.05); l.rotation.set(Math.cos(i) * 0.4, i, Math.sin(i) * 0.4); scene.add(l); }
+      // string lights
+      const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffd27a });
+      for (let i = 0; i <= 18; i++) { const u = i / 18, x = -1.6 + 3.2 * u, y = 1.75 - 0.22 * Math.sin(Math.PI * u); const b = new THREE.Mesh(new THREE.IcosahedronGeometry(0.022, 0), bulbMat); b.position.set(x, y, -1.1); scene.add(b); }
+      // city skyline
+      let sd = 5; const rnd = () => ((sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const winOn = new THREE.MeshBasicMaterial({ color: 0xffd27a }), winOff = new THREE.MeshBasicMaterial({ color: 0x3b2f5c });
+      for (let i = 0; i < 34; i++) {
+        const h = 1.4 + rnd() * 3.2, w = 0.4 + rnd() * 0.6, z = -4 - rnd() * 3, x = -4.5 + i * 0.28 + rnd() * 0.2;
+        box(w, h, 0.5, flat(0x221a3d), x, h / 2 - 0.9, z);
+        for (let k = 0; k < 10; k++) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.08), rnd() > 0.45 ? winOn : winOff); p.position.set(x - w / 2.6 + rnd() * w * 0.77, -0.6 + rnd() * (h - 0.4), z + 0.255); scene.add(p); }
+      }
+
+      /* ---------------- characters ---------------- */
+      const dev = createDev(THREE, { glasses: false });
+      dev.group.position.set(-0.32, 0, 0); dev.group.rotation.y = 0.35; scene.add(dev.group);
+      const quill = createBot(THREE);
+      quill.group.position.set(0.34, 0.2, 0.05); quill.group.rotation.y = -0.45; quill.group.scale.setScalar(1.05); scene.add(quill.group);
+
+      /* ---------------- direction (from direction.js, anchored to words) ---------------- */
+      const beatAt = (B, t) => { let i = 0; while (i < B.length - 1 && t >= B[i + 1][0]) i++; return i; };
+      const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.05) i++; return i; };
+      const BLINK_DEV = [2.6, 6.8, 11.9, 15.8, 19.2, 23.0, 26.3, 30.1, 37.2];
+      const BLINK_Q = [1.2, 4.9, 8.2, 11.2, 13.9, 16.4, 20.6, 24.1, 27.9, 33.2, 36.8];   // Quill keeps blinking behind the cards too
+      const blinkOf = (L, t) => L.reduce((m, b) => Math.max(m, 1 - Math.abs(t - b) / 0.07), 0);
+
+      /* ---------------- camera ---------------- */
+      const SHOT = {
+        hookPunch: [[-0.36, 0.98, -1.7], [-0.33, 0.96, 0]],     // from the monitor, punching in on his shocked face
+        hookHold: [[-0.36, 0.98, -1.4], [-0.33, 0.96, 0]],
+        wide: [[0.05, 0.85, 3.9], [0.0, 0.5, 0]],
+        dev: [[0.18, 0.95, 2.15], [-0.3, 0.7, 0]],
+        devClose: [[0.08, 0.98, 1.55], [-0.3, 0.82, 0]],
+        devLow: [[0.06, 1.3, 1.5], [-0.3, 1.18, 0]],
+        quill: [[-0.08, 0.82, 2.0], [0.34, 0.58, 0]],
+        quillClose: [[0.0, 0.78, 1.35], [0.34, 0.62, 0]],
+        quillPush: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],
+        quillEnd: [[0.05, 0.76, 1.5], [0.34, 0.62, 0]],
+        quillLoop: [[0.02, 0.8, 1.75], [0.34, 0.62, 0]],
+        sleepCam: [[1.25, 1.12, -0.12], [-0.32, 0.6, -0.45]],
+      };
+      function camAt(t) {
+        const i = beatAt(D.shots, t), [t0, now, hard] = D.shots[i], prev = D.shots[Math.max(0, i - 1)][1];
+        const k = hard || i === 0 ? 1 : seg(t, t0, t0 + 0.4);
+        const A = SHOT[prev], B = SHOT[now];
+        let p = A[0].map((v, j) => v + (B[0][j] - v) * k), l = A[1].map((v, j) => v + (B[1][j] - v) * k);
+        if (now === "quillPush") { const u = 1 - Math.pow(1 - clamp(t / 4.0, 0, 1), 2); p = [0.02, 0.8 - 0.02 * u, 1.75 - 0.4 * u]; }
+        if (now === "hookPunch") p = [p[0], p[1], -1.7 + 0.3 * backOut((t - t0) / 0.5)];   // dynamic punch-in in the first half second
+        const drift = now.startsWith("hook") || now === "sleepCam" ? 0 : 0.025 * Math.sin(t * 0.4);
+        let sx = 0, sy = 0;
+        for (const [s0, sd] of D.shakes) if (t >= s0 && t < s0 + sd) { const f = Math.floor((t - s0) * 30); sx = [0.03, -0.035, 0.025, -0.02][f] || 0; sy = [-0.02, 0.025, -0.03, 0.015][f] || 0; }
+        return [[p[0] + drift + sx, p[1] + 0.008 * Math.sin(t * 0.7) + sy, p[2]], l];
+      }
+      const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.05, 40);
+      camera.setViewOffset(1080, 1920, 0, 120, 1080, 1920);
+
+      /* ---------------- three-state lip-sync: closed / open-small / open-wide per syllable ---------------- */
+      const syllables = (w) => Math.max(1, (w.toLowerCase().replace(/[^a-z]/g, "").replace(/e$/, "").match(/[aeiouy]+/g) || []).length);
+      function mouthOf(who, t) {
+        const L = LINES[lineAt(t)];
+        for (const line of LINES) {
+          if (line.who !== who || t < line.s || t >= line.e) continue;
+          for (const w of line.words) {
+            if (t < w.s || t >= w.e) continue;
+            const n = syllables(w.w), slot = (w.e - w.s) / n, p = ((t - w.s) % slot) / slot;
+            return p < 0.14 || p > 0.9 ? 0.05 : p < 0.32 || p > 0.7 ? 0.45 : 0.95;   // closed / small / wide per syllable   // small -> wide -> small within each syllable
+          }
+          return 0.05;   // between words inside a line: closed (flat)
+        }
+        void L; return 0;
+      }
+
+      /* ---------------- custom vector emotes (low-poly two-tone, no system emoji) ---------------- */
+      const SVG = {
+        bang: `<svg viewBox="0 0 100 100"><polygon points="38,6 64,6 58,64 44,64" fill="#ef4444" stroke="#fff" stroke-width="5"/><polygon points="51,6 64,6 58,64 51,64" fill="#b91c1c"/><polygon points="51,72 61,78 61,90 51,96 41,90 41,78" fill="#ef4444" stroke="#fff" stroke-width="5"/></svg>`,
+        question: `<svg viewBox="0 0 100 100"><path d="M28 34 Q28 8 52 8 Q76 8 76 30 Q76 44 60 52 Q54 56 54 66 L42 66 Q42 50 54 43 Q63 38 63 30 Q63 20 52 20 Q41 20 41 34 Z" fill="#facc15" stroke="#3b2a05" stroke-width="5" stroke-linejoin="round"/><polygon points="48,74 58,79 58,90 48,95 38,90 38,79" fill="#facc15" stroke="#3b2a05" stroke-width="5"/></svg>`,
+        sparkle: `<svg viewBox="0 0 100 100"><polygon points="50,4 58,42 96,50 58,58 50,96 42,58 4,50 42,42" fill="#fde047" stroke="#7c5a00" stroke-width="3"/><polygon points="50,4 58,42 96,50 50,50" fill="#fff7c2"/><polygon points="82,10 85,22 97,25 85,28 82,40 79,28 67,25 79,22" fill="#fff"/><polygon points="20,66 23,76 33,79 23,82 20,92 17,82 7,79 17,76" fill="#fde047"/></svg>`,
+        sweat: `<svg viewBox="0 0 100 100"><path d="M40 10 Q62 40 62 58 Q62 76 44 76 Q26 76 26 58 Q26 40 40 10 Z" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="4"/><path d="M34 52 Q34 44 38 38" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M74 40 Q86 56 86 66 Q86 76 77 76 Q68 76 68 66 Q68 56 74 40 Z" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="3"/></svg>`,
+        anger: `<svg viewBox="0 0 100 100"><g fill="none" stroke="#ef4444" stroke-width="11" stroke-linecap="round"><path d="M40 12 Q40 40 12 40"/><path d="M60 12 Q60 40 88 40"/><path d="M40 88 Q40 60 12 60"/><path d="M60 88 Q60 60 88 60"/></g></svg>`,
+        zzz: `<svg viewBox="0 0 100 100"><g fill="#c7d2fe" stroke="#312e81" stroke-width="3" stroke-linejoin="round"><polygon points="10,52 44,52 44,60 24,80 44,80 44,88 10,88 10,80 30,60 10,60"/><polygon points="54,22 80,22 80,28 64,44 80,44 80,50 54,50 54,44 70,28 54,28"/></g></svg>`,
+      };
+      const emoteEls = D.emotes.map(([, , , kind]) => { const d = document.createElement("div"); d.className = "emote"; d.innerHTML = SVG[kind]; $("hud").appendChild(d); return d; });
+
+      /* ---------------- cards: semi-transparent, back.out(1.7) spring in, slow micro-zoom while up ---------------- */
+      const CODE = '<span class="k">&lt;div</span> <span class="t">class</span>=<span class="s">"title"</span><span class="k">&gt;</span>\n  Hello!\n<span class="k">&lt;/div&gt;</span>\n<span class="k">&lt;script&gt;</span>\n  <span class="t">gsap</span>.from(<span class="s">".title"</span>,\n    { y: 200 })\n<span class="k">&lt;/script&gt;</span>';
+      function typeHTML(html, n) {
+        let out = "", shown = 0, i = 0;
+        while (i < html.length && shown < n) {
+          if (html[i] === "<") { const j = html.indexOf(">", i); out += html.slice(i, j + 1); i = j + 1; continue; }
+          if (html[i] === "&") { const j = html.indexOf(";", i); out += html.slice(i, j + 1); i = j + 1; shown++; continue; }
+          out += html[i++]; shown++;
+        }
+        const open = (out.match(/<span[^>]*>/g) || []).length - (out.match(/<\/span>/g) || []).length;
+        return out + "</span>".repeat(Math.max(0, open));
+      }
+      const fmt = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(Math.round(n)));
+      const wordAt = (i, prefix) => LINES[i].words.find((w) => w.w.toLowerCase().replace(/[^a-z0-9]/g, "").startsWith(prefix)).s;
+
+      /* the desk monitor: desktop with the mystery file, then code while Quill explains */
+      const mx = monC.getContext("2d");
+      function monitorAt(t) {
+        const W = 512, H = 312;
+        if (t < LINES[3].s) {
+          const g = mx.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#3b2a7a"); g.addColorStop(1, "#c2507a"); mx.fillStyle = g; mx.fillRect(0, 0, W, H);
+          mx.fillStyle = "rgba(0,0,0,0.35)"; mx.fillRect(0, 0, W, 22);
+          [["notes.txt", 40, 50], ["memes", 40, 140]].forEach(([n, x, y]) => { mx.fillStyle = "#e2e8f0"; mx.fillRect(x, y, 46, 56); mx.fillStyle = "#fff"; mx.font = "bold 16px sans-serif"; mx.fillText(n, x - 6, y + 78); });
+          const glow = 0.5 + 0.5 * Math.sin(t * 6);
+          mx.fillStyle = `rgba(250,204,21,${0.35 + 0.35 * glow})`; mx.fillRect(250, 80, 190, 150);
+          mx.fillStyle = "#111827"; mx.fillRect(300, 95, 90, 70); mx.fillStyle = "#f97316"; mx.beginPath(); mx.moveTo(335, 115); mx.lineTo(335, 145); mx.lineTo(360, 130); mx.fill();
+          mx.fillStyle = "#fff"; mx.font = "bold 20px sans-serif"; mx.fillText("hyperframes", 280, 200);
+        } else {
+          mx.fillStyle = "#0b1020"; mx.fillRect(0, 0, W, H);
+          const cols = ["#c084fc", "#60a5fa", "#4ade80", "#f472b6", "#e2e8f0"];
+          const scroll = Math.floor((t - LINES[3].s) * 3);
+          for (let r = 0; r < 12; r++) {
+            const n = (r + scroll) * 7919 % 97;
+            mx.fillStyle = cols[n % 5]; mx.fillRect(20 + (n % 3) * 24, 18 + r * 24, 80 + (n * 37) % 300, 10);
+          }
+        }
+        monT.needsUpdate = true;
+      }
+
+      function hud(t) {
+        $("dim").style.opacity = 0;
+        // ---------- Quill's screen as a portal ----------
+        const pi = D.portals.findIndex(([a, b]) => t >= a - 0.12 && t < b), P = D.portals[pi];
+        const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
+        const easeIn = (x) => clamp(x, 0, 1) ** 3;
+        let k = 0;
+        if (P) {
+          const [a, b] = P;
+          k = t < b - D.SHUT ? expoOut((t - a) / D.OPEN) : 1 - easeIn((t - (b - D.SHUT)) / D.SHUT);
+          if (t < a) k = 0;
+        }
+        window.__portalK = k;
+        const R = screenRect();
+        const full = { x: -24, y: -24, w: 1128, h: 1968 };
+        const lerpR = (A, B, u) => ({ x: A.x + (B.x - A.x) * u, y: A.y + (B.y - A.y) * u, w: A.w + (B.w - A.w) * u, h: A.h + (B.h - A.h) * u });
+        const rr = lerpR(R, full, k), rad = (1 - k) * R.h * 0.45;
+        const on = P && t >= P[0] - 0.12 && R.w > 1;
+        $("portal").style.clipPath = on ? `inset(${rr.y.toFixed(1)}px ${(1080 - rr.x - rr.w).toFixed(1)}px ${(1920 - rr.y - rr.h).toFixed(1)}px ${rr.x.toFixed(1)}px round ${rad.toFixed(1)}px)` : "inset(50% 50% 50% 50%)";
+        const sc = on ? Math.max(rr.w / 1080, 0.05) : 1;
+        $("pscreen").style.transform = on ? `translate(${rr.x.toFixed(1)}px, ${(rr.y + rr.h / 2 - 960 * sc).toFixed(1)}px) scale(${sc.toFixed(4)})` : "";
+
+        // a slow push while inside the screen, so a held line still has a living camera
+        if (P) { const tc = pi === 0 ? Math.min(t, D.hold) : t, cz = clamp((tc - P[0]) / (P[1] - P[0]), 0, 1); $("pin").style.transform = pi === 0 ? `scale(${(1 + 0.03 * cz).toFixed(4)})` : `scale(${(1 + 0.06 * cz).toFixed(4)}) translateY(${(-24 * cz).toFixed(1)}px) rotate(${(0.6 * Math.sin(t * 0.9)).toFixed(3)}deg)`; }
+        // ---------- what is on the screen ----------
+        const rows = D.rows.filter((r) => r[0] === pi);
+        const blink = Math.floor(t * 2.4) % 2 === 0;
+        const caret = '<span class="caret"></span>';
+        // terminal rows (portal 0 and 2): hanging-indent wrap, no pan; comments arrive whole with no cursor
+        let html = "", lastKind = "", lastDone = true;
+        const termRows = rows.filter((r) => r[1] === "cmd" || r[1] === "comment");
+        const esc = (x) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+        termRows.forEach((r, ri) => {
+          const [, kind, text, times, wrapAt] = r;
+          const shown = times.filter((x) => x <= t).length;
+          if (shown === 0 && t < times[0] && ri > 0) return;
+          if (ri > 0) html += "\n" + (kind === "cmd" && termRows[ri - 1][1] === "comment" ? "\n" : "");
+          let body = text.slice(0, shown);
+          if (wrapAt && shown > wrapAt) body = body.slice(0, wrapAt) + "\n    " + body.slice(wrapAt + 1);
+          html += kind === "comment" ? `<span class="cm">${esc(body)}</span>` : `<span class="ps">$ </span>${esc(body)}`;
+          lastKind = kind; lastDone = shown >= text.length;
+        });
+        const still = pi === 0 && t >= D.hold;
+        if (termRows.length && lastKind === "cmd" && !still) html += blink || !lastDone ? caret : "";
+        $("term").innerHTML = html;
+        $("term").style.transform = `translate(0px, ${pi === 2 ? 300 : 520}px)`;
+        $("term").style.opacity = termRows.length ? 1 : 0;
+
+        // the prompt (portal 1), typed as Quill says it
+        const pr = rows.find((r) => r[1] === "prompt");   // (the hint row is static text in #askHint)
+        $("ask").style.opacity = pr ? 1 : 0;
+        if (pr) {
+          const shown = pr[3].filter((x) => x <= t).length;
+          const txt = pr[2].slice(0, shown).replace("/hyperframes", '<span class="sl">/hyperframes</span>');
+          $("askBox").innerHTML = `<span class="gt">&gt; </span>${txt}${blink || shown < pr[2].length ? caret : ""}`;
+          const [w0, w1] = D.working, wOn = t >= w0 && t < w1;
+          $("work").style.opacity = wOn ? 1 : 0;
+          $("work").textContent = "✻ " + ["Working", "Working.", "Working..", "Working..."][Math.floor((t - w0) * 4) % 4 < 0 ? 0 : Math.floor((t - w0) * 4) % 4];
+        }
+        // preview -> render -> file (portal 2)
+        const pvOn = pi === 2 && t >= D.previewAt;
+        const pvU = pvOn ? expoOut((t - D.previewAt) / 0.5) : 0;
+        const into = t >= D.fileAt - 0.2 ? easeIn((t - (D.fileAt - 0.2)) / 0.2) : 0;     // the preview collapses into the file
+        $("pv").style.opacity = pvOn && into < 1 ? 1 : 0;
+        $("pv").style.transform = `translateY(${(120 * (1 - pvU) + 60 * into).toFixed(1)}px) scale(${((1.12 - 0.12 * pvU) * (1 - 0.7 * into)).toFixed(4)})`;
+        const ft = clamp((t - D.previewAt - 0.25) / 1.1, 0, 1);       // the title fades in: exactly what the prompt asked for
+        $("pvTitle").style.opacity = ft; $("pvTitle").style.transform = `translateY(${(26 * (1 - ft)).toFixed(1)}px)`;
+        const fOn = pi === 2 && t >= D.fileAt, fu = fOn ? expoOut((t - D.fileAt) / 0.35) : 0;
+        $("file").style.opacity = fOn ? 1 : 0;
+        $("file").style.transform = `scale(${(2.6 - 1.6 * fu).toFixed(4)})`;     // lands from oversize, decelerating, no bounce
+
+        // ---------- the ending: Quill's own screen says "part 2" ----------
+        const f2 = t >= D.part2 ? expoOut((t - D.part2) / 0.3) : 0;
+        $("face2").style.opacity = t >= D.part2 ? (1 - smooth((t - D.loop) / 0.27)).toFixed(3) : 0;
+        if (t >= D.part2) {
+          const h = R.h * 0.9, w = R.w * 0.92;
+          $("face2").style.width = w + "px"; $("face2").style.height = h + "px";
+          $("face2").style.fontSize = Math.min(h * 0.34, w / (8 * 0.66)).toFixed(1) + "px";
+          const z = 1.12 - 0.12 * f2;
+          $("face2").style.transform = `translate(${(R.x + R.w / 2 - (w * z) / 2).toFixed(1)}px, ${(R.y + R.h / 2 - (h * z) / 2).toFixed(1)}px) scale(${z.toFixed(4)})`;
+        }
+
+        // ---------- captions: word by word, chunked, speaker colour on the active word ----------
+        const li = lineAt(t), L = LINES[li], capOn = t >= L.s - 0.05 && t < L.e + 0.02;
+        $("cap").style.opacity = capOn ? 1 : 0;
+        if (capOn) {
+          const ws = L.words, chunks = [[]];
+          ws.forEach((w, j) => { chunks[chunks.length - 1].push(j); if (/[.,!?]$/.test(w.w) || chunks[chunks.length - 1].length >= 4) chunks.push([]); });
+          const act = Math.max(0, ws.findIndex((w) => t < w.e) === -1 ? ws.length - 1 : ws.findIndex((w) => t < w.e));
+          const ch = chunks.find((c) => c.includes(act)) || chunks[0];
+          $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on " + L.who : ""}">${ws[j].w}</span>`).join(" ") + "</span>";
+        }
+      }
+
+      // Quill's face-screen rectangle on the frame (projected corners of the screen pivot)
+      const _v = new THREE.Vector3();
+      function screenRect() {
+        quill.group.updateMatrixWorld(true);
+        let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+          _v.set(sx * 0.125, sy * 0.085, 0.02); quill.screen.localToWorld(_v); _v.project(camera);
+          if (_v.z > 1) return { x: 540, y: 960, w: 0, h: 0 };
+          const px = (_v.x + 1) / 2 * 1080, py = (1 - _v.y) / 2 * 1920;
+          x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+        }
+        return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+      }
+
+      // Quill's screen light: cyan wash that swells before the first dive and during every dive approach
+      const qLight = new THREE.PointLight(0x5eead4, 0, 0.7, 2); scene.add(qLight);
+      const _n = new THREE.Vector3(), _q = new THREE.Quaternion();
+
+      function renderAt(t) {
+        monitorAt(t);
+        const shotNow = D.shots[beatAt(D.shots, t)][1];
+        // Shichi: pose + expression eased between beats
+        const di = beatAt(D.dev, t), [d0, dExpr, dPose] = D.dev[di], [, pExpr, pPose] = D.dev[Math.max(0, di - 1)];
+        const dk = di === 0 ? 1 : seg(t, d0, d0 + 0.25);
+        const pose = dev.blend(pPose, dPose, dk);
+        const qTalking = LINES[lineAt(t)].who === "quill";
+        pose.head = [(pose.head?.[0] || 0) + 0.02 * Math.sin(t * 1.3), (pose.head?.[1] || 0) + (qTalking ? 0.32 : 0) + 0.04 * Math.sin(t * 1.1), (pose.head?.[2] || 0) + 0.03 * Math.sin(t * 1.7)];
+        if (dPose === "angry") pose.body = [0.12, 0, 0.03 * Math.sin(t * 30) * (t < S(18) + 0.6 ? 1 : 0)];
+        dev.pose(pose);
+        const hop = dExpr === "shock" || dExpr === "horror" ? 0.025 * Math.max(0, Math.sin(Math.min(1, (t - d0) / 0.25) * Math.PI)) : 0;
+        const sleeping = t >= SLP0 && t < SLP1, facingMonitor = shotNow.startsWith("hook");
+        dev.group.position.set(-0.32, 0.004 * Math.sin(t * 2.4) + hop, sleeping ? -0.02 : 0);
+        dev.group.rotation.y = sleeping ? Math.PI : facingMonitor ? Math.PI + 0.15 : 0.35;
+        quill.group.visible = !sleeping && !facingMonitor; monBox.visible = monStand.visible = mon.visible = !facingMonitor;   // the camera is the monitor here
+        // monitor-POV hook: warm key from the camera side, dim cyan rim, so his face keeps its skin tone
+        if (facingMonitor) { key.position.set(-1.0, 2.2, -2.6); rim.intensity = 0.35; screenLight.intensity = 0.6; }
+        else { key.position.set(1.4, 2.6, 2.4); rim.intensity = 1.5; screenLight.intensity = 1.2; } mug.visible = !sleeping;
+        dev.face({ expr: pExpr, to: dExpr, k: dk, talk: mouthOf("dev", t), blink: dExpr === "asleep" ? 1 : blinkOf(BLINK_DEV, t), t });
+
+        // Quill: mood + gesture, idle bob and blinks all the time (also behind the cards)
+        const qi = beatAt(D.quill, t), [q0, qMood, qGest] = D.quill[qi];
+        quill.face({ mood: qMood, talk: mouthOf("quill", t), blink: blinkOf(BLINK_Q, t), t });
+        quill.update(t, qGest, seg(t, q0, q0 + 0.3));
+        quill.group.position.set(0.34 + (qMood === "wince" ? 0.06 * seg(t, q0, q0 + 0.12) : 0), 0.2 + 0.012 * Math.sin(t * 1.9), 0.05);
+        quill.group.rotation.y = -0.45 + (qTalking ? 0 : -0.15);
+
+        let [cp, cl] = camAt(t);
+        const dp = D.portals.find(([a, b]) => t >= a - 0.12 && t < b);
+        quill.group.updateMatrixWorld(true);
+        quill.screen.getWorldPosition(_v); quill.screen.getWorldQuaternion(_q); _n.set(0, 0, 1).applyQuaternion(_q);
+        if (dp) {
+          const [a, b] = dp, Q = [[0.0, 0.78, 1.35], [0.34, 0.62, 0]];
+          const into = clamp((t - (a - 0.12)) / (D.OPEN + 0.12), 0, 1) ** 2, out = t > b - D.SHUT ? (t - (b - D.SHUT)) / D.SHUT : 0;
+          const u = into * (1 - 0.6 * out);
+          const tgt = [_v.x + _n.x * 0.16, _v.y + _n.y * 0.16, _v.z + _n.z * 0.16];
+          cp = Q[0].map((x, j) => x + (tgt[j] - x) * u); cl = Q[1].map((x, j) => x + ([_v.x, _v.y, _v.z][j] - x) * u);
+        }
+        camera.position.set(...cp); camera.lookAt(...cl);
+        const glow = (t >= D.glow[0] && t < D.glow[1] + D.OPEN) ? clamp((t - D.glow[0]) / (D.glow[1] - D.glow[0]), 0, 1) : (dp ? 1 : 0);
+        qLight.position.set(_v.x + _n.x * 0.25, _v.y + _n.y * 0.25, _v.z + _n.z * 0.25); qLight.intensity = (dp || D.shots[beatAt(D.shots, t)][1].startsWith("quill")) ? 1.5 * glow : 0;   // only while the camera is on Quill
+        hud(t);
+        if ((window.__portalK || 0) < 0.999) renderer.render(scene, camera);   // fully inside the screen: no 3D draw needed
+
+        // emotes ride above the heads, springing in with back.out(1.7)
+        D.emotes.forEach(([a, b, who], n) => {
+          const el = emoteEls[n], on = t >= a && t < b;
+          el.style.opacity = on ? 1 - seg(t, b - 0.12, b) : 0;
+          if (!on) return;
+          const anchor = who === "dev" ? dev.rig.head.localToWorld(new THREE.Vector3(0.17, 0.42, 0)) : quill.group.localToWorld(new THREE.Vector3(-0.22, 0.72, 0));
+          const v = anchor.project(camera);
+          let x = clamp((v.x + 1) / 2 * 1080, 140, 900), y = clamp((1 - v.y) / 2 * 1920, 260, 1300);
+          if (D.emotes[n][3] === "sparkle") {
+            const pop = D.cards.map((c) => c[0]).map($).find((e) => +e.style.opacity > 0.5);
+            if (pop) { const r = pop.getBoundingClientRect(); x = Math.min(r.right - 60, 880); y = Math.max(r.top + 60, 300); }
+            else { x = Math.max(x, 300); y = Math.max(y, 320); }   // never near the @shichi.ai mark
+          }
+          el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${springIn(t, a, 0.3).toFixed(3)}) rotate(${(8 * Math.sin(t * 6)).toFixed(1)}deg)`;
+        });
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["tutorial-hyperframes"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>

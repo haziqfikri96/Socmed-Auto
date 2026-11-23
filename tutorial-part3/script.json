@@ -1,0 +1,45 @@
+[
+ [
+  "dev",
+  "Part three! I made my first video... why does it look like a PowerPoint?"
+ ],
+ [
+  "quill",
+  "Because you didn't ask for motion or sound. Watch."
+ ],
+ [
+  "quill",
+  "Tell Claude three things: camera zoom, spring text physics, and sound effects.",
+  0.5
+ ],
+ [
+  "dev",
+  "Just those three?"
+ ],
+ [
+  "quill",
+  "Listen.",
+  0.25
+ ],
+ [
+  "quill",
+  "Before: flat and silent.",
+  1.0
+ ],
+ [
+  "quill",
+  "After: camera push, snappy text, and sound hits."
+ ],
+ [
+  "dev",
+  "Whoa! Same prompt, completely different vibe!"
+ ],
+ [
+  "quill",
+  "Motion plus sound is everything. Save this for your next video!"
+ ],
+ [
+  "quill",
+  "Follow Shichi dot AI for more!"
+ ]
+]

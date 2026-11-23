@@ -1,0 +1,14 @@
+Part 3: why your AI video looks like a PowerPoint 🎬
+
+Tell Claude three things:
+1. Camera zoom
+2. Spring text physics
+3. Sound effects (whoosh + impact)
+
+Prompt: "Add camera zoom, spring text physics, and whoosh + impact SFX"
+
+Same video, completely different vibe. Motion plus sound is everything. Save this for your next video!
+
+Made with HyperFrames (github.com/heygen-com/hyperframes, Apache 2.0, by HeyGen)
+
+#claudecode #ai #videoediting #tutorial #motiondesign

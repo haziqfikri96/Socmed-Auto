@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="direction.js"></script>
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js" } }
+    </script>
+    <style>
+      /* TikTok safe zone: every text, badge, panel and caption inside x 80–940, y 180–1600 */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #05070c; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; }
+      #bg { position: absolute; inset: 0; z-index: 0;
+        background: linear-gradient(rgba(0,229,255,0.045) 1px, transparent 1px) 0 0 / 60px 60px, linear-gradient(90deg, rgba(0,229,255,0.045) 1px, transparent 1px) 0 0 / 60px 60px,
+                    radial-gradient(circle at 50% 35%, #0e1f38 0%, #070c16 60%, #04060b 100%); }
+      video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; object-fit: cover; }
+      #vHook, #vLoop { z-index: 3; } #vSplit, #vMol { z-index: 2; } #vPay { z-index: 4; } #vLoop { z-index: 6; }
+      #wire { position: absolute; left: 100px; top: 320px; width: 820px; height: 520px; z-index: 2; border-radius: 18px; }
+      #hud { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+      .mono { font-family: 'JetBrains Mono', monospace; }
+      .win { position: absolute; border-radius: 22px; border: 3px solid rgba(120,200,255,0.35); background: rgba(10,16,28,0.96); overflow: hidden; }
+      .bar { height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 18px; background: #0d1626; border-bottom: 2px solid rgba(120,200,255,0.18);
+        font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: #8fb3d9; }
+      .dot { width: 14px; height: 14px; border-radius: 50%; } .r { background: #ff5f57; } .y { background: #febc2e; } .g { background: #28c840; }
+      /* hook */
+      #hook { position: absolute; left: 80px; width: 920px; top: 330px; text-align: center; z-index: 7; font-weight: 900; font-size: 86px; line-height: 92px; letter-spacing: -0.02em; }
+      #hook span { display: inline-block; padding: 6px 26px 10px; border-radius: 22px; background: rgba(4,8,16,0.82); border: 3px solid rgba(0,229,255,0.85); }
+      #hook em { font-style: normal; color: #00E5FF; }
+      /* IDE */
+      #ide { left: 80px; top: 520px; width: 860px; height: 880px; opacity: 0; background: transparent; }
+      #ide .bar { position: absolute; left: 0; right: 0; top: 0; }
+      #code { position: absolute; left: 0; top: 46px; width: 340px; bottom: 0; background: rgba(10,16,28,0.97); border-right: 2px solid rgba(120,200,255,0.18); padding: 18px 16px;
+        font-family: 'JetBrains Mono', monospace; font-size: 21px; line-height: 38px; color: #cfe3f7; white-space: pre; }
+      #code .k { color: #c792ea; } #code .s { color: #c3e88d; } #code .n { color: #f78c6c; } #code .c { color: #5f7a99; } #code .f { color: #82aaff; }
+      #prevTag { position: absolute; right: 16px; top: 62px; padding: 4px 12px; border-radius: 10px; background: rgba(4,8,16,0.85); border: 2px solid #28c840; color: #9cf5ad; font-size: 18px; }
+      /* pipeline */
+      #pipe { position: absolute; left: 80px; top: 300px; width: 860px; height: 1060px; opacity: 0; }
+      .card { position: absolute; left: 70px; width: 720px; height: 230px; border-radius: 26px; background: linear-gradient(135deg, #12233d, #0b1424); border: 4px solid rgba(0,229,255,0.35);
+        padding: 30px 34px 0 150px; opacity: 0; transform-origin: 50% 50%; }
+      .card .num { position: absolute; left: 34px; top: 50px; width: 90px; height: 90px; border-radius: 22px; background: rgba(0,229,255,0.14); border: 3px solid #00E5FF;
+        font: 900 50px/84px 'Montserrat'; text-align: center; color: #00E5FF; }
+      .card h3 { font-size: 50px; white-space: nowrap; font-weight: 900; letter-spacing: -0.02em; }
+      .card p { margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 25px; color: #9fc3e6; }
+      .arrow { position: absolute; left: 50%; width: 8px; margin-left: -4px; height: 0; background: #00E5FF; border-radius: 4px; }
+      .arrow::after { content: ""; position: absolute; left: 50%; bottom: -14px; margin-left: -13px; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 18px solid #00E5FF; }
+      /* step 1 */
+      .badge { position: absolute; left: 50%; top: 212px; padding: 12px 28px; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 36px; letter-spacing: 0.04em;
+        background: rgba(4,12,24,0.88); border: 3px solid #00E5FF; color: #00E5FF; opacity: 0; white-space: nowrap; transform-origin: 50% 50%; }
+      .frame { position: absolute; left: 100px; width: 820px; height: 520px; border-radius: 18px; border: 3px solid rgba(0,229,255,0.5); opacity: 0; }
+      .ptag { position: absolute; left: 18px; top: 16px; padding: 5px 14px; border-radius: 10px; background: rgba(4,8,16,0.85); font: 800 21px 'JetBrains Mono'; color: #00E5FF; border: 2px solid rgba(0,229,255,0.6); }
+      .ptag.final { color: #FFD29A; border-color: #FF9F1C; }
+      #scan { position: absolute; left: 100px; width: 820px; height: 10px; background: linear-gradient(90deg, rgba(0,229,255,0), #00E5FF 30%, #b8fbff 50%, #00E5FF 70%, rgba(0,229,255,0)); opacity: 0; }
+      #divider { position: absolute; top: 860px; width: 6px; height: 520px; background: #00E5FF; opacity: 0; border-radius: 3px; }
+      /* step 2 timeline */
+      #tl { left: 80px; top: 330px; width: 860px; height: 1020px; opacity: 0; transform-origin: 50% 50%; }
+      #chip { position: absolute; left: 24px; right: 24px; top: 70px; padding: 16px 20px; border-radius: 14px; background: #08101d; border: 2px solid rgba(120,200,255,0.22);
+        font: 700 23px/34px 'JetBrains Mono'; color: #cfe3f7; white-space: pre; }
+      #chip .a { color: #ffcb6b; } #chip .s { color: #c3e88d; } #chip .t { color: #f07178; }
+      .row { position: absolute; left: 24px; right: 24px; height: 150px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 2px solid rgba(120,200,255,0.12); }
+      .row .lab { position: absolute; left: 0; top: 0; bottom: 0; width: 140px; display: flex; align-items: center; justify-content: center; font: 800 22px 'JetBrains Mono'; color: #8fb3d9;
+        border-right: 2px solid rgba(120,200,255,0.12); }
+      .lane { position: absolute; left: 150px; right: 14px; top: 14px; bottom: 14px; }
+      .vclip { position: absolute; top: 18px; bottom: 18px; border-radius: 10px; font: 800 18px/86px 'JetBrains Mono'; text-align: center; color: #06101d; overflow: hidden; white-space: nowrap; }
+      .wbar { position: absolute; bottom: 50%; width: 4px; border-radius: 2px; background: #3d7ab8; transform: translateY(50%); }
+      .mk { position: absolute; top: 24px; transform: translateX(-50%); padding: 8px 12px; border-radius: 10px; font: 800 18px 'JetBrains Mono'; color: #9fc3e6; background: #0d1a2c;
+        border: 2px solid rgba(120,200,255,0.35); white-space: nowrap; }
+      .mk::after { content: ""; position: absolute; left: 50%; top: 100%; width: 3px; height: 50px; margin-left: -1.5px; background: rgba(120,200,255,0.35); }
+      .mk.on { color: #04121c; background: #00E5FF; border-color: #b8fbff; } .mk.on::after { background: #00E5FF; }
+      #ph { position: absolute; top: 300px; height: 690px; width: 4px; margin-left: -2px; background: #00E5FF; }
+      #ph::before { content: ""; position: absolute; left: 50%; top: -14px; margin-left: -14px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 18px solid #00E5FF; }
+      #ring { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 5px solid #00E5FF; opacity: 0; }
+      /* step 3 terminal */
+      #term { left: 80px; top: 620px; width: 860px; height: 460px; opacity: 0; }
+      #tbody { padding: 26px 28px; font: 700 27px/48px 'JetBrains Mono'; color: #cfe3f7; white-space: pre-wrap; }
+      #tbody .p { color: #28c840; } #tbody .dim { color: #6c86a6; } #tbody .ok { color: #7dffa1; }
+      #prog { margin-top: 10px; height: 26px; border-radius: 13px; background: #142338; overflow: hidden; } #progFill { height: 100%; width: 0; background: linear-gradient(90deg, #00b8d4, #00E5FF); }
+      #cta { position: absolute; left: 50%; top: 420px; padding: 16px 30px; border-radius: 999px; background: #00E5FF; color: #04121c; font-weight: 900; font-size: 38px; white-space: nowrap;
+        opacity: 0; transform-origin: 50% 50%; z-index: 7; border: 4px solid #e8fdff; }
+      #smear { position: absolute; inset: 0; opacity: 0; z-index: 8; pointer-events: none;
+        background: repeating-linear-gradient(0deg, rgba(200,230,255,0.12) 0 3px, rgba(0,0,0,0) 3px 17px), linear-gradient(90deg, rgba(5,7,12,0.6), rgba(5,7,12,0) 30%, rgba(5,7,12,0) 70%, rgba(5,7,12,0.6)); }
+      #streak { position: absolute; inset: 0; opacity: 0; z-index: 8; pointer-events: none;
+        background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 40px, rgba(220,240,255,0.16) 40px 140px, rgba(255,255,255,0) 140px 230px, rgba(255,190,140,0.10) 230px 300px, rgba(255,255,255,0) 300px 420px); }
+      /* captions: one pill, centred on y = 1440 in every shot */
+      #cap { position: absolute; left: 80px; width: 860px; top: 1395px; height: 90px; text-align: center; z-index: 9; }
+      #cap .ch { display: inline-block; padding: 8px 26px 12px; border-radius: 20px; background: rgba(6,12,24,0.8); border: 2px solid rgba(255,255,255,0.16); white-space: nowrap;
+        font-size: 58px; line-height: 70px; font-weight: 900; color: #fff; }
+      #cap .on { color: #00E5FF; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="mpemba-bts" data-start="0" data-duration="18.13" data-width="1080" data-height="1920" data-fps="30">
+      <div id="bg" class="clip" data-start="0" data-duration="18.13" data-track-index="0"></div>
+      <video id="vHook" src="assets/clip_race.mp4" muted playsinline data-start="0" data-duration="3.45" data-media-start="1.0" data-track-index="1"></video>
+      <video id="vSplit" src="assets/clip_race.mp4" muted playsinline data-start="5.454" data-duration="2.88" data-media-start="1.5" data-track-index="2"></video>
+      <video id="vMol" src="assets/clip_mol.mp4" muted playsinline data-start="8.333" data-duration="1.141" data-media-start="1.4" data-track-index="3"></video>
+      <video id="vPay" src="assets/clip_pay.mp4" muted playsinline data-start="15.25" data-duration="2.88" data-media-start="0.5" data-track-index="4"></video>
+      <video id="vLoop" src="assets/clip_race.mp4" muted playsinline data-start="17.85" data-duration="0.28" data-media-start="0.72" data-track-index="5"></video>
+      <canvas id="wire" class="clip" width="820" height="520" data-start="5.454" data-duration="4.02" data-track-index="6"></canvas>
+      <div id="hud" class="clip" data-start="0" data-duration="18.13" data-track-index="7" data-layout-allow-overlap data-layout-allow-overflow>
+        <div id="ide" class="win"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;mpemba-effect/index.html — Claude Code</div>
+          <div id="code"></div><div id="prevTag" class="mono">● preview</div></div>
+        <div id="pipe">
+          <div class="card" id="c0" style="top:40px"><div class="num">1</div><h3>Three.js 3D</h3><p>beakers · steam · H₂O</p></div>
+          <div class="arrow" id="a0" style="top:290px"></div>
+          <div class="card" id="c1" style="top:400px"><div class="num">2</div><h3>Audio + SFX</h3><p>ElevenLabs voice · Foley</p></div>
+          <div class="arrow" id="a1" style="top:650px"></div>
+          <div class="card" id="c2" style="top:760px"><div class="num">3</div><h3>HyperFrames MP4</h3><p>HTML → MP4, 100% local</p></div>
+        </div>
+        <div class="badge" id="b1">100% LOCAL THREE.JS</div>
+        <div class="frame" id="fTop" style="top:320px"><div class="ptag" id="tagTop">WIREFRAME + NORMALS PASS</div></div>
+        <div class="frame" id="fBot" style="top:860px"><div class="ptag final">FINAL PBR RENDER</div></div>
+        <div id="scan"></div><div id="divider"></div>
+        <div id="tl" class="win"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;HyperFrames timeline · data-* clips</div>
+          <div id="chip"></div>
+          <div class="row" style="top:300px"><div class="lab">VIDEO</div><div class="lane" id="laneV"></div></div>
+          <div class="row" style="top:470px"><div class="lab">VOICE</div><div class="lane" id="laneW"></div></div>
+          <div class="row" style="top:640px"><div class="lab">SFX</div><div class="lane" id="laneS"></div></div>
+          <div class="row" style="top:810px"><div class="lab">MUSIC</div><div class="lane"><div class="vclip" style="left:0;right:0;background:linear-gradient(90deg,#5b3fa8,#7a5cd6);color:#fff">tech_pulse.wav · ducked under voice</div></div></div>
+          <div id="ph"></div><div id="ring"></div>
+        </div>
+        <div id="term" class="win"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;zsh — mpemba-effect</div>
+          <div id="tbody"><div id="cmd"></div><div id="l1" class="dim"></div><div id="prog"><div id="progFill"></div></div><div id="l2" class="dim"></div><div id="l3" class="ok"></div></div></div>
+        <div id="hook"><span>Claude coded<br />this <em>3D video</em></span></div>
+        <div id="cta">Comment "PROMPT" for the template 👇</div>
+        <div id="smear"></div><div id="streak"></div>
+        <div id="cap"></div>
+      </div>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="18.13" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 18.13 }, 0);
+      window.__timelines["mpemba-bts"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      const LINES = window.LINES, D = window.D, DUR = D.DUR, C = D.cues;
+      const $ = (id) => document.getElementById(id);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const lin = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+      const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
+      const backOut = (x, c1 = 1.7) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const bell = (t, a, b) => (t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a)));
+      const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const vid = (id, x, y, s, clip) => { const v = $(id); v.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${s.toFixed(4)})`; v.style.clipPath = clip || "none"; };
+
+      /* ---------- static content ---------- */
+      const CODE = [
+        ['<span class="c">// index.html</span>'], ['<span class="k">import</span> * <span class="k">as</span> THREE'],
+        ['<span class="k">const</span> glass = <span class="k">new</span>'], ['  <span class="f">MeshPhysical</span>({'],
+        ['    transmission: <span class="n">1</span>,'], ['    ior: <span class="n">1.5</span> })'],
+        ['<span class="f">Lathe</span>(beakerProfile)'], ['<span class="f">makeIceTex</span>(seed)'],
+        ['<span class="f">steamAt</span>(t, <span class="n">0.9</span>)'], ['<span class="f">UnrealBloom</span>(<span class="n">0.3</span>)'],
+        ['<span class="f">onSeek</span>(renderAt)'], ['<span class="c">// ✓ 30 s, 1080×1920</span>'],
+      ];
+      $("chip").innerHTML = '&lt;<span class="t">audio</span> <span class="a">src</span>=<span class="s">"ice_crack.wav"</span>\n       <span class="a">data-start</span>=<span class="s">"1.60"</span> /&gt;';
+      const VC = [["race", 0, 16, "#ffb27a"], ["gauge", 16, 35, "#7fd0ff"], ["evap", 35, 50, "#ffd29a"], ["x-ray", 50, 65, "#ff9f6b"], ["H₂O", 65, 83, "#6fe7ff"], ["payoff", 83, 100, "#e6f6ff"]];
+      $("laneV").innerHTML = VC.map(([n, a, b, c]) => `<div class="vclip" style="left:${a}%;width:${b - a - 0.8}%;background:${c}">${n}</div>`).join("");
+      $("laneW").innerHTML = D.bars.map((h, i) => `<div class="wbar" id="w${i}" style="left:${(i / D.bars.length * 100).toFixed(2)}%;height:${Math.max(4, h * 96).toFixed(0)}px"></div>`).join("");
+      // SFX markers: the playhead crosses ice_crack.wav and whoosh.wav exactly when Will says "ice crack" and "whoosh"
+      const SW = C.sweep, fr = (t) => (t - SW[0]) / (SW[1] - SW[0]);
+      const MK = [["impact.wav", 0.08, 0], ["steam.wav", 0.3, 1], ["ice_crack.wav", fr(C.crack), 0], ["whoosh.wav", fr(C.whoosh), 1], ["pop.wav", 0.93, 0]];
+      $("laneS").innerHTML = MK.map(([n, f, row], i) => `<div class="mk" id="m${i}" style="left:${(f * 100).toFixed(2)}%;top:${row ? 62 : 6}px">${n}</div>`).join("");
+
+      /* ---------- step 1: live wireframe / normals pass (Three.js) ---------- */
+      const renderer = new THREE.WebGLRenderer({ canvas: $("wire"), antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1); renderer.setSize(820, 520, false);
+      const scene = new THREE.Scene(); scene.background = new THREE.Color(0x050d1a);
+      const camera = new THREE.PerspectiveCamera(30, 820 / 520, 0.01, 20);
+      const grid = new THREE.GridHelper(3, 30, 0x1d4f7a, 0x10304d); scene.add(grid);
+      const BR = 0.15, BH = 0.36;
+      const prof = [[0, 0], [BR - 0.012, 0], [BR, 0.012], [BR, BH], [BR + 0.012, BH + 0.008]].map(([x, y]) => new THREE.Vector2(x, y));
+      const beakers = new THREE.Group(); scene.add(beakers);
+      for (const [x, c] of [[-0.19, 0xff9f6b], [0.19, 0x6fe7ff]]) {
+        const g = new THREE.Mesh(new THREE.LatheGeometry(prof, 24), new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: 0.75 })); g.position.x = x; beakers.add(g);
+        const w = new THREE.Mesh(new THREE.CylinderGeometry(BR - 0.01, BR - 0.01, 0.3, 24, 6), new THREE.MeshNormalMaterial({ transparent: true, opacity: 0.55 })); w.position.set(x, 0.16, 0); beakers.add(w);
+        const ww = new THREE.Mesh(w.geometry, new THREE.MeshBasicMaterial({ color: c, wireframe: true })); ww.position.copy(w.position); ww.scale.setScalar(1.002); beakers.add(ww);
+      }
+      const R1 = rng(4), steamPts = [];
+      const steamGeo = new THREE.BufferGeometry(); const sp = new Float32Array(90 * 3); steamGeo.setAttribute("position", new THREE.BufferAttribute(sp, 3));
+      for (let i = 0; i < 90; i++) steamPts.push([R1(), (R1() - 0.5) * 0.12, (R1() - 0.5) * 0.12, 0.5 + R1() * 0.6]);
+      const steam = new THREE.Points(steamGeo, new THREE.PointsMaterial({ color: 0xbfefff, size: 0.012 })); beakers.add(steam);
+      // H2O lattice (hexagonal) as wireframe spheres
+      const lat = new THREE.Group(); lat.visible = false; scene.add(lat);
+      const sites = [], mols = [], R2 = rng(8);
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) sites.push([c * 0.2 + (r % 2) * 0.1 - 0.45, r * 0.173 + 0.05, 0]);
+      const oG = new THREE.IcosahedronGeometry(0.045, 1), hG = new THREE.IcosahedronGeometry(0.026, 1);
+      sites.forEach((p, i) => { const m = new THREE.Group(); m.add(new THREE.Mesh(oG, new THREE.MeshBasicMaterial({ color: 0xff6b6b, wireframe: true })));
+        for (const s of [-1, 1]) { const h = new THREE.Mesh(hG, new THREE.MeshBasicMaterial({ color: 0xe6f6ff, wireframe: true })); const a = s * 0.912; h.position.set(Math.sin(a) * 0.06, -Math.cos(a) * 0.06, 0); m.add(h); }
+        lat.add(m); mols.push([m, p, [(R2() - 0.5) * 1.1, R2() * 0.7, (R2() - 0.5) * 0.4], R2() * 6.28, Math.hypot(p[0] + 0.45, p[1] - 0.05)]); });
+      const bondGeo = new THREE.BufferGeometry(); const bonds = new THREE.LineSegments(bondGeo, new THREE.LineBasicMaterial({ color: 0x00e5ff })); lat.add(bonds);
+      const pairs = []; sites.forEach((a, i) => sites.forEach((b, j) => { if (j > i && Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.215) pairs.push([i, j]); }));
+      function wireAt(t) {
+        const u = t - C.step1, molMode = t >= C.mol;
+        const ang = -0.35 + u * 0.12;
+        camera.position.set(Math.sin(ang) * 1.25, molMode ? 0.32 : 0.42, Math.cos(ang) * 1.25); camera.lookAt(0, molMode ? 0.3 : 0.17, 0);
+        beakers.visible = !molMode; lat.visible = molMode;
+        steamPts.forEach(([off, x, z, s], i) => { const p = ((t * 0.35 * s + off) % 1); sp[i * 3] = -0.19 + x * (0.4 + p); sp[i * 3 + 1] = 0.33 + p * 0.35; sp[i * 3 + 2] = z * (0.4 + p); });
+        steamGeo.attributes.position.needsUpdate = true;
+        if (molMode) {
+          const pts = [], snapped = [];
+          mols.forEach(([m, site, rnd, ph, d]) => { const k = expoOut((t - C.mol - 0.15 - d * 0.45) / 0.25);
+            m.position.set(lerp(rnd[0] + Math.sin(t * 3 + ph) * 0.03, site[0], k), lerp(rnd[1] + Math.cos(t * 2.6 + ph) * 0.03, site[1], k), lerp(rnd[2], site[2], k));
+            m.rotation.set(lerp(ph + t, 0, k), lerp(ph * 0.7 + t * 0.8, 0, k), 0); snapped.push(k > 0.95); });
+          pairs.forEach(([i, j]) => { if (snapped[i] && snapped[j]) { const a = mols[i][0].position, b = mols[j][0].position; pts.push(a.x, a.y, a.z, b.x, b.y, b.z); } });
+          bondGeo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3)); bondGeo.computeBoundingSphere();
+        }
+        renderer.render(scene, camera);
+      }
+
+      /* ---------- per-frame ---------- */
+      function renderAt(t) {
+        // ===== shot 1: result-first hook, then shrink into the IDE preview =====
+        const sh = seg(t, C.shrink[0], C.shrink[1]);
+        const pS = 834 / 1920, pX = 80 + 340 + (520 - 1080 * pS) / 2, pY = 566;   // preview pane, absolute px
+        const wp = seg(t, C.whipPipe - 0.05, C.whipPipe + 0.25);            // whip: everything slides left
+        const shiftOut = -1300 * wp;
+        vid("vHook", lerp(0, pX, sh) + shiftOut, lerp(0, pY, sh), lerp(1, pS, sh));
+        const ide = $("ide"); ide.style.opacity = sh > 0.01 ? Math.min(1, sh * 1.4) : 0; ide.style.transform = `translateX(${shiftOut.toFixed(1)}px) scale(${lerp(1.08, 1, sh).toFixed(3)})`;
+        const nCode = Math.floor(clamp((t - C.shrink[0] - 0.2) / 1.5, 0, 1) * CODE.length);
+        $("code").innerHTML = CODE.slice(0, nCode).map((l) => l[0]).join("\n") + (t % 0.5 < 0.25 ? "▍" : " ");
+        const hk = $("hook"); hk.style.opacity = t < C.whipPipe + 0.1 ? 1 : 0;
+        hk.style.transform = `translateX(${shiftOut.toFixed(1)}px) scale(${(1.22 - 0.22 * expoOut(t / 0.2) + 0.04 * bell(t, 1.2, 1.6)).toFixed(3)})`;
+
+        // ===== shot 2: pipeline diagram =====
+        const pipeIn = seg(t, C.whipPipe - 0.05, C.whipPipe + 0.25), pipeOut = seg(t, C.step1 - 0.1, C.step1 + 0.15);
+        const pipe = $("pipe"); pipe.style.opacity = t > C.whipPipe - 0.05 && t < C.step1 + 0.15 ? 1 : 0;
+        pipe.style.transform = `translateX(${(1300 * (1 - pipeIn) - 1300 * pipeOut).toFixed(1)}px)`;
+        C.cards.forEach((ct, i) => { const k = (t - ct) / 0.28, c = $("c" + i); c.style.opacity = t >= ct ? 1 : 0.28;
+          const glow = t >= ct ? 0.35 + 0.65 * Math.max(0, 1 - (t - ct) / 0.5) : 0.35;
+          c.style.borderColor = `rgba(0,229,255,${glow.toFixed(3)})`; c.style.transform = `scale(${t >= ct ? (1.25 - 0.25 * backOut(k, 2.2)).toFixed(3) : 1.25})`;
+          if (i < 2) { const a = $("a" + i); const ah = 70 * expoOut((t - C.cards[i + 1] + 0.12) / 0.2); a.style.height = ah.toFixed(1) + "px"; a.style.opacity = ah > 1 ? 1 : 0; } });
+
+        // ===== shot 3: wireframe (top) vs final render (bottom) =====
+        const s1 = t >= C.step1 - 0.05 && t < C.step2;
+        const s1in = seg(t, C.step1 - 0.05, C.step1 + 0.25), s1out = seg(t, C.step2 - 0.1, C.step2 + 0.1);
+        const s1x = 1300 * (1 - s1in) - 1300 * s1out;
+        $("wire").style.transform = `translateX(${s1x.toFixed(1)}px)`;
+        if (t >= C.step1 - 0.05 && t < C.step2 + 0.1) wireAt(t);
+        const wipe = seg(t, C.step1 + 0.15, C.step1 + 0.75);
+        const bS = 820 / 1080, band = (y0) => [100 + s1x, 860 - y0 * bS, bS, `inset(${y0}px ${(1080 * (1 - wipe)).toFixed(1)}px ${(1920 - y0 - 520 / bS).toFixed(1)}px 0 round 24px)`];
+        { const [x, y, s, cp] = band(560); vid("vSplit", x, y, s, cp); }
+        { const [x, y, s, cp] = band(700); vid("vMol", x, y, s, cp.replace(/inset\(([\d.]+)px [\d.]+px/, "inset($1px 0px")); }
+        $("divider").style.opacity = s1 && wipe > 0.01 && wipe < 0.99 ? 1 : 0; $("divider").style.left = (100 + 820 * wipe - 3 + s1x).toFixed(1) + "px";
+        ["fTop", "fBot"].forEach((id) => { $(id).style.opacity = s1 ? 1 : 0; $(id).style.transform = `translateX(${s1x.toFixed(1)}px)`; });
+        $("tagTop").textContent = t >= C.mol ? "WIREFRAME · H₂O LATTICE" : "WIREFRAME + NORMALS PASS";
+        const b1 = $("b1"); b1.style.opacity = s1 ? 1 : 0; b1.style.transform = `translateX(-50%) scale(${s1 ? (1.3 - 0.3 * expoOut((t - C.step1 - 0.1) / 0.3)).toFixed(3) : 1})`;
+        const scanK = Math.max(lin(t, C.step1 + 0.05, C.step1 + 0.75) * (t < C.step1 + 0.75 ? 1 : 0), lin(t, C.mol, C.mol + 0.6) * (t < C.mol + 0.6 ? 1 : 0));
+        $("scan").style.opacity = scanK > 0 && scanK < 1 ? 1 : 0; $("scan").style.top = (320 + 510 * scanK).toFixed(1) + "px";
+
+        // ===== shot 4: HyperFrames timeline, playhead hits the SFX markers on the spoken words =====
+        const tlIn = seg(t, C.step2 - 0.05, C.step2 + 0.25), tlOut = seg(t, C.step3 - 0.1, C.step3 + 0.12);
+        const tlw = $("tl"); tlw.style.opacity = t > C.step2 - 0.05 && t < C.step3 + 0.12 ? 1 : 0;
+        tlw.style.transform = `translateX(${(1300 * (1 - tlIn) - 1300 * tlOut).toFixed(1)}px) scale(${lerp(0.94, 1.05, seg(t, C.step2, C.step3)).toFixed(4)})`;
+        const f = lin(t, SW[0], SW[1]), laneL = 24 + 150, laneW = 860 - 24 - 24 - 150 - 14 - 6;
+        $("ph").style.left = (laneL + f * laneW).toFixed(1) + "px";
+        MK.forEach(([n, mf], i) => { const el = $("m" + i), on = f >= mf - 0.002; el.classList.toggle("on", on);
+          el.style.transform = `translateX(-50%) scale(${on ? (1 + 0.35 * Math.max(0, 1 - (f - mf) * 12)).toFixed(3) : 1})`; });
+        D.bars.forEach((h, i) => { const el = $("w" + i); const on = i / D.bars.length <= f; el.style.background = on ? "#00E5FF" : "#3d7ab8"; });
+        const hit = [C.crack, C.whoosh].map((x) => (t >= x && t < x + 0.35 ? (t - x) / 0.35 : -1)).find((x) => x >= 0);
+        const ring = $("ring"); ring.style.opacity = hit !== undefined ? (1 - hit).toFixed(3) : 0;
+        if (hit !== undefined) { const mi = t < C.whoosh ? 2 : 3; ring.style.left = (laneL + MK[mi][1] * laneW).toFixed(1) + "px"; ring.style.top = (640 + 14 + (MK[mi][2] ? 62 : 6) + 20).toFixed(1) + "px"; ring.style.transform = `scale(${(0.4 + 1.2 * hit).toFixed(3)})`; }
+
+        // ===== shot 5: local render in the terminal, then the finished MP4 + CTA =====
+        const tmIn = seg(t, C.step3 - 0.05, C.step3 + 0.22);
+        const term = $("term"); term.style.opacity = t > C.step3 - 0.05 && t < C.reveal + 0.25 ? 1 : 0;
+        term.style.transform = `translateX(${(1300 * (1 - tmIn)).toFixed(1)}px)`;
+        const cmd = "npx hyperframes render --quality high", nc = Math.floor(lin(t, C.step3 + 0.12, C.typed) * cmd.length);
+        $("cmd").innerHTML = '<span class="p">$</span> ' + cmd.slice(0, nc) + (t < C.typed + 0.2 && t % 0.4 < 0.2 ? "▍" : "");
+        const pr = lin(t, C.typed + 0.12, C.done - 0.12);
+        $("l1").textContent = t > C.typed + 0.08 ? `▸ capturing frames  ${Math.round(pr * 901)}/901` : "";
+        $("prog").style.opacity = t > C.typed + 0.08 ? 1 : 0; $("progFill").style.width = (pr * 100).toFixed(1) + "%";
+        $("l2").textContent = t > C.done - 0.2 ? "▸ encoding h264 + aac" : "";
+        $("l3").textContent = t > C.done ? "✓ mpemba-final.mp4  30s  1080×1920" : "";
+        // reveal: the MP4 grows out of the terminal to full screen
+        const rv = expoOut((t - C.reveal + 0.3) / 0.45), rs = lerp(0.3, 1, rv);
+        vid("vPay", lerp(540 - 540 * 0.3, 0, rv), lerp(910 - 960 * 0.3, 0, rv), rs, `inset(0 round ${lerp(40, 0, rv).toFixed(1)}px)`);
+        const lw = seg(t, C.loop, DUR - 0.02);                               // loop whip back to frame 1
+        $("vPay").style.transform += ` translateX(${(-1080 * lw).toFixed(1)}px)`;
+        vid("vLoop", 1080 * (1 - lw), 0, 1);
+        const cta = $("cta"), con = t >= C.cta && t < C.loop + 0.05;
+        cta.style.opacity = con ? 1 : 0; cta.style.transform = `translate(-50%, -50%) scale(${con ? (1.4 - 0.4 * backOut((t - C.cta) / 0.3, 2.4)).toFixed(3) : 1})`;
+
+        // whip smears on every hard move
+        const sm = Math.max(bell(t, C.whipPipe - 0.05, C.whipPipe + 0.25), bell(t, C.step1 - 0.05, C.step1 + 0.25), bell(t, C.step2 - 0.05, C.step2 + 0.25),
+          bell(t, C.step3 - 0.05, C.step3 + 0.22), bell(t, C.loop, DUR + 0.02) * 1.0);
+        $("smear").style.opacity = sm.toFixed(3);
+        const lwb = bell(t, C.loop, DUR + 0.02); $("streak").style.opacity = lwb.toFixed(3); $("streak").style.backgroundPosition = `${(-2400 * lw).toFixed(0)}px 0`;
+
+        // captions: word by word, ≤3 words / ≤20 chars per phrase, cyan active word, gone when the voice stops
+        let li = 0; while (li < LINES.length - 1 && t >= LINES[li + 1].s - 0.05) li++;
+        const L = LINES[li], on = t >= L.s - 0.03 && t < L.e;
+        $("cap").style.opacity = on ? 1 : 0;
+        if (on) {
+          const ws = L.words, chunks = [[]];
+          ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
+            if (cur.length && len + w.w.length > 20) { chunks.push([]); cur = chunks[chunks.length - 1]; }
+            cur.push(j); if (/[.,!?:]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
+          let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
+          const ch = chunks.find((c) => c.includes(act)) || chunks[0];
+          const show = (w) => w.replace("H2O", "H₂O").replace(/^PROMPT/, '"PROMPT"');
+          $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${show(ws[j].w)}</span>`).join(" ") + "</span>";
+        }
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["mpemba-bts"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(root.time() || 0);
+    </script>
+  </body>
+</html>

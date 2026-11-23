@@ -1,0 +1,13 @@
+[
+ ["quill", "You asked for the HyperFrames tutorial. Here it is in thirty seconds!"],
+ ["dev", "Okay, go."],
+ ["quill", "First, you need Node twenty-two and FFmpeg on your computer."],
+ ["quill", "Then open Claude Code and add the HyperFrames marketplace."],
+ ["quill", "Now install the plugin."],
+ ["dev", "Installed. Now what?"],
+ ["quill", "Just ask me. Using slash HyperFrames, make a ten-second intro with a fade-in title."],
+ ["dev", "Can I see it before it renders?"],
+ ["quill", "Yep. Preview it in your browser, then render it to MP4."],
+ ["dev", "Wait. That's it?"],
+ ["quill", "That's it. Free and open source. Follow for part two!"]
+]

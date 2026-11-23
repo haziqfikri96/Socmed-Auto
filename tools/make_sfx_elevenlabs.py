@@ -2,9 +2,22 @@
 
 The API key is injected by the environment's network proxy; set ELEVENLABS_API_KEY to use your own.
 Existing files are skipped, so re-running only spends credits on new entries.
+
+FOLEY (new effects): clean, crisp, realistic one-shots. Rules (also in .claude/skills/sfx-foley/SKILL.md):
+  - model_id "eleven_text_to_sound_v3", prompt_influence 0.7, explicit short duration_seconds:
+    0.5–0.8 s for clicks / pops / impacts, 0.8–1.5 s for whooshes / cracks
+  - prompt = [physical source + action] + [texture / weight] + "dry close-mic studio foley, crisp transient, no reverb, one-shot"
+    (never a one- or two-word prompt; the script refuses prompts that break the rules)
+  - every take is cleaned with FFmpeg: leading silence removed (transient at 0.00 s), loudness normalised to -16 LUFS,
+    10 ms fade-out; the script prints duration, leading silence, LUFS and peak so each take can be auditioned
+  - in a mix, place Foley about -10 dB under the voiceover
+
+usage: python tools/make_sfx_elevenlabs.py sfx/elevenlabs            # generate anything missing
+       python tools/make_sfx_elevenlabs.py sfx/elevenlabs --audition  # print stats for every Foley WAV
 """
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -33,10 +46,110 @@ KIT = {
     "snore": (3.0, "Gentle cartoon snoring, two slow soft snores with a little whistle, comedic, no music"),
     "sparkle": (1.0, "Bright magical sparkle chime, short twinkling anime shine sound, clean, no music"),
     "gulp": (0.8, "Cartoon nervous gulp swallow with a tiny water-drop plink, anime sweat drop sound effect"),
+    "ice_crackle": (2.0, "Crisp ice crystals crackling and spreading across a glass surface, close macro frost forming, sharp tiny cracks, no music"),
+    "steam_hiss": (3.0, "Soft continuous hot steam hiss rising from boiling water, gentle airy, no bubbling, no music"),
+    "fluid_swirl": (4.0, "Deep slow underwater fluid swirl whoosh, liquid churning in a closed glass vessel, smooth low rumble, no music"),
+    "ice_lock": (2.0, "Rapid sequence of tiny crystalline ice clicks locking into place like dominoes, glassy and bright, no music"),
+    "ice_thud": (1.2, "Solid block of ice dropped onto a metal shelf, heavy dull thud with a short icy crack, no reverb"),
+    "timer_tick": (3.0, "Fast mechanical stopwatch ticking, crisp clock ticks speeding up slightly, close and dry, no music"),
+    "tech_pulse": (20.0, "Upbeat minimal tech creator background loop, punchy electronic kick and sub pulse at 118 bpm, bright plucky synth arpeggio, clean modern, no vocals, no melody lead"),
+    "scan_sweep": (1.5, "Digital scanner sweep, futuristic laser scan passing left to right, clean sci-fi UI sound, short"),
+    "key_typing": (2.0, "Fast mechanical keyboard typing, crisp clicky keys, a burst of quick keystrokes then enter key, close and dry"),
+    "ui_click": (0.5, "Crisp modern UI click pop, short clean digital tap, satisfying"),
+    "science_pulse": (30.0, "Dark minimal science documentary underscore, slow deep sub pulse every second with a cold airy synth pad, mysterious, no melody, no drums, no voices"),
     "sting": (1.2, "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"),
 }
 
+# Foley one-shots: v3 model, prompt_influence 0.7, short durations, cleaned + normalised (see docstring)
+FOLEY_MODEL, FOLEY_INFLUENCE, FOLEY_LUFS = "eleven_text_to_sound_v3", 0.7, -16
+FOLEY = {
+    "foley_ui_pop": (0.5, "Subtle soft matte button click, clean modern UI tap, dry close-mic foley, no reverb, one-shot"),
+    "foley_whoosh": (0.9, "Fast soft air sweep transition, smooth wind movement, clean modern broadcast whoosh, no metallic resonance, one-shot"),
+    "foley_ice_crack": (0.8, "Sharp brittle ice cube cracking in a glass, crisp high-frequency crystalline fracture, dry close-mic foley, no reverb, one-shot"),
+    "foley_sub_impact": (0.8, "Clean warm low-end cinematic thud, tight punchy sub bass drop, no distortion, one-shot"),
+    # Mpemba BTS short (durations set by the user)
+    "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
+    "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
+    "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    "bts_air_whip": (0.5, "Short clean air whip, thin bamboo stick swished fast through the air, tight natural swish, dry close-mic foley, no metallic tail, no reverb, one-shot"),
+}
+SHORT = re.compile(r"click|pop|tap|tick|thud|impact|hit|knock|drop", re.I)    # 0.5–0.8 s
+MEDIUM = re.compile(r"whoosh|sweep|swish|crack|fracture|snap|swipe", re.I)     # 0.8–1.5 s
+
+
+def check_foley(name, seconds, prompt):
+    """Refuse prompts and durations that produce muddy or sci-fi results."""
+    words = len(prompt.replace(",", " ").split())
+    assert words >= 8, f"{name}: prompt too short ({words} words); use source+action, texture/weight, foley tail"
+    assert "one-shot" in prompt.lower(), f"{name}: prompt must end with the one-shot / no-reverb foley tail"
+    assert "reverb" in prompt.lower() or "resonance" in prompt.lower() or "distortion" in prompt.lower(), f"{name}: say what to avoid (no reverb ...)"
+    assert 0.5 <= seconds <= 1.5, f"{name}: one-shots are 0.5–1.5 s (API minimum 0.5), got {seconds}"
+    # house defaults: 0.5–0.8 s for clicks/pops/impacts, 0.8–1.5 s for whooshes/cracks; a shorter cut asked for on purpose is allowed
+    if MEDIUM.search(name + " " + prompt) and seconds < 0.8:
+        print(f"note {name}: {seconds} s is shorter than the 0.8–1.5 s default for whooshes/cracks (kept as requested)")
+    elif SHORT.search(name + " " + prompt) and not MEDIUM.search(name + " " + prompt) and seconds > 0.8:
+        print(f"note {name}: {seconds} s is longer than the 0.5–0.8 s default for clicks/pops/impacts")
+
+
+def ff(args):
+    return subprocess.run(["ffmpeg", "-hide_banner", "-nostats", *args], capture_output=True, text=True)
+
+
+def clean(src, wav):
+    """Leading silence off (transient at 0.00 s), -16 LUFS (two-pass, linear), 10 ms fade-out, 48 kHz stereo."""
+    trim = "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0"
+    m = ff(["-i", str(src), "-af", f"{trim},loudnorm=I={FOLEY_LUFS}:TP=-1:LRA=7:print_format=json", "-f", "null", "-"]).stderr
+    j = json.loads(m[m.rindex("{"):m.rindex("}") + 1])
+    norm = (f"loudnorm=I={FOLEY_LUFS}:TP=-1:LRA=7:measured_I={j['input_i']}:measured_TP={j['input_tp']}:"
+            f"measured_LRA={j['input_lra']}:measured_thresh={j['input_thresh']}:offset={j['target_offset']}:linear=true")
+    dur = float(ff(["-i", str(src), "-af", trim, "-f", "null", "-"]).stderr.rsplit("time=", 1)[-1].split()[0].split(":")[-1])
+    fade = f"afade=t=out:st={max(0.0, dur - 0.01):.3f}:d=0.01"
+    r = ff(["-y", "-i", str(src), "-af", f"{trim},{norm},{fade}", "-ar", "48000", "-ac", "2", str(wav)])
+    assert r.returncode == 0, r.stderr[-400:]
+
+
+def audition(wav):
+    """Print what matters before mixing: length, leading silence, loudness, peak."""
+    lead = ff(["-i", str(wav), "-af", "silencedetect=n=-50dB:d=0.005", "-f", "null", "-"]).stderr
+    st = re.findall(r"silence_start: (-?[\d.]+)", lead); en = re.findall(r"silence_end: ([\d.]+)", lead)
+    lead_s = float(en[0]) if st and abs(float(st[0])) < 0.001 and en else 0.0     # only a silence that starts at 0 counts
+    m = ff(["-i", str(wav), "-af", "loudnorm=print_format=json,astats=metadata=0", "-f", "null", "-"]).stderr
+    j = json.loads(m[m.rindex("{"):m.rindex("}") + 1])
+    dur = ff(["-i", str(wav), "-f", "null", "-"]).stderr.rsplit("time=", 1)[-1].split()[0]
+    note = "" if float(j["input_i"]) > FOLEY_LUFS - 1.5 else "  (transient one-shot: the -1 dBTP ceiling caps it below -16 LUFS)"
+    print(f"  {wav.name:24} len {dur}  lead {lead_s:.3f}s  {j['input_i']} LUFS  peak {j['input_tp']} dBTP{note}")
+
+
+if "--audition" in sys.argv:
+    for name in FOLEY:
+        if (OUT / f"{name}.wav").exists():
+            audition(OUT / f"{name}.wav")
+    sys.exit(0)
+
 manifest = {}
+for name, (seconds, prompt) in FOLEY.items():
+    check_foley(name, seconds, prompt)
+    wav = OUT / f"{name}.wav"
+    manifest[name] = {"seconds": seconds, "prompt": prompt, "model_id": FOLEY_MODEL, "prompt_influence": FOLEY_INFLUENCE, "lufs": FOLEY_LUFS}
+    if wav.exists():
+        print("skip", name)
+        continue
+    mp3 = OUT / f"{name}.mp3"
+    body = json.dumps({"text": prompt, "duration_seconds": seconds, "prompt_influence": FOLEY_INFLUENCE, "model_id": FOLEY_MODEL})
+    code = subprocess.run(
+        ["curl", "-sS", "-m", "180", "-X", "POST", "https://api.elevenlabs.io/v1/sound-generation",
+         "-H", f"xi-api-key: {KEY}", "-H", "Content-Type: application/json", "-d", body,
+         "-o", str(mp3), "-w", "%{http_code}"],
+        capture_output=True, text=True,
+    ).stdout.strip()
+    if code != "200":
+        print("FAILED", name, code, mp3.read_bytes()[:300] if mp3.exists() else "")
+        mp3.unlink(missing_ok=True)
+        continue
+    clean(mp3, wav); mp3.unlink()
+    print("ok  ", name); audition(wav)
+
+# legacy kit (made before the Foley rules; existing files are kept, never regenerated)
 for name, (seconds, prompt) in KIT.items():
     wav = OUT / f"{name}.wav"
     manifest[name] = {"seconds": seconds, "prompt": prompt}

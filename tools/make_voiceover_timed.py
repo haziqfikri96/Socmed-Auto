@@ -1,6 +1,7 @@
 """Generate one narration track with word timings using ElevenLabs text-to-speech.
 
-usage: make_voiceover_timed.py <script.txt> <out.wav> <words.json> [voice_id] [speed]
+usage: make_voiceover_timed.py <script.txt> <out.wav> <words.json> [voice_id] [speed] [model_id]
+Default model: eleven_v4 (Starter plan and up). Older projects voiced with eleven_multilingual_v2 keep their cached takes.
 The API key is injected by the environment's network proxy; set ELEVENLABS_API_KEY to use your own.
 """
 import base64
@@ -14,11 +15,12 @@ text = " ".join(Path(sys.argv[1]).read_text().split())
 out_wav, out_words = Path(sys.argv[2]), Path(sys.argv[3])
 voice = sys.argv[4] if len(sys.argv) > 4 else "TX3LPaxmHKxFdv7VOQHJ"  # Liam
 speed = float(sys.argv[5]) if len(sys.argv) > 5 else 1.0
+model = sys.argv[6] if len(sys.argv) > 6 else os.environ.get("ELEVEN_TTS_MODEL", "eleven_v4")
 key = os.environ.get("ELEVENLABS_API_KEY", "proxy-injected")
 
 body = json.dumps({
     "text": text,
-    "model_id": "eleven_multilingual_v2",
+    "model_id": model,
     "voice_settings": {"stability": 0.4, "similarity_boost": 0.8, "style": 0.35, "use_speaker_boost": True, "speed": speed},
 })
 res = subprocess.run(
