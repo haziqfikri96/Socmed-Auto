@@ -48,6 +48,34 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "pa_sonar_ping": {
+    "seconds": 0.6,
+    "prompt": "Crisp clean telemetry sonar ping, single bright electronic beep from a spacecraft radio, short tight decay, dry close-mic, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "pa_wave_sweep": {
+    "seconds": 1.2,
+    "prompt": "Soft smooth wave sweep, gentle warm air pressure swell passing slowly by, clean and natural, no metallic resonance, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "pa_shimmer": {
+    "seconds": 0.8,
+    "prompt": "Delicate crystalline shimmer, tiny glass chimes brushed once, bright sparkling high frequencies, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "pa_reactor_hum": {
+    "seconds": 3.0,
+    "prompt": "Warm low steady reactor hum, soft electrical transformer drone with gentle low rumble, smooth and even, no music, no metallic ringing",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "bts_air_whip": {
     "seconds": 0.5,
     "prompt": "Short clean air whip, thin bamboo stick swished fast through the air, tight natural swish, dry close-mic foley, no metallic tail, no reverb, one-shot",

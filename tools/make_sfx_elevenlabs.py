@@ -71,15 +71,23 @@ FOLEY = {
     "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
     "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
     "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    # Pioneer anomaly short
+    "pa_sonar_ping": (0.6, "Crisp clean telemetry sonar ping, single bright electronic beep from a spacecraft radio, short tight decay, dry close-mic, no reverb, one-shot"),
+    "pa_wave_sweep": (1.2, "Soft smooth wave sweep, gentle warm air pressure swell passing slowly by, clean and natural, no metallic resonance, no reverb, one-shot"),
+    "pa_shimmer": (0.8, "Delicate crystalline shimmer, tiny glass chimes brushed once, bright sparkling high frequencies, dry close-mic foley, no reverb, one-shot"),
+    "pa_reactor_hum": (3.0, "Warm low steady reactor hum, soft electrical transformer drone with gentle low rumble, smooth and even, no music, no metallic ringing", "ambient"),
     "bts_air_whip": (0.5, "Short clean air whip, thin bamboo stick swished fast through the air, tight natural swish, dry close-mic foley, no metallic tail, no reverb, one-shot"),
 }
 SHORT = re.compile(r"click|pop|tap|tick|thud|impact|hit|knock|drop", re.I)    # 0.5–0.8 s
 MEDIUM = re.compile(r"whoosh|sweep|swish|crack|fracture|snap|swipe", re.I)     # 0.8–1.5 s
 
 
-def check_foley(name, seconds, prompt):
+def check_foley(name, seconds, prompt, kind="oneshot"):
     """Refuse prompts and durations that produce muddy or sci-fi results."""
     words = len(prompt.replace(",", " ").split())
+    if kind == "ambient":     # sustained hums/beds: detailed prompt, explicit 1–6 s, still cleaned and normalised
+        assert words >= 8 and 1.0 <= seconds <= 6.0, f"{name}: ambient needs a detailed prompt and 1–6 s"
+        return
     assert words >= 8, f"{name}: prompt too short ({words} words); use source+action, texture/weight, foley tail"
     assert "one-shot" in prompt.lower(), f"{name}: prompt must end with the one-shot / no-reverb foley tail"
     assert "reverb" in prompt.lower() or "resonance" in prompt.lower() or "distortion" in prompt.lower(), f"{name}: say what to avoid (no reverb ...)"
@@ -127,8 +135,8 @@ if "--audition" in sys.argv:
     sys.exit(0)
 
 manifest = {}
-for name, (seconds, prompt) in FOLEY.items():
-    check_foley(name, seconds, prompt)
+for name, (seconds, prompt, *kind) in FOLEY.items():
+    check_foley(name, seconds, prompt, *(kind or ["oneshot"]))
     wav = OUT / f"{name}.wav"
     manifest[name] = {"seconds": seconds, "prompt": prompt, "model_id": FOLEY_MODEL, "prompt_influence": FOLEY_INFLUENCE, "lufs": FOLEY_LUFS}
     if wav.exists():
