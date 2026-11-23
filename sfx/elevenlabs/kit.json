@@ -27,6 +27,34 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "bts_sub_thud": {
+    "seconds": 0.7,
+    "prompt": "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "bts_ice_snap": {
+    "seconds": 0.6,
+    "prompt": "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "bts_soft_whoosh": {
+    "seconds": 0.7,
+    "prompt": "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "bts_air_whip": {
+    "seconds": 0.5,
+    "prompt": "Short clean air whip, thin bamboo stick swished fast through the air, tight natural swish, dry close-mic foley, no metallic tail, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "whoosh_soft": {
     "seconds": 0.8,
     "prompt": "Short soft cinematic whoosh, air swish passing left to right, clean, no reverb tail"

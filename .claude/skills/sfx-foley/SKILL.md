@@ -22,7 +22,7 @@ Existing WAVs are skipped (never regenerate an effect that already exists). The 
 | Parameter | Value |
 |---|---|
 | `model_id` | `"eleven_text_to_sound_v3"` (always) |
-| `duration_seconds` | always explicit and short: **0.5–0.8 s** for clicks / pops / impacts, **0.8–1.5 s** for whooshes / cracks |
+| `duration_seconds` | always explicit and short: **0.5–0.8 s** for clicks / pops / impacts, **0.8–1.5 s** for whooshes / cracks by default; a shorter cut (e.g. a 0.5 s whip, a 0.6 s snap) is fine when asked for. Hard limits 0.5–1.5 s for one-shots. |
 | `prompt_influence` | `0.7` (literal, clean sound design; the API default 0.3 drifts into texture) |
 
 Header: `xi-api-key: proxy-injected` (the proxy injects the real key).

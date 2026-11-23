@@ -36,8 +36,13 @@ while pos < N:
 env = np.convolve(np.abs(dia[:, 0]), np.ones(int(0.25 * SR)) / int(0.25 * SR), mode="same")
 duck = 1 - 0.55 * np.clip(env / (env.max() * 0.3), 0, 1)
 fx = np.zeros((N, 2))
+VPK = np.abs(dia).max()          # cue gains are dB relative to the voice peak
+PEAKED = ("whoosh", "whip")      # these sweep in: their loudest point lands on the cue time
 for name, at, g in D["sfx"]:
-    add(fx, load(name), at, db(g))
+    s = load(name)
+    if any(k in name for k in PEAKED):
+        env = np.convolve(np.abs(s).max(1), np.ones(480) / 480, "same"); at -= np.argmax(env) / SR
+    add(fx, s, at, db(g) * VPK)
 mix = bed * db(-19) * duck[:, None] + fx + dia * 1.0
 mix = mix / np.abs(mix).max() * 0.89
 fade = int(0.02 * SR); mix[:fade] *= np.linspace(0, 1, fade)[:, None]

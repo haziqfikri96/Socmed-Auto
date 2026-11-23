@@ -67,6 +67,11 @@ FOLEY = {
     "foley_whoosh": (0.9, "Fast soft air sweep transition, smooth wind movement, clean modern broadcast whoosh, no metallic resonance, one-shot"),
     "foley_ice_crack": (0.8, "Sharp brittle ice cube cracking in a glass, crisp high-frequency crystalline fracture, dry close-mic foley, no reverb, one-shot"),
     "foley_sub_impact": (0.8, "Clean warm low-end cinematic thud, tight punchy sub bass drop, no distortion, one-shot"),
+    # Mpemba BTS short (durations set by the user)
+    "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
+    "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
+    "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    "bts_air_whip": (0.5, "Short clean air whip, thin bamboo stick swished fast through the air, tight natural swish, dry close-mic foley, no metallic tail, no reverb, one-shot"),
 }
 SHORT = re.compile(r"click|pop|tap|tick|thud|impact|hit|knock|drop", re.I)    # 0.5–0.8 s
 MEDIUM = re.compile(r"whoosh|sweep|swish|crack|fracture|snap|swipe", re.I)     # 0.8–1.5 s
@@ -78,10 +83,12 @@ def check_foley(name, seconds, prompt):
     assert words >= 8, f"{name}: prompt too short ({words} words); use source+action, texture/weight, foley tail"
     assert "one-shot" in prompt.lower(), f"{name}: prompt must end with the one-shot / no-reverb foley tail"
     assert "reverb" in prompt.lower() or "resonance" in prompt.lower() or "distortion" in prompt.lower(), f"{name}: say what to avoid (no reverb ...)"
-    if SHORT.search(name + " " + prompt) and not MEDIUM.search(name + " " + prompt):
-        assert 0.5 <= seconds <= 0.8, f"{name}: clicks/pops/impacts must be 0.5–0.8 s, got {seconds}"
-    elif MEDIUM.search(name + " " + prompt):
-        assert 0.8 <= seconds <= 1.5, f"{name}: whooshes/cracks must be 0.8–1.5 s, got {seconds}"
+    assert 0.5 <= seconds <= 1.5, f"{name}: one-shots are 0.5–1.5 s (API minimum 0.5), got {seconds}"
+    # house defaults: 0.5–0.8 s for clicks/pops/impacts, 0.8–1.5 s for whooshes/cracks; a shorter cut asked for on purpose is allowed
+    if MEDIUM.search(name + " " + prompt) and seconds < 0.8:
+        print(f"note {name}: {seconds} s is shorter than the 0.8–1.5 s default for whooshes/cracks (kept as requested)")
+    elif SHORT.search(name + " " + prompt) and not MEDIUM.search(name + " " + prompt) and seconds > 0.8:
+        print(f"note {name}: {seconds} s is longer than the 0.5–0.8 s default for clicks/pops/impacts")
 
 
 def ff(args):

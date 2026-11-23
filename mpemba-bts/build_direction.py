@@ -37,14 +37,17 @@ cues = {
     "cta": r(W(4, "comment")),                              # CTA pill pops
     "loop": r(DUR - 0.28),                                   # whip back to the opening frame
 }
-sfx = [["impact_deep", 0.0, -3], ["ice_crackle", 0.04, -8], ["ice_crackle", 1.0, -12],
-       ["whoosh_fast", r(cues["whipPipe"] - 0.05), -7]] + [["ui_click", c, -5] for c in cues["cards"]] + [
-       ["whoosh_soft", r(cues["step1"] - 0.08), -10], ["scan_sweep", r(cues["step1"] + 0.05), -9],
-       ["sparkle", cues["mol"], -9], ["scan_sweep", r(cues["mol"] + 0.02), -13],
-       ["whoosh_soft", r(cues["step2"] - 0.08), -10], ["ice_crackle", cues["crack"], -7], ["whoosh_fast", cues["whoosh"], -9],
-       ["whoosh_soft", r(cues["step3"] - 0.08), -10], ["key_typing", r(S(4) + 0.05), -11], ["ui_click", cues["done"], -6],
-       ["impact_deep", cues["reveal"], -9], ["pop", cues["cta"], -6],
-       ["whoosh_fast", r(cues["loop"] - 0.02), -14]]          # loop whoosh, 8 dB under the voice peak (-5.7 dB)
+# Sound cues: [file, time, dB relative to the voice peak]. Clean Foley (sfx-foley rules, v3 model); whoosh/whip cues are
+# placed by their loudest point (make_audio.py aligns the file's peak to the cue time).
+sfx = [["bts_sub_thud", 0.0, -4], ["foley_ice_crack", 0.02, -6], ["foley_ice_crack", 0.9, -15],          # hook: warm thud + glass ice crack
+       ["foley_whoosh", r(cues["whipPipe"] + 0.1), -10]] + [["foley_ui_pop", c, -14] for c in cues["cards"]] + [  # stack cards: matte clicks
+       ["foley_whoosh", r(cues["step1"] + 0.1), -10],                                                       # 05.5 transition
+       ["sparkle", cues["mol"], -16],
+       ["foley_whoosh", r(cues["step2"] + 0.1), -10],                                                       # 09.5 transition
+       ["bts_ice_snap", cues["crack"], -7], ["bts_soft_whoosh", cues["whoosh"], -10],                     # on "ice crack" / "whoosh"
+       ["foley_whoosh", r(cues["step3"] + 0.1), -11], ["key_typing", r(S(4) + 0.05), -16], ["foley_ui_pop", cues["done"], -14],
+       ["bts_sub_thud", cues["reveal"], -9], ["foley_ui_pop", cues["cta"], -12],
+       ["bts_air_whip", r(cues["loop"] + 0.12), -10]]                                                     # loop whip, 10 dB under the voice
 
 # timeline panel: a 96-bar envelope of the real Mpemba narration
 a, sr = sf.read(HERE.parent / "mpemba-effect/assets/dialogue.wav", always_2d=True)
