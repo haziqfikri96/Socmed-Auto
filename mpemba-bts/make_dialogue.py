@@ -3,7 +3,7 @@ assets/dialogue.wav and write assets/lines.json: [{who, text, s, e, words: [{w, 
 
 usage: python make_dialogue.py   (needs numpy + soundfile; lines already in assets/lines/ are reused)
 """
-import hashlib, json, subprocess, sys
+import hashlib, json, re, subprocess, sys
 from pathlib import Path
 import numpy as np, soundfile as sf
 
@@ -38,7 +38,7 @@ for i, entry in enumerate(lines):
     a = a[: int(vend * SR)]
     w[-1]["e"] = min(w[-1]["e"], vend)
     dur = len(a) / SR
-    out.append({"who": who, "text": text, "s": round(t, 3), "e": round(t + w[-1]["e"], 3),
+    out.append({"who": who, "text": re.sub(r"\[[^\]]*\]\s*", "", text).strip(), "s": round(t, 3), "e": round(t + w[-1]["e"], 3),
                 "words": [{"w": x["w"], "s": round(t + x["s"], 3), "e": round(t + x["e"], 3)} for x in w]})
     chunks.append((int(t * SR), a * gain))
     t += w[-1]["e"] + pause
