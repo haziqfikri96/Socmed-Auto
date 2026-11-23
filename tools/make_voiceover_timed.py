@@ -2,6 +2,10 @@
 
 usage: make_voiceover_timed.py <script.txt> <out.wav> <words.json> [voice_id] [speed] [model_id]
 Default model: eleven_v4 (Starter plan and up). Older projects voiced with eleven_multilingual_v2 keep their cached takes.
+Output: mp3_44100_128, the best format on the Starter plan (192 kbps needs Creator, pcm_44100 needs Pro); decoded to 48 kHz WAV.
+Eleven v4 audio tags such as [excited] [curious] [confident] [fast-paced] may be written inline in the script. They steer the
+delivery and are not spoken; they are removed from words.json, so captions match the spoken words 1:1. Use them sparingly
+(at most one per line, at the start of a sentence).
 The API key is injected by the environment's network proxy; set ELEVENLABS_API_KEY to use your own.
 """
 import base64
@@ -39,8 +43,14 @@ subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(mp3), "-ar", "48000", "
 mp3.unlink()
 
 al = data["alignment"]
-words, cur, start, end = [], "", None, None
+words, cur, start, end, in_tag = [], "", None, None, False
 for ch, s, e in zip(al["characters"], al["character_start_times_seconds"], al["character_end_times_seconds"]):
+    if ch == "[":                  # audio tag: steers delivery, never spoken, never captioned
+        in_tag = True
+        continue
+    if in_tag:
+        in_tag = ch != "]"
+        continue
     if ch.isspace():
         if cur:
             words.append({"w": cur, "s": round(start, 3), "e": round(end, 3)})
