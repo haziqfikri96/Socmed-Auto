@@ -4,6 +4,6 @@ Why do onions make you cry? 🧅😭 Cutting an onion sets off a tiny chemical d
 
 Sources:
 - Imai et al. (2002), "An onion enzyme that makes the eyes water", Nature 419, 685: https://www.nature.com/articles/419685a
-- Library of Congress, Everyday Mysteries: "Why does chopping an onion make you cry?": https://www.loc.gov/everyday-mysteries/food-and-nutrition/item/why-does-chopping-an-onion-make-you-cry/
-- Cleveland Clinic, "Why Do Onions Make You Cry?": https://health.clevelandclinic.org/why-do-onions-make-you-cry
+- Wikipedia, "syn-Propanethial-S-oxide" (how alliinase and lachrymatory-factor synthase make the gas): https://en.wikipedia.org/wiki/Syn-Propanethial-S-oxide
+- Wikipedia, "Onion", Eye irritation (the gas activates sensory neurons in the eye; lacrimal glands make tears to flush it out): https://en.wikipedia.org/wiki/Onion
 Molecules and cells are shown simplified and not to scale.
