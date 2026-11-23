@@ -48,6 +48,48 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "ot_veg_slice": {
+    "seconds": 0.6,
+    "prompt": "Crisp chef knife slicing through a fresh juicy onion on a wooden cutting board, sharp wet crunch, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "ot_gas_burst": {
+    "seconds": 0.7,
+    "prompt": "Punchy fizzy gas burst, a soda bottle cap popped open with a quick rush of bright carbonated bubbles, clear and loud, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "ot_bubble_pops": {
+    "seconds": 0.8,
+    "prompt": "Rapid cluster of small cartoon bubble pops, quick bright plip sounds in a fast burst, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "ot_alarm_ding": {
+    "seconds": 0.6,
+    "prompt": "Subtle cute alarm bell ding, small brass desk bell struck twice quickly, bright and clean, dry close-mic, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "ot_water_splash": {
+    "seconds": 0.8,
+    "prompt": "Small clean water splash, a few drops of water hitting a glossy surface, bright wet droplets, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "ot_frost_chime": {
+    "seconds": 0.6,
+    "prompt": "Frosty icy chime, tiny glass bell tapped once with a cold sparkly ring, bright and clean, dry close-mic, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "pa_sonar_ping": {
     "seconds": 0.6,
     "prompt": "Crisp clean telemetry sonar ping, single bright electronic beep from a spacecraft radio, short tight decay, dry close-mic, no reverb, one-shot",
@@ -202,6 +244,10 @@
   "ui_click": {
     "seconds": 0.5,
     "prompt": "Crisp modern UI click pop, short clean digital tap, satisfying"
+  },
+  "kids_bed": {
+    "seconds": 20.0,
+    "prompt": "Playful upbeat kids science background music loop, bouncy pizzicato strings and light marimba, cheerful and curious, steady tempo, no vocals, no drums"
   },
   "science_pulse": {
     "seconds": 30.0,

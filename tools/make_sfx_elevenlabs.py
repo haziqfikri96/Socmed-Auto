@@ -56,6 +56,7 @@ KIT = {
     "scan_sweep": (1.5, "Digital scanner sweep, futuristic laser scan passing left to right, clean sci-fi UI sound, short"),
     "key_typing": (2.0, "Fast mechanical keyboard typing, crisp clicky keys, a burst of quick keystrokes then enter key, close and dry"),
     "ui_click": (0.5, "Crisp modern UI click pop, short clean digital tap, satisfying"),
+    "kids_bed": (20.0, "Playful upbeat kids science background music loop, bouncy pizzicato strings and light marimba, cheerful and curious, steady tempo, no vocals, no drums"),
     "science_pulse": (30.0, "Dark minimal science documentary underscore, slow deep sub pulse every second with a cold airy synth pad, mysterious, no melody, no drums, no voices"),
     "sting": (1.2, "Punchy comedic bass hit sting, deep boom with a short dramatic orchestral stab, cartoon reaction, no reverb tail"),
 }
@@ -71,6 +72,13 @@ FOLEY = {
     "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
     "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
     "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    # Onion tears short (kids)
+    "ot_veg_slice": (0.6, "Crisp chef knife slicing through a fresh juicy onion on a wooden cutting board, sharp wet crunch, dry close-mic foley, no reverb, one-shot"),
+    "ot_gas_burst": (0.7, "Punchy fizzy gas burst, a soda bottle cap popped open with a quick rush of bright carbonated bubbles, clear and loud, dry close-mic foley, no reverb, one-shot"),
+    "ot_bubble_pops": (0.8, "Rapid cluster of small cartoon bubble pops, quick bright plip sounds in a fast burst, dry close-mic foley, no reverb, one-shot"),
+    "ot_alarm_ding": (0.6, "Subtle cute alarm bell ding, small brass desk bell struck twice quickly, bright and clean, dry close-mic, no reverb, one-shot"),
+    "ot_water_splash": (0.8, "Small clean water splash, a few drops of water hitting a glossy surface, bright wet droplets, dry close-mic foley, no reverb, one-shot"),
+    "ot_frost_chime": (0.6, "Frosty icy chime, tiny glass bell tapped once with a cold sparkly ring, bright and clean, dry close-mic, no reverb, one-shot"),
     # Pioneer anomaly short
     "pa_sonar_ping": (0.6, "Crisp clean telemetry sonar ping, single bright electronic beep from a spacecraft radio, short tight decay, dry close-mic, no reverb, one-shot"),
     "pa_wave_sweep": (1.2, "Soft smooth wave sweep, gentle warm air pressure swell passing slowly by, clean and natural, no metallic resonance, no reverb, one-shot"),
@@ -154,6 +162,11 @@ for name, (seconds, prompt, *kind) in FOLEY.items():
         print("FAILED", name, code, mp3.read_bytes()[:300] if mp3.exists() else "")
         mp3.unlink(missing_ok=True)
         continue
+    peak = ff(["-i", str(mp3), "-af", "volumedetect", "-f", "null", "-"]).stderr
+    peak = float(peak.split("max_volume: ")[1].split()[0]) if "max_volume: " in peak else -99
+    if peak < -30:                    # near-silent take: reject it rather than normalise noise up
+        print(f"FAILED {name}: take is near-silent (peak {peak} dB); change the prompt and run again")
+        mp3.unlink(); continue
     clean(mp3, wav); mp3.unlink()
     print("ok  ", name); audition(wav)
 
