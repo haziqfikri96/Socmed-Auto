@@ -5,6 +5,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"; TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 cp -a "$HERE/../mpemba-effect/." "$TMP/"; rm -rf "$TMP"/review*.mp4 "$TMP/.hyperframes"
 sed -i 's/#cap { position: absolute;/#cap { display: none !important; position: absolute;/' "$TMP/index.html"
+sed -i 's/#stamp { position: absolute;/#stamp { display: none !important; position: absolute;/' "$TMP/index.html"   # no OBSERVED badge in the BTS
 cd "$TMP"
 for r in "0 4.6 race" "21.2 24.8 mol" "25.0 29.4 pay"; do set -- $r
   [[ -f "$HERE/assets/clip_$3.mp4" ]] && { echo "skip clip_$3"; continue; }

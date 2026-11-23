@@ -35,7 +35,7 @@ cues = {
     "done": r(W(4, "mp4") - 0.05),                          # render finished
     "reveal": r(W(4, "mp4") + 0.1),                         # final MP4 snaps full screen
     "cta": r(W(4, "comment")),                              # CTA pill pops
-    "loop": r(DUR - 0.3),                                   # whip back to the opening frame
+    "loop": r(DUR - 0.28),                                   # whip back to the opening frame
 }
 sfx = [["impact_deep", 0.0, -3], ["ice_crackle", 0.04, -8], ["ice_crackle", 1.0, -12],
        ["whoosh_fast", r(cues["whipPipe"] - 0.05), -7]] + [["ui_click", c, -5] for c in cues["cards"]] + [
@@ -44,7 +44,7 @@ sfx = [["impact_deep", 0.0, -3], ["ice_crackle", 0.04, -8], ["ice_crackle", 1.0,
        ["whoosh_soft", r(cues["step2"] - 0.08), -10], ["ice_crackle", cues["crack"], -7], ["whoosh_fast", cues["whoosh"], -9],
        ["whoosh_soft", r(cues["step3"] - 0.08), -10], ["key_typing", r(S(4) + 0.05), -11], ["ui_click", cues["done"], -6],
        ["impact_deep", cues["reveal"], -9], ["pop", cues["cta"], -6],
-       ["whoosh_fast", r(cues["loop"] - 0.05), -16]]          # loop whoosh tucked well under the last words
+       ["whoosh_fast", r(cues["loop"] - 0.02), -14]]          # loop whoosh, 8 dB under the voice peak (-5.7 dB)
 
 # timeline panel: a 96-bar envelope of the real Mpemba narration
 a, sr = sf.read(HERE.parent / "mpemba-effect/assets/dialogue.wav", always_2d=True)

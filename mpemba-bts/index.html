@@ -80,10 +80,12 @@
       #tbody { padding: 26px 28px; font: 700 27px/48px 'JetBrains Mono'; color: #cfe3f7; white-space: pre-wrap; }
       #tbody .p { color: #28c840; } #tbody .dim { color: #6c86a6; } #tbody .ok { color: #7dffa1; }
       #prog { margin-top: 10px; height: 26px; border-radius: 13px; background: #142338; overflow: hidden; } #progFill { height: 100%; width: 0; background: linear-gradient(90deg, #00b8d4, #00E5FF); }
-      #cta { position: absolute; left: 50%; top: 1260px; padding: 16px 30px; border-radius: 999px; background: #00E5FF; color: #04121c; font-weight: 900; font-size: 38px; white-space: nowrap;
+      #cta { position: absolute; left: 50%; top: 420px; padding: 16px 30px; border-radius: 999px; background: #00E5FF; color: #04121c; font-weight: 900; font-size: 38px; white-space: nowrap;
         opacity: 0; transform-origin: 50% 50%; z-index: 7; border: 4px solid #e8fdff; }
       #smear { position: absolute; inset: 0; opacity: 0; z-index: 8; pointer-events: none;
         background: repeating-linear-gradient(0deg, rgba(200,230,255,0.12) 0 3px, rgba(0,0,0,0) 3px 17px), linear-gradient(90deg, rgba(5,7,12,0.6), rgba(5,7,12,0) 30%, rgba(5,7,12,0) 70%, rgba(5,7,12,0.6)); }
+      #streak { position: absolute; inset: 0; opacity: 0; z-index: 8; pointer-events: none;
+        background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 40px, rgba(220,240,255,0.16) 40px 140px, rgba(255,255,255,0) 140px 230px, rgba(255,190,140,0.10) 230px 300px, rgba(255,255,255,0) 300px 420px); }
       /* captions: one pill, centred on y = 1440 in every shot */
       #cap { position: absolute; left: 80px; width: 860px; top: 1395px; height: 90px; text-align: center; z-index: 9; }
       #cap .ch { display: inline-block; padding: 8px 26px 12px; border-radius: 20px; background: rgba(6,12,24,0.8); border: 2px solid rgba(255,255,255,0.16); white-space: nowrap;
@@ -98,7 +100,7 @@
       <video id="vSplit" src="assets/clip_race.mp4" muted playsinline data-start="5.454" data-duration="2.88" data-media-start="1.5" data-track-index="2"></video>
       <video id="vMol" src="assets/clip_mol.mp4" muted playsinline data-start="8.333" data-duration="1.141" data-media-start="1.4" data-track-index="3"></video>
       <video id="vPay" src="assets/clip_pay.mp4" muted playsinline data-start="15.25" data-duration="2.88" data-media-start="0.5" data-track-index="4"></video>
-      <video id="vLoop" src="assets/clip_race.mp4" muted playsinline data-start="17.83" data-duration="0.3" data-media-start="0.7" data-track-index="5"></video>
+      <video id="vLoop" src="assets/clip_race.mp4" muted playsinline data-start="17.85" data-duration="0.28" data-media-start="0.72" data-track-index="5"></video>
       <canvas id="wire" class="clip" width="820" height="520" data-start="5.454" data-duration="4.02" data-track-index="6"></canvas>
       <div id="hud" class="clip" data-start="0" data-duration="18.13" data-track-index="7" data-layout-allow-overlap data-layout-allow-overflow>
         <div id="ide" class="win"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;mpemba-effect/index.html — Claude Code</div>
@@ -126,7 +128,7 @@
           <div id="tbody"><div id="cmd"></div><div id="l1" class="dim"></div><div id="prog"><div id="progFill"></div></div><div id="l2" class="dim"></div><div id="l3" class="ok"></div></div></div>
         <div id="hook"><span>Claude coded<br />this <em>3D video</em></span></div>
         <div id="cta">Comment "PROMPT" for the template 👇</div>
-        <div id="smear"></div>
+        <div id="smear"></div><div id="streak"></div>
         <div id="cap"></div>
       </div>
       <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="18.13" data-track-index="10" data-volume="1"></audio>
@@ -286,7 +288,7 @@
         // reveal: the MP4 grows out of the terminal to full screen
         const rv = expoOut((t - C.reveal + 0.3) / 0.45), rs = lerp(0.3, 1, rv);
         vid("vPay", lerp(540 - 540 * 0.3, 0, rv), lerp(910 - 960 * 0.3, 0, rv), rs, `inset(0 round ${lerp(40, 0, rv).toFixed(1)}px)`);
-        const lw = seg(t, C.loop - 0.02, DUR);                               // loop whip back to frame 1
+        const lw = seg(t, C.loop, DUR - 0.02);                               // loop whip back to frame 1
         $("vPay").style.transform += ` translateX(${(-1080 * lw).toFixed(1)}px)`;
         vid("vLoop", 1080 * (1 - lw), 0, 1);
         const cta = $("cta"), con = t >= C.cta && t < C.loop + 0.05;
@@ -294,8 +296,9 @@
 
         // whip smears on every hard move
         const sm = Math.max(bell(t, C.whipPipe - 0.05, C.whipPipe + 0.25), bell(t, C.step1 - 0.05, C.step1 + 0.25), bell(t, C.step2 - 0.05, C.step2 + 0.25),
-          bell(t, C.step3 - 0.05, C.step3 + 0.22), bell(t, C.loop - 0.02, DUR + 0.25));
+          bell(t, C.step3 - 0.05, C.step3 + 0.22), bell(t, C.loop, DUR + 0.02) * 1.0);
         $("smear").style.opacity = sm.toFixed(3);
+        const lwb = bell(t, C.loop, DUR + 0.02); $("streak").style.opacity = lwb.toFixed(3); $("streak").style.backgroundPosition = `${(-2400 * lw).toFixed(0)}px 0`;
 
         // captions: word by word, ≤3 words / ≤20 chars per phrase, cyan active word, gone when the voice stops
         let li = 0; while (li < LINES.length - 1 && t >= LINES[li + 1].s - 0.05) li++;
