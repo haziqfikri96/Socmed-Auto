@@ -23,7 +23,7 @@ for name, text in LINES.items():
     mp3 = OUT / f"{name}.mp3"
     body = json.dumps({
         "text": text,
-        "model_id": "eleven_multilingual_v2",
+        "model_id": os.environ.get("ELEVEN_TTS_MODEL", "eleven_v4"),
         "voice_settings": {"stability": 0.45, "similarity_boost": 0.8, "style": 0.25, "use_speaker_boost": True},
     })
     code = subprocess.run(
