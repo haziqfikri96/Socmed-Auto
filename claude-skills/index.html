@@ -4,135 +4,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
     <script src="lines.js"></script>
     <script src="direction.js"></script>
     <script src="render-mode.js"></script>
     <script type="importmap">
-      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js" } }
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
     </script>
     <style>
-      /* TikTok safe zone for this video: everything inside x 80–940, y 220–1620 */
+      /* TikTok safe zone for this video: x 80–940, y 220–1620 */
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #F7F6F2; }
-      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; color: #141414; }
-      #bg { position: absolute; inset: 0; background-color: #F7F6F2;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 30v12M30 36h12' stroke='%23d6d2c8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); }
-      #burst { position: absolute; left: 95px; top: 250px; width: 170px; height: 170px; transform-origin: 50% 50%; }
-      #bot { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
-      .layer { position: absolute; inset: 0; pointer-events: none; }
-      /* kinetic type */
-      .kt { position: absolute; left: 80px; width: 860px; text-align: center; font-weight: 900; letter-spacing: -0.035em; line-height: 0.98; }
-      .kt span { display: inline-block; opacity: 0; transform-origin: 50% 70%; }
-      .kt .tc { color: #D97757; }
-      #head { top: 520px; font-size: 128px; }
-      #sub { top: 1010px; font-size: 46px; font-weight: 800; letter-spacing: -0.02em; color: #3b3b3b; }
-      #sub b { color: #D97757; }
-      /* dark UI cards (solid offset shadow, no blur) */
-      .card { position: absolute; left: 130px; width: 820px; border-radius: 24px; background: #111318; color: #e9ecf2; border: 2px solid #23262e; opacity: 0;
-        box-shadow: 0 14px 0 rgba(20,20,20,0.12); }
-      .bar { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 22px; border-bottom: 1px solid #23262e; font: 700 22px 'JetBrains Mono', monospace; color: #8b93a3; }
-      .dot { width: 14px; height: 14px; border-radius: 50%; } .r { background: #ff5f57; } .y { background: #febc2e; } .g { background: #28c840; }
-      #gh { top: 420px; height: 760px; left: 130px; overflow: hidden; }
-      #gh .chip { position: absolute; right: 22px; top: 10px; padding: 6px 14px; border-radius: 999px; background: #D97757; color: #fff; font: 800 22px 'Inter Tight'; }
-      #rowsWin { position: absolute; left: 0; right: 0; top: 56px; bottom: 0; overflow: hidden; }
-      #rows { position: absolute; left: 0; right: 0; top: 14px; }
-      .row { height: 74px; margin: 0 22px; display: flex; align-items: center; gap: 18px; border-bottom: 1px solid #1d2027; font: 700 30px 'JetBrains Mono', monospace; color: #c9cfda; }
-      .row i { width: 28px; height: 34px; border-radius: 5px; border: 3px solid #5d6575; }
-      .row.warn { color: #ffb4b4; }
-      #warnBox { position: absolute; left: 14px; right: 14px; height: 74px; border: 4px solid #ff4d4d; border-radius: 12px; opacity: 0; }
-      #wasted { position: absolute; right: 160px; top: 340px; padding: 12px 22px; border-radius: 999px; background: #ff4d4d; color: #fff; font: 900 38px 'Inter Tight'; opacity: 0; white-space: nowrap; }
-      /* save */
-      #bm { position: absolute; left: 390px; top: 470px; width: 300px; height: 380px; opacity: 0; }
-      #cursor { position: absolute; left: 0; top: 0; width: 70px; height: 90px; opacity: 0; }
-      #spark { position: absolute; left: 540px; top: 660px; width: 0; height: 0; }
-      #spark i { position: absolute; width: 18px; height: 18px; margin: -9px; background: #D97757; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); opacity: 0; }
-      #saveTxt { top: 930px; font-size: 92px; }
-      #nameTxt { top: 1150px; font-size: 120px; }
-      /* demo */
-      #term { top: 400px; height: 330px; }
-      #tbody { padding: 26px 28px; font: 700 31px/50px 'JetBrains Mono', monospace; white-space: pre-wrap; }
-      #tbody .p { color: #28c840; } #tbody .ok { color: #7dffa1; }
-      #cc { top: 770px; height: 470px; }
-      #cc .bar b { margin-left: auto; padding: 4px 14px; border-radius: 999px; background: #2a1d17; color: #f0a585; border: 2px solid #D97757; font: 800 20px 'Inter Tight'; }
-      #prompt { margin: 22px 24px 0; padding: 18px 22px; border-radius: 16px; background: #1a1d24; border: 2px solid #2d313b; font: 700 32px 'JetBrains Mono', monospace; color: #fff; min-height: 76px; }
-      #prompt .gt { color: #D97757; }
-      #result { margin: 18px 24px 0; padding: 18px 22px; border-radius: 16px; background: #0f2418; border: 2px solid #2f8f55; font: 700 28px/44px 'JetBrains Mono', monospace; color: #c8f7d6; opacity: 0; }
-      #result b { color: #7dffa1; } #result .st { color: #8fd6a7; }
-      /* checks */
-      .chk { position: absolute; left: 110px; width: 840px; font-weight: 900; font-size: 68px; white-space: nowrap; letter-spacing: -0.03em; opacity: 0; transform-origin: 0 50%; }
-      .chk em { font-style: normal; color: #D97757; margin-right: 18px; }
-      /* cta */
-      #ctaCard { position: absolute; left: 130px; top: 620px; width: 820px; padding: 46px 40px 44px; border-radius: 32px; background: #111318; color: #fff; text-align: center; opacity: 0;
-        box-shadow: 0 16px 0 rgba(217,119,87,0.35); }
-      #ctaCard .big { font-weight: 900; font-size: 92px; letter-spacing: -0.03em; line-height: 1; }
-      #ctaCard .big em { font-style: normal; color: #D97757; }
-      #ctaCard .fol { display: inline-block; margin-top: 30px; padding: 14px 30px; border-radius: 999px; background: #D97757; font-weight: 800; font-size: 44px; opacity: 0; }
-      #smear { position: absolute; inset: 0; opacity: 0; pointer-events: none;
-        background: repeating-linear-gradient(90deg, rgba(247,246,242,0) 0 40px, rgba(217,119,87,0.10) 40px 150px, rgba(247,246,242,0) 150px 260px); }
-      /* captions: compact pill at y 1460 during UI shots; large dark kinetic words mid-canvas otherwise */
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #080B12; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+      #hud { position: absolute; inset: 0; pointer-events: none; }
+      #flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(160,250,255,0.95), rgba(0,229,255,0.35) 40%, rgba(8,11,18,0) 75%); opacity: 0; }
+      #smear { position: absolute; inset: 0; opacity: 0;
+        background: repeating-radial-gradient(circle at 50% 45%, rgba(0,229,255,0) 0 60px, rgba(0,229,255,0.12) 60px 90px, rgba(0,229,255,0) 90px 160px); }
       #cap { position: absolute; left: 80px; width: 860px; top: 1415px; height: 90px; text-align: center; }
-      #cap .ch { display: inline-block; padding: 8px 24px 12px; border-radius: 18px; background: rgba(17,19,24,0.88); white-space: nowrap; font-size: 54px; line-height: 66px; font-weight: 900; color: #fff; }
-      #cap .on { color: #F0A585; }
-      #kcap { position: absolute; left: 80px; width: 860px; top: 1180px; text-align: center; font-weight: 900; font-size: 70px; letter-spacing: -0.03em; color: #141414; white-space: nowrap; }
-      #kcap .on { color: #D97757; }
+      #cap .ch { display: inline-block; padding: 8px 26px 12px; border-radius: 20px; background: rgba(6,10,18,0.82); border: 2px solid rgba(0,229,255,0.28); white-space: nowrap;
+        font-size: 56px; line-height: 68px; font-weight: 900; color: #fff; }
+      #cap .on { color: #00E5FF; }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="claude-skills" data-start="0" data-duration="30.26" data-width="1080" data-height="1920" data-fps="30">
-      <div id="bg" class="clip" data-start="0" data-duration="30.26" data-track-index="0"></div>
-      <div id="ui" class="clip" data-start="0" data-duration="30.26" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
-        <svg id="burst" viewBox="-100 -100 200 200"><g fill="#D97757">
-          <!-- original 12-ray burst (not a brand logo) -->
-          <rect x="-11" y="-96" width="22" height="80" rx="11" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(30)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(60)" />
-          <rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(90)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(120)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(150)" />
-          <rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(180)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(210)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(240)" />
-          <rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(270)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(300)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(330)" />
-          <circle r="24" /></g></svg>
-        <!-- 1: hook -->
-        <div class="kt" id="head"><span id="h1">Stop installing</span><br /><span id="h2" class="tc">Claude Skills</span><br /><span id="h3">manually.</span></div>
-        <div class="kt" id="sub"><span id="h4">One command → <b>the exact skill</b></span></div>
-        <!-- 2: github -->
-        <div class="card" id="gh"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;github.com / awesome-agent-skills<span class="chip">1,000s OF SKILLS</span></div>
-          <div id="rowsWin"><div id="rows"></div><div id="warnBox"></div></div></div>
-        <div id="wasted">⏱ 30 MIN WASTED</div>
-        <!-- 3: save -->
-        <svg id="bm" viewBox="0 0 300 380"><defs><clipPath id="bmClip"><path d="M30 20h240v340l-120-90-120 90z" /></clipPath></defs>
-          <path d="M30 20h240v340l-120-90-120 90z" fill="#fff" stroke="#141414" stroke-width="16" stroke-linejoin="round" />
-          <rect id="bmFill" x="0" y="380" width="300" height="380" fill="#D97757" clip-path="url(#bmClip)" />
-          <path d="M30 20h240v340l-120-90-120 90z" fill="none" stroke="#141414" stroke-width="16" stroke-linejoin="round" /></svg>
-        <svg id="cursor" viewBox="0 0 70 90"><path d="M6 4l56 40-26 6 14 30-12 6-14-30-18 18z" fill="#141414" stroke="#fff" stroke-width="5" stroke-linejoin="round" /></svg>
-        <div id="spark"></div>
-        <div class="kt" id="saveTxt"><span id="s1">Save this</span><br /><span id="s2" class="tc">before you forget.</span></div>
-        <div class="kt" id="nameTxt"><span id="s3">Find Skills</span></div>
-        <!-- 4: demo -->
-        <div class="card" id="term"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;zsh</div><div id="tbody"></div></div>
-        <div class="card" id="cc"><div class="bar">✳ Claude Code<b>Sonnet 4.6</b></div><div id="prompt"></div><div id="result"></div></div>
-        <!-- 5: checks -->
-        <div class="chk" id="c1" style="top:820px"><em>✦</em>No browsing.</div>
-        <div class="chk" id="c2" style="top:960px"><em>✦</em>No guessing.</div>
-        <div class="chk" id="c3" style="top:1100px"><em>✦</em>Right skill, every time.</div>
-        <!-- 6: cta -->
-        <div id="ctaCard"><div class="big">Comment <em>"SKILL"</em> 👇</div><div class="fol" id="fol">Follow @Shichi.AI</div></div>
+    <div id="root" data-composition-id="claude-skills" data-start="0" data-duration="28.13" data-width="1080" data-height="1920" data-fps="30">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="28.13" data-track-index="0"></canvas>
+      <div id="hud" class="clip" data-start="0" data-duration="28.13" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div id="smear"></div><div id="flash"></div><div id="cap"></div>
       </div>
-      <canvas id="bot" class="clip" width="1080" height="1920" data-start="0" data-duration="30.26" data-track-index="2"></canvas>
-      <div id="top" class="clip" data-start="0" data-duration="30.26" data-track-index="3" data-layout-allow-overlap data-layout-allow-overflow>
-        <div id="smear"></div><div id="kcap"></div><div id="cap"></div>
-      </div>
-      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="30.26" data-track-index="10" data-volume="1"></audio>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="28.13" data-track-index="10" data-volume="1"></audio>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      tl.to({}, { duration: 30.26 }, 0);
+      tl.to({}, { duration: 28.13 }, 0);
       window.__timelines["claude-skills"] = tl;
       tl.seek(0);
     </script>
 
     <script type="module">
       import * as THREE from "three";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       import { createBot } from "./characters.js";
       const LINES = window.LINES, D = window.D, DUR = D.DUR, C = D.cues, DRAFT = !!window.HF_DRAFT;
       const $ = (id) => document.getElementById(id);
@@ -142,110 +63,209 @@
       const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
       const backOut = (x, c1 = 1.9) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
       const lerp = (a, b, k) => a + (b - a) * k;
+      const lerp3 = (A, B, k) => A.map((v, i) => lerp(v, B[i], k));
       const bell = (t, a, b) => (t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a)));
+      const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
       const SH = D.shots.map((s) => s[0]), shotOf = (t) => { let i = 0; while (i < SH.length - 1 && t >= SH[i + 1]) i++; return D.shots[i][1]; };
-      const stamp = (el, t0, t, on = 1) => { const k = (t - t0) / 0.28; el.style.opacity = t >= t0 && on ? 1 : 0;
-        el.style.transform = t >= t0 ? `scale(${(1.45 - 0.45 * backOut(k)).toFixed(3)}) rotate(${(-4 * (1 - expoOut(k))).toFixed(2)}deg)` : "scale(1.45)"; };
 
-      /* ---------- Quill (3D, transparent canvas over the UI) ---------- */
+      /* ---------- renderer: obsidian lab ---------- */
       const W = DRAFT ? 540 : 1080, H = DRAFT ? 960 : 1920;
-      const renderer = new THREE.WebGLRenderer({ canvas: $("bot"), antialias: !DRAFT, alpha: true, preserveDrawingBuffer: true });
-      renderer.setPixelRatio(1); renderer.setSize(W, H, false); renderer.setClearColor(0x000000, 0);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
-      const scene = new THREE.Scene();
-      scene.add(new THREE.HemisphereLight(0xffffff, 0xd8cfc0, 1.6));
-      const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-2, 3, 4); scene.add(key);
-      const warm = new THREE.DirectionalLight(0xffc9ad, 1.0); warm.position.set(3, 1, 2); scene.add(warm);
-      const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.1, 50); camera.position.set(0, 0, 6); camera.lookAt(0, 0, 0);
-      const PX = 1920 / (2 * 6 * Math.tan(15 * Math.PI / 180));     // pixels per world unit at z = 0
-      const bot = createBot(THREE); scene.add(bot.group);
-      // where Quill stands (pixel centre of his body), how big, which way he looks, per shot
-      function quill(t, shot) {
-        let x = 1260, y = 1000, s = 2.4, yaw = -0.5, gest = "none", mood = "happy", vis = 1, extra = 0;
-        if (shot === "hook") { x = lerp(1260, 870, expoOut((t - 0.05) / 0.6)); y = 1430; s = 1.9; yaw = -0.55; gest = t > C.h4 ? "point" : "wave"; mood = "cheeky"; }
-        else if (shot === "github") { x = 860; y = 1260; s = 1.6; yaw = -0.35; mood = t > C.thirty ? "worried" : "wide"; extra = t > C.painful - 0.6 ? Math.sin(t * 16) * 0.45 : 0; gest = t > C.painful - 0.6 ? "shrug" : "none"; }
-        else if (shot === "save" || shot === "demo") vis = 0;
-        else if (shot === "checks") { x = 560; y = 470; s = 1.5; yaw = 0; gest = "cheer"; mood = "happy"; }
-        else { x = 850; y = 1250; s = 1.7; yaw = -0.4; gest = "wave"; mood = "cheeky"; }
-        if (t >= C.loop) { x = lerp(1260, 870, seg(t, C.loop, DUR)); y = 1430; s = 1.9; yaw = -0.55; vis = 1; gest = "wave"; mood = "cheeky"; }
-        bot.group.visible = !!vis; bot.group.scale.setScalar(s);
-        bot.group.position.set((x - 540) / PX, (960 - y) / PX - 0.36 * s, 0); bot.group.rotation.set(0, yaw + extra * 0.6, 0);
-        const talking = LINES.some((L) => L.words.some((w) => t >= w.s && t < w.e));
-        bot.face({ mood, blink: (t % 3.1) < 0.12 ? 1 : 0, talk: 0 }); bot.update(t, gest, 1);
-        renderer.render(scene, camera);
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+      const scene = new THREE.Scene(); scene.background = new THREE.Color(0x080b12); scene.fog = new THREE.FogExp2(0x080b12, 0.035);
+      const camera = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 120);
+      const composer = new EffectComposer(renderer); composer.setSize(W, H); composer.addPass(new RenderPass(scene, camera));
+      composer.addPass(new UnrealBloomPass(new THREE.Vector2(W / 2, H / 2), 0.32, 0.4, 0.97)); composer.addPass(new OutputPass());
+      function canvasTex(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d"); if (draw) draw(g, w, h); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4; return { c, g, tx }; }
+      const glow = canvasTex(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.3, "rgba(255,255,255,0.5)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }).tx;
+
+      // lights: cool key, cyan + violet rims
+      scene.add(new THREE.HemisphereLight(0x9fb6ff, 0x05070c, 0.5));
+      const key = new THREE.DirectionalLight(0xe8f4ff, 1.6); key.position.set(2, 5, 6); scene.add(key);
+      const rimC = new THREE.PointLight(0x00e5ff, 40, 14, 2); rimC.position.set(-3, 3, -2); scene.add(rimC);
+      const rimV = new THREE.PointLight(0x7a5cff, 30, 14, 2); rimV.position.set(3.5, 2, -3); scene.add(rimV);
+
+      // glowing perspective floor grid
+      const gridT = canvasTex(512, 512, (g, w, h) => { g.clearRect(0, 0, w, h); g.strokeStyle = "rgba(0,229,255,0.9)"; g.lineWidth = 3; g.strokeRect(1.5, 1.5, w - 3, h - 3);
+        g.strokeStyle = "rgba(0,229,255,0.25)"; g.lineWidth = 1.5; g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(w / 2, h); g.moveTo(0, h / 2); g.lineTo(w, h / 2); g.stroke(); });
+      gridT.tx.wrapS = gridT.tx.wrapT = THREE.RepeatWrapping; gridT.tx.repeat.set(30, 30);
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), new THREE.MeshBasicMaterial({ map: gridT.tx, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }));
+      floor.rotation.x = -Math.PI / 2; floor.position.y = -1.6; scene.add(floor);
+      const floorGlow = new THREE.Mesh(new THREE.CircleGeometry(7, 48), new THREE.MeshBasicMaterial({ map: glow, color: 0x00a8c0, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending }));
+      floorGlow.rotation.x = -Math.PI / 2; floorGlow.position.y = -1.59; scene.add(floorGlow);
+      // volumetric light shafts (additive gradient planes)
+      const shaftT = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(0.5, "rgba(255,255,255,1)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+        g.globalCompositeOperation = "destination-in"; const v = g.createLinearGradient(0, 0, 0, h); v.addColorStop(0, "rgba(0,0,0,0.9)"); v.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = v; g.fillRect(0, 0, w, h); }).tx;
+      const shafts = [[-2.6, 0x00e5ff], [2.4, 0x7a5cff], [0.2, 0x00e5ff]].map(([x, c], i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 9), new THREE.MeshBasicMaterial({ map: shaftT, color: c, transparent: true, opacity: 0.09, depthWrite: false, blending: THREE.AdditiveBlending }));
+        m.position.set(x, 2.8, -4 - i); m.rotation.z = 0.2 - i * 0.2; scene.add(m); return m; });
+      // dust motes
+      const R0 = rng(5), NM = 420, mPos = new Float32Array(NM * 3), mSeed = [];
+      for (let i = 0; i < NM; i++) mSeed.push([(R0() - 0.5) * 16, R0() * 8 - 1.6, (R0() - 0.5) * 22 - 2, R0() * 6.28]);
+      const motesGeo = new THREE.BufferGeometry(); motesGeo.setAttribute("position", new THREE.BufferAttribute(mPos, 3));
+      scene.add(new THREE.Points(motesGeo, new THREE.PointsMaterial({ color: 0xbff8ff, size: DRAFT ? 0.035 : 0.03, transparent: true, opacity: 0.6, depthWrite: false })));
+      // light rings the camera flies through
+      const rings = [15.5, 12.5].map((z) => { const r = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.06, 12, 128), new THREE.MeshBasicMaterial({ color: 0x00e5ff, fog: false })); r.position.set(0, 1.1, z); scene.add(r); return r; });
+
+      /* ---------- Quill ---------- */
+      const bot = createBot(THREE); scene.add(bot.group); bot.group.scale.setScalar(1.9);
+
+      /* ---------- holographic panels (canvas-textured glass) ---------- */
+      function panel(w, h, px, opts = {}) {
+        const ct = canvasTex(Math.round(px * w / h), px);
+        const g = new THREE.Group();
+        const glass = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: opts.tint || 0x0b1a2a, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide }));
+        const face = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: ct.tx, transparent: true, depthWrite: false, side: THREE.DoubleSide })); face.position.z = 0.005;
+        const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w, h)), new THREE.LineBasicMaterial({ color: opts.edge || 0x00e5ff, transparent: true }));
+        g.add(glass, face, edge); scene.add(g);
+        return { g, ct, glass, face, edge, w, h, set(o) { glass.material.opacity = 0.55 * o; face.material.opacity = o; edge.material.opacity = o; g.visible = o > 0.01; } };
+      }
+      const txt = (g, s, x, y, size, col, weight = 900, font = "Montserrat") => { g.font = `${weight} ${size}px ${font}`; g.fillStyle = col; g.fillText(s, x, y); };
+      // shot 1: terminal with the kinetic headline
+      const hook = panel(2.9, 1.95, 600); hook.g.position.set(-0.05, 1.75, 0); hook.g.rotation.y = 0.12;
+      // shot 2: README stack + red timer
+      const slabs = []; const SLAB = ["README.md", "GITHUB", "INSTALLATION.md", "README.md", "GEMINI.md", "README.md"];
+      SLAB.forEach((name, i) => { const lab = canvasTex(512, 128, (g, w, h) => { g.fillStyle = "#1c2230"; g.fillRect(0, 0, w, h); g.strokeStyle = name === "README.md" ? "#ff5a5a" : "#3a4458"; g.lineWidth = 6; g.strokeRect(3, 3, w - 6, h - 6);
+          g.font = "800 56px JetBrains Mono"; g.fillStyle = name === "README.md" ? "#ffb0b0" : "#c8d2e4"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(name, w / 2, h / 2 + 2); }).tx;
+        const side = new THREE.MeshStandardMaterial({ color: 0x232a38, roughness: 0.55, metalness: 0.4 }), front = new THREE.MeshStandardMaterial({ map: lab, roughness: 0.5, metalness: 0.2, emissive: 0xffffff, emissiveMap: lab, emissiveIntensity: 0.35 });
+        const m = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.5, 0.9), [side, side, side, side, front, side]); scene.add(m); slabs.push([m, i, (i % 2 ? 1 : -1) * (0.06 + 0.04 * i)]); });
+      const timerRing = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.035, 10, 64), new THREE.MeshBasicMaterial({ color: 0xff3b3b })); scene.add(timerRing);
+      const timer = panel(1.9, 0.48, 160, { edge: 0xff3b3b, tint: 0x2a0b0b });
+      // shot 3: crystal bookmark + zap beam + text
+      const bmShape = new THREE.Shape(); bmShape.moveTo(-0.5, 0.75); bmShape.lineTo(0.5, 0.75); bmShape.lineTo(0.5, -0.75); bmShape.lineTo(0, -0.38); bmShape.lineTo(-0.5, -0.75); bmShape.lineTo(-0.5, 0.75);
+      const bookmark = new THREE.Mesh(new THREE.ExtrudeGeometry(bmShape, { depth: 0.22, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 3 }),
+        new THREE.MeshPhysicalMaterial({ color: 0x7ff3ff, roughness: 0.05, metalness: 0.1, transmission: 0.6, thickness: 0.4, ior: 1.6, clearcoat: 1, emissive: 0x00a8c0, emissiveIntensity: 0.5, iridescence: 0.8 }));
+      bookmark.geometry.center(); scene.add(bookmark);
+      const bmGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0x00e5ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(bmGlow);
+      const zap = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1, 8), new THREE.MeshBasicMaterial({ color: 0x9ffcff })); scene.add(zap);
+      const saveP = panel(2.8, 1.25, 420, { tint: 0x081420 });
+      // shot 4: two tilted glass consoles + emerald orb + beam
+      const conTop = panel(3.0, 1.15, 420); const conBot = panel(3.0, 1.55, 520, { edge: 0x7a9cff });
+      const orb = new THREE.Mesh(new THREE.IcosahedronGeometry(0.28, 3), new THREE.MeshPhysicalMaterial({ color: 0x2bff9a, emissive: 0x18d97a, emissiveIntensity: 1.2, roughness: 0.15, clearcoat: 1 })); scene.add(orb);
+      const orbGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0x2bff9a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(orbGlow);
+      const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1, 8), new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true })); scene.add(beam);
+      // shot 5: three neon badges
+      const badges = ["No browsing", "No README files", "Right skill, every time"].map((s) => { const p = panel(2.6, 0.46, 150, { tint: 0x06202a });
+        const g = p.ct.g, w = p.ct.c.width, h = p.ct.c.height; g.clearRect(0, 0, w, h); g.textBaseline = "middle"; txt(g, "✦", 30, h / 2 + 4, 70, "#00E5FF");
+        let fs = 70; g.font = `900 ${fs}px Montserrat`; while (g.measureText(s).width > w - 160 && fs > 40) { fs -= 2; g.font = `900 ${fs}px Montserrat`; } txt(g, s, 120, h / 2 + 4, fs, "#e9feff"); p.ct.tx.needsUpdate = true; return p; });
+      // shot 6: CTA card
+      const cta = panel(3.0, 1.5, 480);
+      { const g = cta.ct.g, w = cta.ct.c.width, h = cta.ct.c.height; g.textAlign = "center"; g.textBaseline = "middle"; txt(g, "Comment", w / 2, h * 0.24, 110, "#ffffff"); txt(g, '"SKILL" 👇', w / 2, h * 0.5, 120, "#00E5FF");
+        g.fillStyle = "#00E5FF"; const bw = 640, bh = 96; g.beginPath(); g.roundRect(w / 2 - bw / 2, h * 0.78 - bh / 2, bw, bh, 48); g.fill(); txt(g, "Follow @Shichi.AI", w / 2, h * 0.78 + 4, 58, "#04121c", 800); cta.ct.tx.needsUpdate = true; }
+
+      /* ---------- per-frame drawing of the live panels ---------- */
+      function drawHook(t) {
+        const p = hook, g = p.ct.g, w = p.ct.c.width, h = p.ct.c.height; g.clearRect(0, 0, w, h);
+        [["#ff5f57", 30], ["#febc2e", 62], ["#28c840", 94]].forEach(([c, x]) => { g.fillStyle = c; g.beginPath(); g.arc(x, 34, 11, 0, 7); g.fill(); });
+        txt(g, "claude-skills — zsh", 124, 44, 26, "#7fa8c0", 700, "JetBrains Mono");
+        const lines = [["Stop installing", "#ffffff", -0.2], ["Claude Skills", "#00E5FF", C.h2], ["manually.", "#ffffff", C.h3]];
+        g.textAlign = "center"; g.textBaseline = "middle";
+        lines.forEach(([s, col, t0], i) => { if (t < t0) return; const k = backOut((t - t0) / 0.28); g.save(); g.translate(w / 2, 170 + i * 128); g.scale(1.5 - 0.5 * k, 1.5 - 0.5 * k); txt(g, s, 0, 0, 112, col); g.restore(); });
+        if (t >= C.h4) { g.globalAlpha = seg(t, C.h4, C.h4 + 0.25); txt(g, "one command → the exact skill", w / 2, 540, 40, "#9fe9f5", 800, "JetBrains Mono"); g.globalAlpha = 1; }
+        g.textAlign = "left"; p.ct.tx.needsUpdate = true;
+      }
+      function drawSave(t) {
+        const p = saveP, g = p.ct.g, w = p.ct.c.width, h = p.ct.c.height; g.clearRect(0, 0, w, h); g.textAlign = "center"; g.textBaseline = "middle";
+        [["Save this", "#ffffff", C.save, 96, 0.26], ["before you forget", "#00E5FF", C.forget - 0.25, 78, 0.52], ["Find Skills", "#ffffff", C.name, 120, 0.82]].forEach(([s, col, t0, sz, y]) => {
+          if (t < t0) return; const k = backOut((t - t0) / 0.28); g.save(); g.translate(w / 2, h * y); g.scale(1.4 - 0.4 * k, 1.4 - 0.4 * k); txt(g, s, 0, 0, sz, col); g.restore(); });
+        g.textAlign = "left"; p.ct.tx.needsUpdate = true;
+      }
+      function drawConsoles(t) {
+        { const g = conTop.ct.g, w = conTop.ct.c.width, h = conTop.ct.c.height; g.clearRect(0, 0, w, h); g.textBaseline = "alphabetic"; txt(g, "zsh", 30, 50, 30, "#7fa8c0", 700, "JetBrains Mono");
+          const cmd = "npx skills add vercel-labs/skills", n = Math.floor(clamp((t - C.cmd0) / (C.cmd1 - C.cmd0), 0, 1) * cmd.length);
+          txt(g, "$", 30, 170, 52, "#28c840", 800, "JetBrains Mono"); txt(g, cmd.slice(0, n) + (t < C.cmd1 + 0.1 && t % 0.4 < 0.2 ? "▍" : ""), 80, 170, 52, "#e8f6ff", 800, "JetBrains Mono");
+          if (t >= C.cmd1 + 0.1) txt(g, "✓ Installed find-skills", 30, 290, 54, "#5dffa8", 800, "JetBrains Mono"); conTop.ct.tx.needsUpdate = true; }
+        { const g = conBot.ct.g, w = conBot.ct.c.width, h = conBot.ct.c.height; g.clearRect(0, 0, w, h); g.textBaseline = "alphabetic"; txt(g, "✳ Claude Code", 30, 52, 32, "#b9c8ff", 800, "JetBrains Mono");
+          g.strokeStyle = "#7a9cff"; g.lineWidth = 3; g.beginPath(); g.roundRect(w - 260, 18, 230, 52, 26); g.stroke(); txt(g, "Sonnet 4.6", w - 238, 54, 28, "#b9c8ff", 800, "JetBrains Mono");
+          const q = "Is there a skill for 3D video?", n = Math.floor(clamp((t - C.ask0) / (C.ask1 - C.ask0), 0, 1) * q.length);
+          txt(g, ">", 30, 160, 50, "#00E5FF", 800, "JetBrains Mono"); txt(g, q.slice(0, n) + (t < C.ask1 && t >= C.ask0 - 0.3 && t % 0.4 < 0.2 ? "▍" : ""), 76, 160, 50, "#ffffff", 800, "JetBrains Mono");
+          if (t >= C.search) { const st = "✓ searched" + (t >= C.verify ? " · ✓ verified" : "") + (t >= C.install ? " · ✓ installed" : "");
+            txt(g, st, 30, 270, 38, "#8fe6c0", 700, "JetBrains Mono"); g.globalAlpha = seg(t, C.search, C.search + 0.25); txt(g, "✓ Found: hyperframes-core", 30, 370, 54, "#5dffa8", 800, "JetBrains Mono"); txt(g, "931K installs", 30, 450, 44, "#c8f7d6", 700, "JetBrains Mono"); g.globalAlpha = 1; }
+          conBot.ct.tx.needsUpdate = true; }
       }
 
-      /* ---------- static content ---------- */
-      const FILES = ["skills/", "docs/", "GEMINI.md", "INSTALLATION.md", "CONTRIBUTING.md", "SKILL.md", "README.md", "agents.yaml", "LICENSE", "examples/", "setup.sh", "CHANGELOG.md"];
-      $("rows").innerHTML = FILES.map((f) => `<div class="row${f === "README.md" ? " warn" : ""}"><i></i>${f}</div>`).join("");
-      $("spark").innerHTML = Array.from({ length: 10 }, (_, i) => `<i id="sp${i}"></i>`).join("");
+      /* ---------- camera direction ---------- */
+      function camAt(t, shot) {
+        if (shot === "hook") { const k = expoOut(t / 2.4); return [[lerp(0.2, 0.1, k), lerp(1.3, 1.2, k), lerp(20, 9.6, k)], [0, 1.1, 0]]; }
+        if (shot === "github") { const u = (t - SH[1]) / (SH[2] - SH[1]), a = lerp(-0.35, 0.4, smooth(u)); return [[Math.sin(a) * 11.5, lerp(2.2, 2.9, u), Math.cos(a) * 11.5], [0, 2.45, 0]]; }
+        if (shot === "save") { const u = (t - SH[2]) / (SH[3] - SH[2]); return [[lerp(0.5, 0.15, u), lerp(1.4, 1.2, u), lerp(9.8, 9.0, u)], [0, 1.15, 0]]; }
+        if (shot === "demo") { const u = (t - SH[3]) / (SH[4] - SH[3]); return [[lerp(-0.7, 0.6, u), lerp(1.4, 1.2, u), lerp(9.6, 9.0, u)], [0, 1.2, 0]]; }
+        if (shot === "checks") { const u = (t - SH[4]) / (SH[5] - SH[4]); return [[lerp(0.9, -0.6, u), 1.3, 9.0], [0, 1.2, 0]]; }
+        const u = (t - SH[5]) / (C.loop - SH[5]); return [[lerp(0.5, 0.1, u), 1.3, lerp(9.4, 8.8, u)], [0, 1.25, 0]];
+      }
 
       function renderAt(t) {
-        const shot = t >= C.loop ? "hook" : shotOf(t);
-        // background starburst: always turning; it sweeps big during the loop whip
-        const lw = t >= C.loop ? seg(t, C.loop, DUR) : 0;
-        $("burst").style.transform = `rotate(${(t * 40).toFixed(1)}deg) scale(${(1 + 0.08 * Math.sin(t * 3) + (t >= C.loop ? 1.2 * (1 - lw) : 0)).toFixed(3)})`;
-        // 1. hook: kinetic stamps
-        const hOn = shot === "hook" && t < C.loop;
-        stamp($("h1"), 0, t + 0.12, hOn); stamp($("h2"), C.h2, t, hOn); stamp($("h3"), C.h3, t, hOn); stamp($("h4"), C.h4, t, hOn);
-        // 2. GitHub README problem
-        const g = $("gh"), gOn = shot === "github";
-        g.style.opacity = gOn ? 1 : 0; g.style.transform = `translateY(${(gOn ? 300 * (1 - expoOut((t - SH[1]) / 0.5)) : 0).toFixed(1)}px)`;
-        const sc = gOn ? 74 * 6 * smooth((t - C.wasting) / (C.readme - C.wasting)) : 0; $("rows").style.transform = `translateY(${(-sc).toFixed(1)}px)`;
-        const wb = $("warnBox"); wb.style.top = (14 + 74 * 6 - sc).toFixed(1) + "px"; wb.style.opacity = gOn && t >= C.readme ? 1 : 0;
-        const ws = $("wasted"); ws.style.opacity = gOn && t >= C.thirty ? 1 : 0; ws.style.transform = `scale(${t >= C.thirty ? (1.5 - 0.5 * backOut((t - C.thirty) / 0.3)).toFixed(3) : 1}) rotate(-4deg)`;
-        // 3. Save trigger
-        const sOn = shot === "save", bm = $("bm");
-        bm.style.opacity = sOn ? 1 : 0; bm.style.transform = `scale(${sOn ? (0.6 + 0.4 * expoOut((t - SH[2]) / 0.4) - 0.08 * bell(t, C.save, C.save + 0.18)).toFixed(3) : 1})`;
-        $("bmFill").setAttribute("y", (380 - 380 * expoOut((t - C.save - 0.05) / 0.35)).toFixed(1));
-        const cu = $("cursor"), ck = seg(t, SH[2] + 0.05, C.save); cu.style.opacity = sOn && t < C.save + 0.6 ? 1 : 0;
-        cu.style.transform = `translate(${lerp(900, 560, ck).toFixed(1)}px, ${lerp(1150, 640, ck).toFixed(1)}px) scale(${(1 - 0.15 * bell(t, C.save - 0.05, C.save + 0.15)).toFixed(3)})`;
-        for (let i = 0; i < 10; i++) { const p = clamp((t - C.save - 0.15) / 0.6, 0, 1), a = i * 0.628, r = 40 + 230 * expoOut(p); const e = $("sp" + i);
-          e.style.opacity = sOn && p > 0 && p < 1 ? (1 - p) : 0; e.style.transform = `translate(${(Math.cos(a) * r).toFixed(1)}px, ${(Math.sin(a) * r).toFixed(1)}px) scale(${(1.6 - p).toFixed(2)}) rotate(${(p * 180).toFixed(0)}deg)`; }
-        stamp($("s1"), C.save, t, sOn); stamp($("s2"), C.forget - 0.25, t, sOn); stamp($("s3"), C.name, t, sOn);
-        // 4. terminal + Claude Code
-        const dOn = shot === "demo";
-        for (const [id, d] of [["term", 0], ["cc", 0.15]]) { const e = $(id); e.style.opacity = dOn ? 1 : 0; e.style.transform = `translateY(${(dOn ? 220 * (1 - expoOut((t - SH[3] - d) / 0.45)) : 0).toFixed(1)}px)`; }
-        const cmd = "npx skills add vercel-labs/skills", nc = Math.floor(clamp((t - C.cmd0) / (C.cmd1 - C.cmd0), 0, 1) * cmd.length);
-        $("tbody").innerHTML = '<span class="p">$</span> ' + cmd.slice(0, nc) + (t < C.cmd1 + 0.1 && t % 0.4 < 0.2 ? "▍" : "") + (t >= C.cmd1 + 0.1 ? '\n<span class="ok">✓ Installed find-skills</span>' : "");
-        const q = "Is there a skill for 3D video?", nq = Math.floor(clamp((t - C.ask0) / (C.ask1 - C.ask0), 0, 1) * q.length);
-        $("prompt").innerHTML = '<span class="gt">&gt;</span> ' + q.slice(0, nq) + (t < C.ask1 && t % 0.4 < 0.2 && t >= C.ask0 - 0.3 ? "▍" : "");
-        const rs = $("result"), rOn = dOn && t >= C.search; rs.style.opacity = rOn ? 1 : 0; rs.style.transform = `scaleY(${rOn ? expoOut((t - C.search) / 0.3).toFixed(3) : 0})`; rs.style.transformOrigin = "50% 0";
-        rs.innerHTML = `<span class="st">${t >= C.search ? "✓ searched skills.sh" : ""}${t >= C.verify ? " · ✓ verified" : ""}${t >= C.install ? " · ✓ installed" : ""}</span><br /><b>✓ Found: hyperframes-core</b><br />931K installs`;
-        // 5. three checks
+        const looping = t >= C.loop, shot = looping ? "hook" : shotOf(t);
+        const ht = looping ? t - DUR : t;
+        let [pos, tgt] = camAt(shot === "hook" ? Math.max(0, ht) : t, shot);
+        if (looping) { const k = seg(t, C.loop, DUR); pos = lerp3([0.1, 1.3, 8.8], [0.2, 1.3, 20], k); tgt = [0, lerp(1.25, 1.1, k), 0]; }   // whip-dolly through a ring back to the opening pose
+        camera.position.set(...pos); camera.lookAt(...tgt); camera.updateMatrixWorld();
+        // environment motion
+        for (let i = 0; i < NM; i++) { const [x, y, z, ph] = mSeed[i]; mPos[i * 3] = x + Math.sin(t * 0.3 + ph) * 0.3; mPos[i * 3 + 1] = ((y + 1.6 + t * 0.08 + ph) % 8) - 1.6; mPos[i * 3 + 2] = z; } motesGeo.attributes.position.needsUpdate = true;
+        rings.forEach((r, i) => { r.rotation.z = t * 0.4 * (i ? -1 : 1); r.visible = shot === "hook"; });
+        shafts.forEach((m, i) => { m.material.opacity = 0.07 + 0.03 * Math.sin(t * 0.8 + i * 2); });
+        gridT.tx.offset.y = -t * 0.08;
+        // Quill
+        const qp = new THREE.Vector3(0.85, -0.55, 0.7); let qyaw = -0.35, gest = "none", mood = "happy", qs = 1.5, squash = 0;
+        if (shot === "hook") { gest = t > C.h4 ? "point" : "wave"; mood = "cheeky"; }
+        else if (shot === "github") { qp.set(0, 0.6, 0.2); qs = 1.3; mood = t > C.thirty ? "worried" : "wide"; squash = 0.12 * seg(t, SH[1] + 0.3, C.thirty); gest = t > C.painful - 0.6 ? "shrug" : "none"; qyaw = -0.6 + (t > C.painful - 0.6 ? 0.5 * Math.sin(t * 16) : 0); }
+        else if (shot === "save") { qp.set(1.15, 1.95, 0.6); qs = 1.0; gest = "point"; mood = "sly"; qyaw = -0.8; }
+        else if (shot === "demo") { qp.set(-1.15, -1.2, 0.9); qs = 1.0; mood = "happy"; qyaw = -0.7; }
+        else if (shot === "checks") { qp.set(0, 2.55, 0); qs = 1.4; gest = "cheer"; mood = "happy"; qyaw = 0.4 + Math.PI * 2 * seg(t, C.c1 - 0.2, C.c1 + 0.8); }
+        else if (shot === "cta") { qp.set(0.95, -0.9, 0.8); qs = 1.1; gest = "wave"; mood = "cheeky"; qyaw = -0.6; }
+        if (looping) { qp.set(0.85, -0.55, 0.7); qs = 1.5; gest = "wave"; mood = "cheeky"; qyaw = -0.35; }
+        bot.group.position.copy(qp); bot.group.scale.set(qs * (1 + squash), qs * (1 - squash), qs * (1 + squash)); bot.group.rotation.set(0, qyaw, 0);
+        bot.face({ mood, blink: (t % 3.1) < 0.12 ? 1 : 0, talk: 0 }); bot.update(t, gest, 1);
+        // shot 1 panel (also present behind the loop whip, so the cut lands on the same frame)
+        const hOn = shot === "hook"; hook.set(hOn ? 1 : 0); if (hOn) drawHook(looping ? -0.1 : t);
+        hook.g.position.y = 1.75 + 0.04 * Math.sin(t * 1.5);
+        // shot 2: stack drops onto Quill, wobbles; zapped away at the save cue
+        const gOn = shot === "github" || (shot === "save" && t < SH[2] + 0.9);
+        slabs.forEach(([m, i, tilt]) => { m.visible = gOn; if (!gOn) return; const land = expoOut((t - SH[1] - 0.15 - i * 0.18) / 0.5), base = 1.4 + i * 0.52;
+          let y = lerp(base + 6, base, land), x = Math.sin(t * 2 + i) * 0.03, rz = tilt * Math.sin(t * 1.7 + i) * 0.4, rx = 0, z = 0;
+          if (shot === "save") { const e = expoOut((t - SH[2] - 0.05) / 0.7); x += (i % 2 ? 1 : -1) * e * (3 + i * 0.4); y += e * (2 + i * 0.3); z -= e * 3; rz += e * (i % 2 ? 2 : -2); rx = e * 2; }
+          m.position.set(x, y, z); m.rotation.set(rx, 0.12 * Math.sin(i), rz); });
+        const tOn = shot === "github" && t >= C.thirty; timerRing.visible = tOn; timer.set(tOn ? seg(t, C.thirty, C.thirty + 0.2) : 0);
+        timerRing.position.set(0, 4.85, 0); timerRing.rotation.set(Math.PI / 2 - 0.3, 0, t * 3); timer.g.position.set(0, 4.85 + 0.6, 0.2); timer.g.rotation.y = Math.sin(t * 2) * 0.5;
+        if (tOn) { const g = timer.ct.g, w = timer.ct.c.width, h = timer.ct.c.height; g.clearRect(0, 0, w, h); g.textAlign = "center"; g.textBaseline = "middle"; let fs = 86; g.font = `900 ${fs}px Montserrat`; while (g.measureText("⏱ 30 MIN WASTED").width > w - 40) { fs -= 2; g.font = `900 ${fs}px Montserrat`; } txt(g, "⏱ 30 MIN WASTED", w / 2, h / 2 + 4, fs, "#ff6b6b"); g.textAlign = "left"; timer.ct.tx.needsUpdate = true; }
+        // shot 3: zap + crystal bookmark + save text
+        const sOn = shot === "save"; zap.visible = sOn && t < SH[2] + 0.45;
+        if (zap.visible) { const a = new THREE.Vector3(1.15, 2.45, 0.6), b = new THREE.Vector3(0, 3.6, 0); zap.position.copy(a).add(b).multiplyScalar(0.5); zap.scale.set(1 + Math.sin(t * 60), a.distanceTo(b), 1 + Math.sin(t * 60)); zap.lookAt(b); zap.rotateX(Math.PI / 2); }
+        bookmark.visible = bmGlow.visible = sOn; if (sOn) { const k = expoOut((t - SH[2] - 0.2) / 0.5); bookmark.position.set(-0.2, 2.35, 0.3); bookmark.scale.setScalar(Math.max(0.01, k * (1 + 0.08 * bell(t, C.save, C.save + 0.3)))); bookmark.rotation.set(0.15, t * 1.4, 0.08);
+          bmGlow.position.copy(bookmark.position); bmGlow.scale.setScalar(2.6 * k); bmGlow.material.opacity = 0.35 + 0.15 * Math.sin(t * 5); }
+        saveP.set(sOn ? seg(t, C.save - 0.1, C.save + 0.1) : 0); saveP.g.position.set(0, 0.55, 0.6); if (sOn) drawSave(t);
+        // shot 4: tilted consoles, orb, beam
+        const dOn = shot === "demo", dk = dOn ? expoOut((t - SH[3]) / 0.5) : 0;
+        conTop.set(dOn ? dk : 0); conBot.set(dOn ? expoOut((t - SH[3] - 0.15) / 0.5) : 0);
+        conTop.g.position.set(0, lerp(3.3, 2.55, dk), 0); conTop.g.rotation.set(0.12, 0.28, -0.03);
+        conBot.g.position.set(0, lerp(-0.1, 0.65, dk), 0.35); conBot.g.rotation.set(-0.1, -0.22, 0.02);
+        if (dOn) drawConsoles(t);
+        const oOn = dOn && t >= C.cmd1 + 0.1, ok = oOn ? backOut((t - C.cmd1 - 0.1) / 0.35) : 0; orb.visible = orbGlow.visible = oOn;
+        orb.position.set(0.85, 3.5 + 0.06 * Math.sin(t * 3), 0.4); orb.scale.setScalar(Math.max(0.01, ok)); orb.rotation.set(t, t * 1.3, 0); orbGlow.position.copy(orb.position); orbGlow.scale.setScalar(1.3 * ok);
+        const bOn = dOn && t >= C.search; beam.visible = bOn; if (bOn) { const a = orb.position.clone(), b = new THREE.Vector3(0.95, 1.35, 0.6), e = expoOut((t - C.search) / 0.25), bb = a.clone().lerp(b, e);
+          beam.position.copy(a).add(bb).multiplyScalar(0.5); beam.scale.set(1, Math.max(0.001, a.distanceTo(bb)), 1); beam.lookAt(bb); beam.rotateX(Math.PI / 2); beam.material.opacity = 0.7 + 0.3 * Math.sin(t * 20); }
+        // shot 5: badges
         const kOn = shot === "checks";
-        [["c1", C.c1], ["c2", C.c2], ["c3", C.c3]].forEach(([id, t0]) => { const e = $(id), k = (t - t0) / 0.3; e.style.opacity = kOn && t >= t0 ? 1 : 0; e.style.transform = `translateX(${(kOn && t >= t0 ? -120 * (1 - expoOut(k)) : -120).toFixed(1)}px) scale(${(t >= t0 ? 1.25 - 0.25 * backOut(k) : 1).toFixed(3)})`; });
-        // 6. CTA
-        const cOn = shot === "cta" && t < C.loop, cc = $("ctaCard");
-        cc.style.opacity = cOn ? 1 : 0; cc.style.transform = `scale(${cOn ? (1.3 - 0.3 * backOut((t - C.cta) / 0.35) + 0.025 * Math.sin(t * 6)).toFixed(3) : 1})`;
-        $("fol").style.opacity = cOn && t >= C.follow ? 1 : 0; $("fol").style.transform = `scale(${t >= C.follow ? (1.4 - 0.4 * backOut((t - C.follow) / 0.3)).toFixed(3) : 1})`;
-        // whips between shots + the loop whip
+        badges.forEach((p, i) => { const t0 = [C.c1, C.c2, C.c3][i], k = kOn && t >= t0 ? expoOut((t - t0) / 0.35) : 0; p.set(k); p.g.position.set(lerp(2.6, 0, k), 1.62 - i * 0.66 + 0.04 * Math.sin(t * 2 + i), 0.3); p.g.rotation.y = -0.18 + 0.05 * Math.sin(t * 1.5 + i); p.g.scale.setScalar(0.8 + 0.2 * backOut((t - t0) / 0.35)); });
+        // shot 6: CTA card pulse
+        const cOn = shot === "cta"; cta.set(cOn ? seg(t, C.cta, C.cta + 0.2) : 0); cta.g.position.set(0, 1.85, 0.2); cta.g.rotation.y = 0.1 * Math.sin(t * 1.2);
+        cta.g.scale.setScalar(cOn ? (0.85 + 0.15 * backOut((t - C.cta) / 0.35) + 0.02 * Math.sin(t * 6)) : 1);
+        composer.render();
         const sm = Math.max(...SH.slice(1).map((a) => bell(t, a - 0.06, a + 0.24)), bell(t, C.loop, DUR + 0.02));
-        $("smear").style.opacity = sm.toFixed(3);
-        $("ui").style.transform = t >= C.loop ? `translateX(${(-900 * (1 - lw)).toFixed(1)}px)` : "none";
-        quill(t, shot);
-        captions(t, shot);
+        $("smear").style.opacity = sm.toFixed(3); $("flash").style.opacity = (0.7 * bell(t, C.loop + 0.06, DUR - 0.04)).toFixed(3);
+        captions(t, looping);
       }
-
-      // captions: compact pill at y 1460 in the UI shots; large kinetic words mid-canvas in the type shots (except where the type already says it)
       const SAY = (w) => w.replace(/^N-P-X/, "npx").replace(/^SKILL/, '"SKILL"');
-      function captions(t, shot) {
+      function captions(t, looping) {
         let li = 0; while (li < LINES.length - 1 && t >= LINES[li + 1].s - 0.05) li++;
-        const L = LINES[li], on = t >= L.s - 0.03 && t < L.e && t < C.loop;
-        const kinetic = shot === "hook" || shot === "save" || shot === "checks";
-        const covered = shot === "hook" || shot === "save" || shot === "checks";   // the big type already shows these words
-        $("cap").style.opacity = on && !kinetic ? 1 : 0; $("kcap").style.opacity = on && kinetic && !covered ? 1 : 0;
-        if (!on) return;
+        const L = LINES[li], on = t >= L.s - 0.03 && t < L.e && !looping; $("cap").style.opacity = on ? 1 : 0; if (!on) return;
         const ws = L.words, chunks = [[]];
         ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
           if (cur.length && len + w.w.length > 20) { chunks.push([]); cur = chunks[chunks.length - 1]; }
           cur.push(j); if (/[.,!?:]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
         let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
         const ch = chunks.find((c) => c.includes(act)) || chunks[0];
-        const html = ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${SAY(ws[j].w)}</span>`).join(" ");
-        if (kinetic) $("kcap").innerHTML = html; else $("cap").innerHTML = '<span class="ch">' + html + "</span>";
+        $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${SAY(ws[j].w)}</span>`).join(" ") + "</span>";
       }
-
       window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
       const root = window.__timelines["claude-skills"];
       root.eventCallback("onUpdate", () => renderAt(root.time()));

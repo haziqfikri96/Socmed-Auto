@@ -1,4 +1,4 @@
-"""Direction for "Stop Installing Claude Skills Manually" (~30 s): shot windows, kinetic-type and UI cues and sound
+"""Direction for "Stop Installing Claude Skills Manually" (~28 s, 3D lab cut): shot windows, kinetic-type and UI cues and sound
 cues keyed to the narration's word timings (assets/lines.json). Writes direction.js (window.D) and direction.json.
 
 usage: python build_direction.py   (after make_dialogue.py)
@@ -33,7 +33,8 @@ cues = {
 sfx = [["sk_tactile_pop", cues["h1"], -9], ["ob_key_click", cues["h2"], -10], ["sk_tactile_pop", cues["h3"], -11],
        ["foley_whoosh", r(shots[1][0] + 0.15), -11], ["sk_scroll_ticks", cues["wasting"], -11], ["sk_error_thud", cues["readme"], -9],
        ["bts_soft_whoosh", r(shots[2][0] + 0.08), -11], ["sk_mouse_click", cues["save"], -8], ["sk_chime", r(cues["save"] + 0.18), -10],
-       ["foley_whoosh", r(shots[3][0] + 0.12), -12], ["sk_typing", cues["cmd0"], -13], ["foley_ui_pop", r(cues["cmd1"] + 0.1), -11],
+       ["bts_sub_thud", r(shots[2][0] + 0.05), -10],   # Quill zaps the README stack away
+       ["foley_whoosh", r(shots[3][0] + 0.12), -12], ["sk_typing", cues["cmd0"], -13], ["sk_chime", r(cues["cmd1"] + 0.1), -12],   # orb spawns
        ["sk_typing", cues["ask0"], -14], ["foley_ui_pop", cues["search"], -11],
        ["sk_pops_up", cues["c1"], -11], ["sk_tactile_pop", cues["c2"], -12], ["sk_tactile_pop", cues["c3"], -11],
        ["bts_soft_whoosh", r(shots[5][0] + 0.08), -11], ["sk_tactile_pop", cues["cta"], -10], ["foley_ui_pop", cues["follow"], -12],
