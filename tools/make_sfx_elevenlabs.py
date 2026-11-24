@@ -72,6 +72,14 @@ FOLEY = {
     "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
     "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
     "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    # Claude skills explainer
+    "sk_tactile_pop": (0.5, "Crisp tactile pop, a firm plastic button snapping into place, short bright transient, dry close-mic foley, no reverb, one-shot"),
+    "sk_scroll_ticks": (0.7, "Rapid soft scroll-wheel ticks, a mouse wheel spun quickly with tiny clean detents, dry close-mic foley, no reverb, one-shot"),
+    "sk_error_thud": (0.5, "Soft muted error thud, a padded low knock like a gentle wrong-answer bump, warm and short, dry close-mic, no reverb, no distortion, one-shot"),
+    "sk_mouse_click": (0.5, "Single crisp computer mouse click, clean plastic left-button press, dry close-mic foley, no reverb, one-shot"),
+    "sk_chime": (0.6, "Bright clean success chime, two quick rising glass bell notes, light and cheerful, dry, no reverb tail, one-shot"),
+    "sk_typing": (1.2, "Fast crisp mechanical keyboard typing burst, quick tactile keystrokes in an even rhythm, dry close-mic foley, no reverb, one-shot"),
+    "sk_pops_up": (0.8, "Three quick ascending soft UI pops, small rounded bubbles rising in pitch one after another, clean and subtle, dry close-mic, no reverb, one-shot"),
     # Onion BTS short
     "ob_scan_hum": (2.0, "Subtle soft digital scanner hum, gentle electronic sweep tone with a light warm buzz, clean and smooth, no music, no beeps, no metallic ringing", "ambient"),
     "ob_key_click": (0.5, "Single crisp mechanical keyboard keystroke, one clean tactile key press, dry close-mic foley, no reverb, one-shot"),

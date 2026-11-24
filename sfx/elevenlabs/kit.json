@@ -48,6 +48,55 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "sk_tactile_pop": {
+    "seconds": 0.5,
+    "prompt": "Crisp tactile pop, a firm plastic button snapping into place, short bright transient, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "sk_scroll_ticks": {
+    "seconds": 0.7,
+    "prompt": "Rapid soft scroll-wheel ticks, a mouse wheel spun quickly with tiny clean detents, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "sk_error_thud": {
+    "seconds": 0.5,
+    "prompt": "Soft muted error thud, a padded low knock like a gentle wrong-answer bump, warm and short, dry close-mic, no reverb, no distortion, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "sk_mouse_click": {
+    "seconds": 0.5,
+    "prompt": "Single crisp computer mouse click, clean plastic left-button press, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "sk_chime": {
+    "seconds": 0.6,
+    "prompt": "Bright clean success chime, two quick rising glass bell notes, light and cheerful, dry, no reverb tail, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "sk_typing": {
+    "seconds": 1.2,
+    "prompt": "Fast crisp mechanical keyboard typing burst, quick tactile keystrokes in an even rhythm, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "sk_pops_up": {
+    "seconds": 0.8,
+    "prompt": "Three quick ascending soft UI pops, small rounded bubbles rising in pitch one after another, clean and subtle, dry close-mic, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "ob_scan_hum": {
     "seconds": 2.0,
     "prompt": "Subtle soft digital scanner hum, gentle electronic sweep tone with a light warm buzz, clean and smooth, no music, no beeps, no metallic ringing",

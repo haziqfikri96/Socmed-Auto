@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="direction.js"></script>
+    <script src="render-mode.js"></script>
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js" } }
+    </script>
+    <style>
+      /* TikTok safe zone for this video: everything inside x 80–940, y 220–1620 */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #F7F6F2; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif; color: #141414; }
+      #bg { position: absolute; inset: 0; background-color: #F7F6F2;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 30v12M30 36h12' stroke='%23d6d2c8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); }
+      #burst { position: absolute; left: 95px; top: 250px; width: 170px; height: 170px; transform-origin: 50% 50%; }
+      #bot { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      /* kinetic type */
+      .kt { position: absolute; left: 80px; width: 860px; text-align: center; font-weight: 900; letter-spacing: -0.035em; line-height: 0.98; }
+      .kt span { display: inline-block; opacity: 0; transform-origin: 50% 70%; }
+      .kt .tc { color: #D97757; }
+      #head { top: 520px; font-size: 128px; }
+      #sub { top: 1010px; font-size: 46px; font-weight: 800; letter-spacing: -0.02em; color: #3b3b3b; }
+      #sub b { color: #D97757; }
+      /* dark UI cards (solid offset shadow, no blur) */
+      .card { position: absolute; left: 130px; width: 820px; border-radius: 24px; background: #111318; color: #e9ecf2; border: 2px solid #23262e; opacity: 0;
+        box-shadow: 0 14px 0 rgba(20,20,20,0.12); }
+      .bar { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 22px; border-bottom: 1px solid #23262e; font: 700 22px 'JetBrains Mono', monospace; color: #8b93a3; }
+      .dot { width: 14px; height: 14px; border-radius: 50%; } .r { background: #ff5f57; } .y { background: #febc2e; } .g { background: #28c840; }
+      #gh { top: 420px; height: 760px; left: 130px; overflow: hidden; }
+      #gh .chip { position: absolute; right: 22px; top: 10px; padding: 6px 14px; border-radius: 999px; background: #D97757; color: #fff; font: 800 22px 'Inter Tight'; }
+      #rowsWin { position: absolute; left: 0; right: 0; top: 56px; bottom: 0; overflow: hidden; }
+      #rows { position: absolute; left: 0; right: 0; top: 14px; }
+      .row { height: 74px; margin: 0 22px; display: flex; align-items: center; gap: 18px; border-bottom: 1px solid #1d2027; font: 700 30px 'JetBrains Mono', monospace; color: #c9cfda; }
+      .row i { width: 28px; height: 34px; border-radius: 5px; border: 3px solid #5d6575; }
+      .row.warn { color: #ffb4b4; }
+      #warnBox { position: absolute; left: 14px; right: 14px; height: 74px; border: 4px solid #ff4d4d; border-radius: 12px; opacity: 0; }
+      #wasted { position: absolute; right: 160px; top: 340px; padding: 12px 22px; border-radius: 999px; background: #ff4d4d; color: #fff; font: 900 38px 'Inter Tight'; opacity: 0; white-space: nowrap; }
+      /* save */
+      #bm { position: absolute; left: 390px; top: 470px; width: 300px; height: 380px; opacity: 0; }
+      #cursor { position: absolute; left: 0; top: 0; width: 70px; height: 90px; opacity: 0; }
+      #spark { position: absolute; left: 540px; top: 660px; width: 0; height: 0; }
+      #spark i { position: absolute; width: 18px; height: 18px; margin: -9px; background: #D97757; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); opacity: 0; }
+      #saveTxt { top: 930px; font-size: 92px; }
+      #nameTxt { top: 1150px; font-size: 120px; }
+      /* demo */
+      #term { top: 400px; height: 330px; }
+      #tbody { padding: 26px 28px; font: 700 31px/50px 'JetBrains Mono', monospace; white-space: pre-wrap; }
+      #tbody .p { color: #28c840; } #tbody .ok { color: #7dffa1; }
+      #cc { top: 770px; height: 470px; }
+      #cc .bar b { margin-left: auto; padding: 4px 14px; border-radius: 999px; background: #2a1d17; color: #f0a585; border: 2px solid #D97757; font: 800 20px 'Inter Tight'; }
+      #prompt { margin: 22px 24px 0; padding: 18px 22px; border-radius: 16px; background: #1a1d24; border: 2px solid #2d313b; font: 700 32px 'JetBrains Mono', monospace; color: #fff; min-height: 76px; }
+      #prompt .gt { color: #D97757; }
+      #result { margin: 18px 24px 0; padding: 18px 22px; border-radius: 16px; background: #0f2418; border: 2px solid #2f8f55; font: 700 28px/44px 'JetBrains Mono', monospace; color: #c8f7d6; opacity: 0; }
+      #result b { color: #7dffa1; } #result .st { color: #8fd6a7; }
+      /* checks */
+      .chk { position: absolute; left: 110px; width: 840px; font-weight: 900; font-size: 68px; white-space: nowrap; letter-spacing: -0.03em; opacity: 0; transform-origin: 0 50%; }
+      .chk em { font-style: normal; color: #D97757; margin-right: 18px; }
+      /* cta */
+      #ctaCard { position: absolute; left: 130px; top: 620px; width: 820px; padding: 46px 40px 44px; border-radius: 32px; background: #111318; color: #fff; text-align: center; opacity: 0;
+        box-shadow: 0 16px 0 rgba(217,119,87,0.35); }
+      #ctaCard .big { font-weight: 900; font-size: 92px; letter-spacing: -0.03em; line-height: 1; }
+      #ctaCard .big em { font-style: normal; color: #D97757; }
+      #ctaCard .fol { display: inline-block; margin-top: 30px; padding: 14px 30px; border-radius: 999px; background: #D97757; font-weight: 800; font-size: 44px; opacity: 0; }
+      #smear { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+        background: repeating-linear-gradient(90deg, rgba(247,246,242,0) 0 40px, rgba(217,119,87,0.10) 40px 150px, rgba(247,246,242,0) 150px 260px); }
+      /* captions: compact pill at y 1460 during UI shots; large dark kinetic words mid-canvas otherwise */
+      #cap { position: absolute; left: 80px; width: 860px; top: 1415px; height: 90px; text-align: center; }
+      #cap .ch { display: inline-block; padding: 8px 24px 12px; border-radius: 18px; background: rgba(17,19,24,0.88); white-space: nowrap; font-size: 54px; line-height: 66px; font-weight: 900; color: #fff; }
+      #cap .on { color: #F0A585; }
+      #kcap { position: absolute; left: 80px; width: 860px; top: 1180px; text-align: center; font-weight: 900; font-size: 70px; letter-spacing: -0.03em; color: #141414; white-space: nowrap; }
+      #kcap .on { color: #D97757; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="claude-skills" data-start="0" data-duration="30.26" data-width="1080" data-height="1920" data-fps="30">
+      <div id="bg" class="clip" data-start="0" data-duration="30.26" data-track-index="0"></div>
+      <div id="ui" class="clip" data-start="0" data-duration="30.26" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <svg id="burst" viewBox="-100 -100 200 200"><g fill="#D97757">
+          <!-- original 12-ray burst (not a brand logo) -->
+          <rect x="-11" y="-96" width="22" height="80" rx="11" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(30)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(60)" />
+          <rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(90)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(120)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(150)" />
+          <rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(180)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(210)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(240)" />
+          <rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(270)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(300)" /><rect x="-11" y="-96" width="22" height="80" rx="11" transform="rotate(330)" />
+          <circle r="24" /></g></svg>
+        <!-- 1: hook -->
+        <div class="kt" id="head"><span id="h1">Stop installing</span><br /><span id="h2" class="tc">Claude Skills</span><br /><span id="h3">manually.</span></div>
+        <div class="kt" id="sub"><span id="h4">One command → <b>the exact skill</b></span></div>
+        <!-- 2: github -->
+        <div class="card" id="gh"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;github.com / awesome-agent-skills<span class="chip">1,000s OF SKILLS</span></div>
+          <div id="rowsWin"><div id="rows"></div><div id="warnBox"></div></div></div>
+        <div id="wasted">⏱ 30 MIN WASTED</div>
+        <!-- 3: save -->
+        <svg id="bm" viewBox="0 0 300 380"><defs><clipPath id="bmClip"><path d="M30 20h240v340l-120-90-120 90z" /></clipPath></defs>
+          <path d="M30 20h240v340l-120-90-120 90z" fill="#fff" stroke="#141414" stroke-width="16" stroke-linejoin="round" />
+          <rect id="bmFill" x="0" y="380" width="300" height="380" fill="#D97757" clip-path="url(#bmClip)" />
+          <path d="M30 20h240v340l-120-90-120 90z" fill="none" stroke="#141414" stroke-width="16" stroke-linejoin="round" /></svg>
+        <svg id="cursor" viewBox="0 0 70 90"><path d="M6 4l56 40-26 6 14 30-12 6-14-30-18 18z" fill="#141414" stroke="#fff" stroke-width="5" stroke-linejoin="round" /></svg>
+        <div id="spark"></div>
+        <div class="kt" id="saveTxt"><span id="s1">Save this</span><br /><span id="s2" class="tc">before you forget.</span></div>
+        <div class="kt" id="nameTxt"><span id="s3">Find Skills</span></div>
+        <!-- 4: demo -->
+        <div class="card" id="term"><div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;zsh</div><div id="tbody"></div></div>
+        <div class="card" id="cc"><div class="bar">✳ Claude Code<b>Sonnet 4.6</b></div><div id="prompt"></div><div id="result"></div></div>
+        <!-- 5: checks -->
+        <div class="chk" id="c1" style="top:820px"><em>✦</em>No browsing.</div>
+        <div class="chk" id="c2" style="top:960px"><em>✦</em>No guessing.</div>
+        <div class="chk" id="c3" style="top:1100px"><em>✦</em>Right skill, every time.</div>
+        <!-- 6: cta -->
+        <div id="ctaCard"><div class="big">Comment <em>"SKILL"</em> 👇</div><div class="fol" id="fol">Follow @Shichi.AI</div></div>
+      </div>
+      <canvas id="bot" class="clip" width="1080" height="1920" data-start="0" data-duration="30.26" data-track-index="2"></canvas>
+      <div id="top" class="clip" data-start="0" data-duration="30.26" data-track-index="3" data-layout-allow-overlap data-layout-allow-overflow>
+        <div id="smear"></div><div id="kcap"></div><div id="cap"></div>
+      </div>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="30.26" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 30.26 }, 0);
+      window.__timelines["claude-skills"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { createBot } from "./characters.js";
+      const LINES = window.LINES, D = window.D, DUR = D.DUR, C = D.cues, DRAFT = !!window.HF_DRAFT;
+      const $ = (id) => document.getElementById(id);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
+      const backOut = (x, c1 = 1.9) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const bell = (t, a, b) => (t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a)));
+      const SH = D.shots.map((s) => s[0]), shotOf = (t) => { let i = 0; while (i < SH.length - 1 && t >= SH[i + 1]) i++; return D.shots[i][1]; };
+      const stamp = (el, t0, t, on = 1) => { const k = (t - t0) / 0.28; el.style.opacity = t >= t0 && on ? 1 : 0;
+        el.style.transform = t >= t0 ? `scale(${(1.45 - 0.45 * backOut(k)).toFixed(3)}) rotate(${(-4 * (1 - expoOut(k))).toFixed(2)}deg)` : "scale(1.45)"; };
+
+      /* ---------- Quill (3D, transparent canvas over the UI) ---------- */
+      const W = DRAFT ? 540 : 1080, H = DRAFT ? 960 : 1920;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("bot"), antialias: !DRAFT, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false); renderer.setClearColor(0x000000, 0);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+      const scene = new THREE.Scene();
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xd8cfc0, 1.6));
+      const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-2, 3, 4); scene.add(key);
+      const warm = new THREE.DirectionalLight(0xffc9ad, 1.0); warm.position.set(3, 1, 2); scene.add(warm);
+      const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.1, 50); camera.position.set(0, 0, 6); camera.lookAt(0, 0, 0);
+      const PX = 1920 / (2 * 6 * Math.tan(15 * Math.PI / 180));     // pixels per world unit at z = 0
+      const bot = createBot(THREE); scene.add(bot.group);
+      // where Quill stands (pixel centre of his body), how big, which way he looks, per shot
+      function quill(t, shot) {
+        let x = 1260, y = 1000, s = 2.4, yaw = -0.5, gest = "none", mood = "happy", vis = 1, extra = 0;
+        if (shot === "hook") { x = lerp(1260, 870, expoOut((t - 0.05) / 0.6)); y = 1430; s = 1.9; yaw = -0.55; gest = t > C.h4 ? "point" : "wave"; mood = "cheeky"; }
+        else if (shot === "github") { x = 860; y = 1260; s = 1.6; yaw = -0.35; mood = t > C.thirty ? "worried" : "wide"; extra = t > C.painful - 0.6 ? Math.sin(t * 16) * 0.45 : 0; gest = t > C.painful - 0.6 ? "shrug" : "none"; }
+        else if (shot === "save" || shot === "demo") vis = 0;
+        else if (shot === "checks") { x = 560; y = 470; s = 1.5; yaw = 0; gest = "cheer"; mood = "happy"; }
+        else { x = 850; y = 1250; s = 1.7; yaw = -0.4; gest = "wave"; mood = "cheeky"; }
+        if (t >= C.loop) { x = lerp(1260, 870, seg(t, C.loop, DUR)); y = 1430; s = 1.9; yaw = -0.55; vis = 1; gest = "wave"; mood = "cheeky"; }
+        bot.group.visible = !!vis; bot.group.scale.setScalar(s);
+        bot.group.position.set((x - 540) / PX, (960 - y) / PX - 0.36 * s, 0); bot.group.rotation.set(0, yaw + extra * 0.6, 0);
+        const talking = LINES.some((L) => L.words.some((w) => t >= w.s && t < w.e));
+        bot.face({ mood, blink: (t % 3.1) < 0.12 ? 1 : 0, talk: 0 }); bot.update(t, gest, 1);
+        renderer.render(scene, camera);
+      }
+
+      /* ---------- static content ---------- */
+      const FILES = ["skills/", "docs/", "GEMINI.md", "INSTALLATION.md", "CONTRIBUTING.md", "SKILL.md", "README.md", "agents.yaml", "LICENSE", "examples/", "setup.sh", "CHANGELOG.md"];
+      $("rows").innerHTML = FILES.map((f) => `<div class="row${f === "README.md" ? " warn" : ""}"><i></i>${f}</div>`).join("");
+      $("spark").innerHTML = Array.from({ length: 10 }, (_, i) => `<i id="sp${i}"></i>`).join("");
+
+      function renderAt(t) {
+        const shot = t >= C.loop ? "hook" : shotOf(t);
+        // background starburst: always turning; it sweeps big during the loop whip
+        const lw = t >= C.loop ? seg(t, C.loop, DUR) : 0;
+        $("burst").style.transform = `rotate(${(t * 40).toFixed(1)}deg) scale(${(1 + 0.08 * Math.sin(t * 3) + (t >= C.loop ? 1.2 * (1 - lw) : 0)).toFixed(3)})`;
+        // 1. hook: kinetic stamps
+        const hOn = shot === "hook" && t < C.loop;
+        stamp($("h1"), 0, t + 0.12, hOn); stamp($("h2"), C.h2, t, hOn); stamp($("h3"), C.h3, t, hOn); stamp($("h4"), C.h4, t, hOn);
+        // 2. GitHub README problem
+        const g = $("gh"), gOn = shot === "github";
+        g.style.opacity = gOn ? 1 : 0; g.style.transform = `translateY(${(gOn ? 300 * (1 - expoOut((t - SH[1]) / 0.5)) : 0).toFixed(1)}px)`;
+        const sc = gOn ? 74 * 6 * smooth((t - C.wasting) / (C.readme - C.wasting)) : 0; $("rows").style.transform = `translateY(${(-sc).toFixed(1)}px)`;
+        const wb = $("warnBox"); wb.style.top = (14 + 74 * 6 - sc).toFixed(1) + "px"; wb.style.opacity = gOn && t >= C.readme ? 1 : 0;
+        const ws = $("wasted"); ws.style.opacity = gOn && t >= C.thirty ? 1 : 0; ws.style.transform = `scale(${t >= C.thirty ? (1.5 - 0.5 * backOut((t - C.thirty) / 0.3)).toFixed(3) : 1}) rotate(-4deg)`;
+        // 3. Save trigger
+        const sOn = shot === "save", bm = $("bm");
+        bm.style.opacity = sOn ? 1 : 0; bm.style.transform = `scale(${sOn ? (0.6 + 0.4 * expoOut((t - SH[2]) / 0.4) - 0.08 * bell(t, C.save, C.save + 0.18)).toFixed(3) : 1})`;
+        $("bmFill").setAttribute("y", (380 - 380 * expoOut((t - C.save - 0.05) / 0.35)).toFixed(1));
+        const cu = $("cursor"), ck = seg(t, SH[2] + 0.05, C.save); cu.style.opacity = sOn && t < C.save + 0.6 ? 1 : 0;
+        cu.style.transform = `translate(${lerp(900, 560, ck).toFixed(1)}px, ${lerp(1150, 640, ck).toFixed(1)}px) scale(${(1 - 0.15 * bell(t, C.save - 0.05, C.save + 0.15)).toFixed(3)})`;
+        for (let i = 0; i < 10; i++) { const p = clamp((t - C.save - 0.15) / 0.6, 0, 1), a = i * 0.628, r = 40 + 230 * expoOut(p); const e = $("sp" + i);
+          e.style.opacity = sOn && p > 0 && p < 1 ? (1 - p) : 0; e.style.transform = `translate(${(Math.cos(a) * r).toFixed(1)}px, ${(Math.sin(a) * r).toFixed(1)}px) scale(${(1.6 - p).toFixed(2)}) rotate(${(p * 180).toFixed(0)}deg)`; }
+        stamp($("s1"), C.save, t, sOn); stamp($("s2"), C.forget - 0.25, t, sOn); stamp($("s3"), C.name, t, sOn);
+        // 4. terminal + Claude Code
+        const dOn = shot === "demo";
+        for (const [id, d] of [["term", 0], ["cc", 0.15]]) { const e = $(id); e.style.opacity = dOn ? 1 : 0; e.style.transform = `translateY(${(dOn ? 220 * (1 - expoOut((t - SH[3] - d) / 0.45)) : 0).toFixed(1)}px)`; }
+        const cmd = "npx skills add vercel-labs/skills", nc = Math.floor(clamp((t - C.cmd0) / (C.cmd1 - C.cmd0), 0, 1) * cmd.length);
+        $("tbody").innerHTML = '<span class="p">$</span> ' + cmd.slice(0, nc) + (t < C.cmd1 + 0.1 && t % 0.4 < 0.2 ? "▍" : "") + (t >= C.cmd1 + 0.1 ? '\n<span class="ok">✓ Installed find-skills</span>' : "");
+        const q = "Is there a skill for 3D video?", nq = Math.floor(clamp((t - C.ask0) / (C.ask1 - C.ask0), 0, 1) * q.length);
+        $("prompt").innerHTML = '<span class="gt">&gt;</span> ' + q.slice(0, nq) + (t < C.ask1 && t % 0.4 < 0.2 && t >= C.ask0 - 0.3 ? "▍" : "");
+        const rs = $("result"), rOn = dOn && t >= C.search; rs.style.opacity = rOn ? 1 : 0; rs.style.transform = `scaleY(${rOn ? expoOut((t - C.search) / 0.3).toFixed(3) : 0})`; rs.style.transformOrigin = "50% 0";
+        rs.innerHTML = `<span class="st">${t >= C.search ? "✓ searched skills.sh" : ""}${t >= C.verify ? " · ✓ verified" : ""}${t >= C.install ? " · ✓ installed" : ""}</span><br /><b>✓ Found: hyperframes-core</b><br />931K installs`;
+        // 5. three checks
+        const kOn = shot === "checks";
+        [["c1", C.c1], ["c2", C.c2], ["c3", C.c3]].forEach(([id, t0]) => { const e = $(id), k = (t - t0) / 0.3; e.style.opacity = kOn && t >= t0 ? 1 : 0; e.style.transform = `translateX(${(kOn && t >= t0 ? -120 * (1 - expoOut(k)) : -120).toFixed(1)}px) scale(${(t >= t0 ? 1.25 - 0.25 * backOut(k) : 1).toFixed(3)})`; });
+        // 6. CTA
+        const cOn = shot === "cta" && t < C.loop, cc = $("ctaCard");
+        cc.style.opacity = cOn ? 1 : 0; cc.style.transform = `scale(${cOn ? (1.3 - 0.3 * backOut((t - C.cta) / 0.35) + 0.025 * Math.sin(t * 6)).toFixed(3) : 1})`;
+        $("fol").style.opacity = cOn && t >= C.follow ? 1 : 0; $("fol").style.transform = `scale(${t >= C.follow ? (1.4 - 0.4 * backOut((t - C.follow) / 0.3)).toFixed(3) : 1})`;
+        // whips between shots + the loop whip
+        const sm = Math.max(...SH.slice(1).map((a) => bell(t, a - 0.06, a + 0.24)), bell(t, C.loop, DUR + 0.02));
+        $("smear").style.opacity = sm.toFixed(3);
+        $("ui").style.transform = t >= C.loop ? `translateX(${(-900 * (1 - lw)).toFixed(1)}px)` : "none";
+        quill(t, shot);
+        captions(t, shot);
+      }
+
+      // captions: compact pill at y 1460 in the UI shots; large kinetic words mid-canvas in the type shots (except where the type already says it)
+      const SAY = (w) => w.replace(/^N-P-X/, "npx").replace(/^SKILL/, '"SKILL"');
+      function captions(t, shot) {
+        let li = 0; while (li < LINES.length - 1 && t >= LINES[li + 1].s - 0.05) li++;
+        const L = LINES[li], on = t >= L.s - 0.03 && t < L.e && t < C.loop;
+        const kinetic = shot === "hook" || shot === "save" || shot === "checks";
+        const covered = shot === "hook" || shot === "save" || shot === "checks";   // the big type already shows these words
+        $("cap").style.opacity = on && !kinetic ? 1 : 0; $("kcap").style.opacity = on && kinetic && !covered ? 1 : 0;
+        if (!on) return;
+        const ws = L.words, chunks = [[]];
+        ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
+          if (cur.length && len + w.w.length > 20) { chunks.push([]); cur = chunks[chunks.length - 1]; }
+          cur.push(j); if (/[.,!?:]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
+        let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
+        const ch = chunks.find((c) => c.includes(act)) || chunks[0];
+        const html = ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${SAY(ws[j].w)}</span>`).join(" ");
+        if (kinetic) $("kcap").innerHTML = html; else $("cap").innerHTML = '<span class="ch">' + html + "</span>";
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["claude-skills"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(root.time() || 0);
+    </script>
+  </body>
+</html>

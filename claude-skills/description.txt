@@ -1,0 +1,10 @@
+Stop installing Claude skills by hand 🛑 Install the find-skills skill once, then just ask Claude Code "is there a skill for this?" and it searches, checks and installs the right one for you.
+
+Comment "SKILL" and I'll send you the exact install command 👇
+
+#claudecode #claude #aitools #devtools #productivity #coding #shichiai
+
+Install: npx skills add vercel-labs/skills
+Skills directory: https://skills.sh
+CLI: https://github.com/vercel-labs/skills
+Install counts as shown on skills.sh in November 2026.
