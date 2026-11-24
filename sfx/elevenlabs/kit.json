@@ -48,6 +48,20 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "ob_scan_hum": {
+    "seconds": 2.0,
+    "prompt": "Subtle soft digital scanner hum, gentle electronic sweep tone with a light warm buzz, clean and smooth, no music, no beeps, no metallic ringing",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "ob_key_click": {
+    "seconds": 0.5,
+    "prompt": "Single crisp mechanical keyboard keystroke, one clean tactile key press, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "ot_veg_slice": {
     "seconds": 0.6,
     "prompt": "Crisp chef knife slicing through a fresh juicy onion on a wooden cutting board, sharp wet crunch, dry close-mic foley, no reverb, one-shot",

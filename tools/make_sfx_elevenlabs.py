@@ -72,6 +72,9 @@ FOLEY = {
     "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
     "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
     "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    # Onion BTS short
+    "ob_scan_hum": (2.0, "Subtle soft digital scanner hum, gentle electronic sweep tone with a light warm buzz, clean and smooth, no music, no beeps, no metallic ringing", "ambient"),
+    "ob_key_click": (0.5, "Single crisp mechanical keyboard keystroke, one clean tactile key press, dry close-mic foley, no reverb, one-shot"),
     # Onion tears short (kids)
     "ot_veg_slice": (0.6, "Crisp chef knife slicing through a fresh juicy onion on a wooden cutting board, sharp wet crunch, dry close-mic foley, no reverb, one-shot"),
     "ot_gas_burst": (0.7, "Punchy fizzy gas burst, a soda bottle cap popped open with a quick rush of bright carbonated bubbles, clear and loud, dry close-mic foley, no reverb, one-shot"),

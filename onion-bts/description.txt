@@ -1,0 +1,7 @@
+Claude Code built this whole 3D onion video in code 🧅 No Blender keyframes: Three.js for the 3D and shaders, ElevenLabs for voice and Foley, HyperFrames to render the MP4 on my own machine.
+
+Comment "ONION" and I'll send you the prompt 👇
+
+#claudecode #threejs #aivideo #hyperframes #3danimation #coding #shichiai
+
+Full video: "Why do onions make you cry?" on my profile.

@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="onion-direction.js"></script>
+    <script src="direction.js"></script>
+    <script src="bars.js"></script>
+    <script src="render-mode.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      /* TikTok safe zone: every label, badge and caption inside x 80–940, y 180–1600 */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+      #hud { position: absolute; inset: 0; pointer-events: none; }
+      .tag { position: absolute; left: 0; top: 0; padding: 10px 22px; border-radius: 14px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 34px; opacity: 0; white-space: nowrap; }
+      .tag.cyan { background: rgba(4,24,48,0.8); border: 3px solid #00E5FF; color: #B6F6FF; }
+      .tag.amber { background: rgba(60,22,4,0.8); border: 3px solid #FF9F1C; color: #FFD29A; }
+      .tag.red { background: rgba(60,6,6,0.8); border: 3px solid #ff4d4d; color: #ffc2c2; }
+      .tag.green { background: rgba(6,40,14,0.82); border: 3px solid #39ff7a; color: #c8ffd9; }
+      .tag.yellow { background: rgba(48,40,4,0.82); border: 3px solid #ffd43b; color: #fff3b0; }
+      .tag.pink { background: rgba(52,8,40,0.82); border: 3px solid #ff6ec7; color: #ffd0ee; }
+      .tag.small { font-size: 26px; padding: 6px 14px; }
+      #hook { position: absolute; left: 50%; top: 420px; transform: translate(-50%, -50%); padding: 14px 30px 16px; border-radius: 24px; background: rgba(4,8,16,0.84); border: 3px solid #00E5FF;
+        font-weight: 900; font-size: 72px; line-height: 70px; text-align: center; white-space: nowrap; opacity: 0; }
+      #hook em { font-style: normal; color: #00E5FF; }
+      .badge { position: absolute; left: 50%; padding: 14px 28px; border-radius: 16px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 36px; letter-spacing: 0.04em;
+        background: rgba(4,12,24,0.86); border: 3px solid #00E5FF; color: #00E5FF; opacity: 0; white-space: nowrap; transform-origin: 50% 50%; }
+      #bGas { top: 232px; border-color: #39ff7a; color: #7dffaa; }
+      #bSlow { top: 232px; border-color: #7fd8ff; color: #c9f1ff; }
+      #alarm { position: absolute; left: 50%; top: 300px; padding: 14px 30px; border-radius: 20px; background: #ff3b3b; border: 4px solid #fff; color: #fff; font-weight: 900; font-size: 44px; white-space: nowrap; opacity: 0; transform-origin: 50% 50%; }
+      #thermo { position: absolute; left: 800px; top: 520px; width: 70px; height: 520px; opacity: 0; }
+      #thermo .tube { position: absolute; left: 13px; top: 0; width: 44px; height: 440px; border-radius: 15px; background: rgba(255,255,255,0.85); border: 4px solid #fff; overflow: hidden; }
+      #thermo .fill { position: absolute; left: 0; bottom: 0; width: 100%; background: #ff4d4d; }
+      #thermo .bulb { position: absolute; left: 5px; top: 420px; width: 60px; height: 60px; border-radius: 50%; background: #ff4d4d; border: 4px solid #fff; }
+      #thermoVal { font-size: 44px; }
+      #scan { position: absolute; left: 0; width: 1080px; height: 12px; opacity: 0; background: linear-gradient(90deg, rgba(0,229,255,0), #00E5FF 30%, #c8fdff 50%, #00E5FF 70%, rgba(0,229,255,0)); }
+      #smear { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+        background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 40px, rgba(200,230,255,0.13) 40px 150px, rgba(255,255,255,0) 150px 260px), linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.55)); }
+      /* captions: one pill centred on y = 1440 in every shot */
+      #cap { position: absolute; left: 80px; width: 860px; top: 1395px; height: 90px; text-align: center; }
+      #cap .ch { display: inline-block; padding: 8px 26px 12px; border-radius: 20px; background: rgba(6,12,24,0.8); border: 2px solid rgba(255,255,255,0.16); white-space: nowrap;
+        font-size: 58px; line-height: 70px; font-weight: 900; color: #fff; }
+      #cap .on { color: #00E5FF; }
+      #bShader { top: 232px; border-color: #00E5FF; color: #00E5FF; }
+      #cta { position: absolute; left: 50%; top: 420px; transform: translate(-50%, -50%); padding: 16px 32px; border-radius: 999px; background: #00E5FF; color: #04121c; border: 4px solid #e8fdff;
+        font-weight: 900; font-size: 44px; white-space: nowrap; opacity: 0; }
+      #wipe { position: absolute; left: 0; top: 0; width: 3000px; height: 10px; margin: -5px 0 0 -1500px; opacity: 0; transform-origin: 50% 50%;
+        background: linear-gradient(90deg, rgba(0,229,255,0), #00E5FF 35%, #d8feff 50%, #00E5FF 65%, rgba(0,229,255,0)); }
+      #tlp { position: absolute; left: 80px; top: 1010px; width: 860px; height: 300px; border-radius: 22px; background: rgba(6,12,24,0.72); border: 2px solid rgba(0,229,255,0.45); opacity: 0; overflow: hidden; }
+      #tlp .hd { height: 40px; padding: 0 18px; display: flex; align-items: center; font: 700 20px 'JetBrains Mono', monospace; color: #8fd8ee; border-bottom: 1px solid rgba(0,229,255,0.25); }
+      #tlp .row { position: absolute; left: 14px; right: 14px; height: 72px; }
+      #tlp .lab { position: absolute; left: 0; top: 0; bottom: 0; width: 150px; display: flex; align-items: center; font: 800 20px 'JetBrains Mono', monospace; color: #b6f6ff; }
+      #tlp .lane { position: absolute; left: 160px; right: 0; top: 10px; bottom: 10px; border-radius: 10px; background: rgba(255,255,255,0.05); }
+      #tlp .wb { position: absolute; bottom: 50%; width: 4px; border-radius: 2px; background: #3d7ab8; transform: translateY(50%); }
+      #tlp .mk { position: absolute; top: 9px; transform: translateX(-50%); padding: 6px 10px; border-radius: 8px; font: 800 16px 'JetBrains Mono', monospace; color: #9fc3e6; background: #0d1a2c; border: 2px solid rgba(120,200,255,0.4); white-space: nowrap; }
+      #tlp .mk.on { color: #04121c; background: #00E5FF; border-color: #c8fdff; }
+      #tlp .kf { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; transform: rotate(45deg); background: #FF9F1C; border: 2px solid #ffe0b0; }
+      #tlp .kf.on { background: #00E5FF; border-color: #c8fdff; }
+      #ph { position: absolute; top: 40px; bottom: 0; width: 4px; margin-left: -2px; background: #00E5FF; }
+      #term { position: absolute; left: 50%; top: 340px; transform: translate(-50%, -50%); padding: 14px 28px; border-radius: 16px; background: rgba(6,12,24,0.88); border: 3px solid #28c840;
+        font: 800 32px 'JetBrains Mono', monospace; color: #d8f7df; white-space: nowrap; opacity: 0; }
+      #term .p { color: #28c840; } #term .ok { color: #7dffa1; }
+
+    </style>
+  </head>
+  <body>
+        <div id="root" data-composition-id="onion-bts" data-start="0" data-duration="18.06" data-width="1080" data-height="1920" data-fps="30">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="18.06" data-track-index="0"></canvas>
+      <div id="hud" class="clip" data-start="0" data-duration="18.06" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div class="tag yellow small" id="tEnz">ENZYMES</div>
+        <div class="tag pink small" id="tAmino">AMINO ACIDS</div>
+        <div class="tag green small" id="tGas">syn-propanethial-S-oxide</div>
+        <div class="tag red small" id="tNerve">PAIN NERVES</div>
+        <div class="tag cyan" id="tGland">TEAR GLAND →</div>
+        <div class="badge" id="bGas">CHEMICAL DEFENSE GAS</div>
+        <div class="badge" id="bSlow">SLOWER GAS = FEWER TEARS</div>
+        <div id="alarm">🔔 IRRITANT DETECTED!</div>
+        <div id="thermo"><div class="tube"><div class="fill" id="tFill"></div></div><div class="bulb"></div></div>
+        <div class="tag cyan" id="thermoVal">20°C</div>
+        <div id="hook">Claude coded this<br /><em>3D onion video</em></div>
+        <div class="badge" id="bShader">100% THREE.JS SHADERS</div>
+        <div id="wipe"></div>
+        <div id="tlp"><div class="hd">HyperFrames timeline · data-* clips</div>
+          <div class="row" style="top:48px"><div class="lab">VOICE</div><div class="lane" id="lVoice"></div></div>
+          <div class="row" style="top:126px"><div class="lab">SFX</div><div class="lane" id="lSfx"></div></div>
+          <div class="row" style="top:204px"><div class="lab">3D_CAMERA</div><div class="lane" id="lCam"></div></div>
+          <div id="ph"></div></div>
+        <div id="cta">Comment "ONION" for the prompt 👇</div>
+        <div id="term"></div>
+
+        <div id="scan"></div>
+        <div id="smear"></div>
+        <div id="cap"></div>
+      </div>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="18.06" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 18.06 }, 0);
+      window.__timelines["onion-bts"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+      const LINES = window.LINES, B = window.D, BD = B.DUR, BC = B.cues, D = window.OD, DUR = D.DUR, C = D.cues, DRAFT = !!window.HF_DRAFT;   // D/C = onion scene timing
+      const $ = (id) => document.getElementById(id);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
+      const backOut = (x, c1 = 1.7) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const lerp3 = (A, B, k) => A.map((v, i) => lerp(v, B[i], k));
+      const bell = (t, a, b) => (t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a)));
+      const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+      /* ---------- renderer / post (bright, colourful) ---------- */
+      const W = DRAFT ? 540 : 1080, H = DRAFT ? 960 : 1920;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95;
+      renderer.localClippingEnabled = true;
+      const scene = new THREE.Scene();
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.8;
+      const camera = new THREE.PerspectiveCamera(36, 1080 / 1920, 0.02, 200);
+      const composer = new EffectComposer(renderer); composer.setSize(W, H);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W / 2, H / 2), 0.4, 0.4, 0.92); composer.addPass(bloom);
+      composer.addPass(new OutputPass());
+      function canvasTex(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx; }
+      const glowTex = canvasTex(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.3, "rgba(255,255,255,0.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); });
+      scene.add(new THREE.HemisphereLight(0xfff4e8, 0x5a4a7a, 1.3));
+      const key = new THREE.DirectionalLight(0xfff0dc, 2.4); key.position.set(3, 6, 5); scene.add(key);
+      const rim = new THREE.DirectionalLight(0x8fe3ff, 1.4); rim.position.set(-5, 3, -4); scene.add(rim);
+
+      /* ---------- backdrops: one gradient sphere per set ---------- */
+      const backdrop = (pos, stops, dots) => { const tx = canvasTex(64, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+          if (dots) { const R = rng(5); for (let i = 0; i < 60; i++) { g.fillStyle = `rgba(255,255,255,${0.05 + R() * 0.12})`; g.beginPath(); g.arc(R() * w, R() * h, 1 + R() * 5, 0, 7); g.fill(); } } });
+        const m = new THREE.Mesh(new THREE.SphereGeometry(40, 32, 16), new THREE.MeshBasicMaterial({ map: tx, side: THREE.BackSide, fog: false })); m.position.copy(pos); scene.add(m); return m; };
+      const KITCHEN = new THREE.Vector3(0, 0, 0), CELLS = new THREE.Vector3(0, 120, 0), EYE = new THREE.Vector3(120, 0, 0), FRIDGE = new THREE.Vector3(-120, 0, 0);
+      const bgKitchen = backdrop(KITCHEN, [[0, "#ffd6a5"], [0.5, "#ff9fb2"], [1, "#6f5bd6"]], true);
+      const bgCells = backdrop(CELLS, [[0, "#3a0d5c"], [0.6, "#7a1e8c"], [1, "#22093a"]], true);
+      const bgEye = backdrop(EYE, [[0, "#b8f2ff"], [0.5, "#ffc6e0"], [1, "#7a6cff"]], true);
+      const bgFridge = backdrop(FRIDGE, [[0, "#eef9ff"], [0.5, "#D6F0FF"], [1, "#a8d8f5"]], true);
+
+      /* ---------- kitchen: board, onion, knife, giant eye watching ---------- */
+      const kitchen = new THREE.Group(); scene.add(kitchen);
+      const woodTex = canvasTex(512, 256, (g, w, h) => { g.fillStyle = "#c98b52"; g.fillRect(0, 0, w, h); const R = rng(2); for (let i = 0; i < 90; i++) { g.strokeStyle = `rgba(${R() < 0.5 ? "120,70,30" : "235,180,120"},${0.15 + R() * 0.2})`; g.lineWidth = 1 + R() * 3; g.beginPath(); const y = R() * h; g.moveTo(0, y); g.bezierCurveTo(w * 0.3, y + (R() - 0.5) * 20, w * 0.7, y + (R() - 0.5) * 20, w, y + (R() - 0.5) * 10); g.stroke(); } });
+      const board = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.14, 2.2), new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.6 })); board.position.y = -0.07; kitchen.add(board);
+      const R0 = 0.62, CUT = 0.18;
+      const skinMat = new THREE.MeshPhysicalMaterial({ color: 0x6a1b7a, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.15, sheen: 0.6, sheenColor: new THREE.Color(0xff9ad5) });
+      const ringTex = canvasTex(512, 512, (g) => { for (let i = 14; i >= 0; i--) { const r = 250 * (i + 1) / 15; g.fillStyle = i % 2 ? "#f6e6f6" : "#d9b3e0"; g.beginPath(); g.ellipse(256, 256, r, r * 1.08, 0, 0, 7); g.fill(); g.strokeStyle = "#a54fae"; g.lineWidth = i === 14 ? 14 : 3; g.stroke(); } });
+      const capMat = new THREE.MeshPhysicalMaterial({ map: ringTex, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.05, side: THREE.DoubleSide });
+      const onion = new THREE.Group(); onion.position.y = R0; onion.scale.set(1, 1.08, 1); kitchen.add(onion);
+      const body = new THREE.Mesh(new THREE.SphereGeometry(R0, 64, 48), skinMat.clone()); body.material.clippingPlanes = [new THREE.Plane(new THREE.Vector3(-1, 0, 0), CUT)]; onion.add(body);
+      const capR = Math.sqrt(R0 * R0 - CUT * CUT);
+      const cap = new THREE.Mesh(new THREE.CircleGeometry(capR, 64), capMat); cap.rotation.y = Math.PI / 2; cap.position.x = CUT; onion.add(cap);
+      const tip = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.22, 12), skinMat); tip.position.set(-0.05, R0 + 0.06, 0); onion.add(tip);
+      // the falling slice: a thin disc with rings on both faces
+      const slice = new THREE.Group(); onion.add(slice);
+      const sliceR = Math.sqrt(R0 * R0 - (CUT + 0.08) ** 2);
+      const sliceDisc = new THREE.Mesh(new THREE.CylinderGeometry(capR, sliceR, 0.12, 64, 1, false), [skinMat, capMat, capMat]); sliceDisc.rotation.z = Math.PI / 2; slice.add(sliceDisc); slice.position.x = CUT + 0.06;
+      // knife
+      const knife = new THREE.Group(); kitchen.add(knife);
+      const bladeShape = new THREE.Shape(); bladeShape.moveTo(0, 0); bladeShape.lineTo(1.9, 0); bladeShape.quadraticCurveTo(2.2, 0.05, 2.25, 0.42); bladeShape.lineTo(0, 0.42); bladeShape.lineTo(0, 0);
+      const blade = new THREE.Mesh(new THREE.ExtrudeGeometry(bladeShape, { depth: 0.02, bevelEnabled: true, bevelThickness: 0.006, bevelSize: 0.006, bevelSegments: 1 }), new THREE.MeshStandardMaterial({ color: 0xe9eef4, metalness: 1, roughness: 0.12 }));
+      blade.rotation.y = Math.PI / 2; blade.position.set(CUT + 0.07, 0, 0.95); knife.add(blade);
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.3, 0.95), new THREE.MeshStandardMaterial({ color: 0x1f1b2e, roughness: 0.4 })); handle.position.set(CUT + 0.07, 0.24, 1.42); knife.add(handle);
+      // the giant eye watching from the background
+      function makeEye(r) {
+        const g = new THREE.Group();
+        const veins = canvasTex(1024, 512, (c, w, h) => { c.fillStyle = "#fbf7f4"; c.fillRect(0, 0, w, h); const R = rng(8); c.lineCap = "round";
+          for (let i = 0; i < 40; i++) { let x = (R() < 0.5 ? 0.05 : 0.45) * w + R() * 0.12 * w, y = R() * h, a = R() * 6.28; c.strokeStyle = `rgba(210,60,70,${0.25 + R() * 0.3})`;
+            for (let s = 0; s < 18; s++) { const nx = x + Math.cos(a) * 9, ny = y + Math.sin(a) * 9; c.lineWidth = 2.6 - s * 0.12; c.beginPath(); c.moveTo(x, y); c.lineTo(nx, ny); c.stroke(); x = nx; y = ny; a += (R() - 0.5) * 0.8; } } });
+        const sclera = new THREE.Mesh(new THREE.SphereGeometry(r, 64, 48), new THREE.MeshPhysicalMaterial({ map: veins, color: 0xe9e2dc, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.08 })); g.add(sclera);
+        const irisTex = canvasTex(256, 512, (c, w, h) => { const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#05070a"); gr.addColorStop(0.36, "#05070a"); gr.addColorStop(0.4, "#0e5a3e"); gr.addColorStop(0.62, "#2fc08f"); gr.addColorStop(0.85, "#2a86e0"); gr.addColorStop(0.96, "#0b2a66"); gr.addColorStop(1, "#f4efe9");
+          c.fillStyle = gr; c.fillRect(0, 0, w, h); const R = rng(4); for (let i = 0; i < 90; i++) { const x = R() * w; c.strokeStyle = `rgba(${R() < 0.5 ? "200,255,230" : "8,40,60"},${0.25 + R() * 0.35})`; c.lineWidth = 1.5 + R() * 2; c.beginPath(); c.moveTo(x, h * 0.4); c.lineTo(x + (R() - 0.5) * 8, h * 0.95); c.stroke(); } });
+        const iris = new THREE.Mesh(new THREE.SphereGeometry(r * 1.002, 64, 24, 0, Math.PI * 2, 0, 0.52), new THREE.MeshStandardMaterial({ map: irisTex, roughness: 0.3 })); iris.rotation.x = Math.PI / 2; g.add(iris);
+        const glint = new THREE.Mesh(new THREE.CircleGeometry(r * 0.07, 24), new THREE.MeshBasicMaterial({ color: 0xffffff })); glint.position.set(-r * 0.12, r * 0.14, r * 1.012); g.add(glint);
+        const cornea = new THREE.Mesh(new THREE.SphereGeometry(r * 1.005, 64, 32, 0, Math.PI * 2, 0, 0.62), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.06, roughness: 0.02, clearcoat: 1, emissive: 0xff2a2a, emissiveIntensity: 0, depthWrite: false }));
+        cornea.rotation.x = Math.PI / 2; g.add(cornea);
+        return { g, sclera, cornea };
+      }
+      const bigEye = makeEye(1.3); bigEye.g.position.set(1.7, 3.1, -3.2); bigEye.g.lookAt(0, 0.6, 2); kitchen.add(bigEye.g);
+      // green gas particles leaving the cut onion toward the eye
+      const R1 = rng(13), gas = [];
+      for (let i = 0; i < 90; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: i % 4 ? 0x2fe06a : 0x9cff3a, transparent: true, depthWrite: false, opacity: 0 })); kitchen.add(s); gas.push([s, R1(), R1() * 6.28, 0.6 + R1() * 0.8, R1()]); }
+      const gasPath = (p, ph, sp) => new THREE.Vector3(lerp(CUT, 1.5, p) + Math.sin(p * 9 + ph) * 0.18 * p, lerp(0.75, 3.0, Math.pow(p, 0.8)), lerp(0, -2.6, p) + Math.cos(p * 7 + ph) * 0.18 * p);
+
+      /* ---------- onion cells cutaway ---------- */
+      const cells = new THREE.Group(); cells.position.copy(CELLS); scene.add(cells);
+      const cellMat = () => new THREE.MeshPhysicalMaterial({ color: 0xc86bd6, roughness: 0.25, clearcoat: 1, transparent: true, opacity: 0.55, emissive: 0x5a1466, emissiveIntensity: 0.35, depthWrite: false });
+      const cellList = [];
+      for (let r = 0; r < 8; r++) for (let c = 0; c < 5; c++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16), cellMat()); m.scale.set(0.62, 0.95, 0.4); m.position.set((c - 2) * 0.68 + (r % 2) * 0.12, (r - 3.5) * 0.98, 0); cells.add(m);
+        const d = Math.hypot(m.position.x, m.position.y); cellList.push([m, d, m.position.clone()]); }
+      const R2 = rng(21), enz = [], amino = [], bubbles = [];
+      const ball = (col, r, emis) => new THREE.Mesh(new THREE.SphereGeometry(r, 20, 14), new THREE.MeshPhysicalMaterial({ color: col, roughness: 0.2, clearcoat: 1, emissive: emis, emissiveIntensity: 0.4 }));
+      for (let i = 0; i < 18; i++) { const e = ball(0xffd43b, 0.09, 0x7a5a00); cells.add(e); enz.push([e, (R2() - 0.5) * 2.6, (R2() - 0.5) * 3.2, R2() * 6.28]); }
+      for (let i = 0; i < 18; i++) { const a = ball(0xff6ec7, 0.075, 0x6a0a4a); cells.add(a); amino.push([a, (R2() - 0.5) * 2.6, (R2() - 0.5) * 3.2, R2() * 6.28]); }
+      for (let i = 0; i < 40; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 14), new THREE.MeshPhysicalMaterial({ color: 0x5dff8f, roughness: 0.05, clearcoat: 1, transparent: true, opacity: 0, emissive: 0x1fbf4f, emissiveIntensity: 0.8 })); cells.add(b); bubbles.push([b, (R2() - 0.5) * 2.4, (R2() - 0.5) * 2.0, R2(), 0.5 + R2() * 0.6]); }
+
+      /* ---------- eye close-up: nerves, alarm, tear gland, tears ---------- */
+      const eyeSet = new THREE.Group(); eyeSet.position.copy(EYE); scene.add(eyeSet);
+      const eye = makeEye(1.0); eyeSet.add(eye.g);
+      const nerveTex = canvasTex(1024, 512, (c, w, h) => { c.clearRect(0, 0, w, h); const R = rng(17); c.lineCap = "round";
+        for (let i = 0; i < 26; i++) { let x = w * (0.1 + R() * 0.3), y = h * (0.28 + R() * 0.44), a = R() * 6.28; c.strokeStyle = "rgba(255,70,70,1)";
+          for (let s = 0; s < 14; s++) { const nx = x + Math.cos(a) * 11, ny = y + Math.sin(a) * 11; c.lineWidth = 5 - s * 0.3; c.beginPath(); c.moveTo(x, y); c.lineTo(nx, ny); c.stroke(); if (R() < 0.2) { c.beginPath(); c.arc(nx, ny, 5, 0, 7); c.fillStyle = "#ffd0d0"; c.fill(); } x = nx; y = ny; a += (R() - 0.5) * 1.0; } } });
+      const nerves = new THREE.Mesh(new THREE.SphereGeometry(1.012, 64, 48), new THREE.MeshBasicMaterial({ map: nerveTex, transparent: true, opacity: 0, depthWrite: false })); eye.g.add(nerves);
+      const gland = new THREE.Mesh(new THREE.SphereGeometry(0.32, 32, 16), new THREE.MeshPhysicalMaterial({ color: 0xff8fb0, roughness: 0.35, clearcoat: 0.6, emissive: 0xff3f7f, emissiveIntensity: 0.1 }));
+      gland.scale.set(1.3, 0.7, 0.8); gland.position.set(0.72, 0.98, 0.35); eyeSet.add(gland);
+      const R3 = rng(31), tears = [];
+      for (let i = 0; i < 26; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.075, 20, 14), new THREE.MeshPhysicalMaterial({ color: 0x4fc3ff, roughness: 0.02, clearcoat: 1, transparent: true, opacity: 0, emissive: 0x0a7ad1, emissiveIntensity: 0.5 })); d.scale.set(0.8, 1.1, 0.8); eyeSet.add(d); tears.push([d, R3(), (R3() - 0.5) * 1.1, 0.6 + R3() * 0.6]); }
+      const eyeGas = [];
+      for (let i = 0; i < 70; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x2fe06a, transparent: true, depthWrite: false, opacity: 0 })); eyeSet.add(s); eyeGas.push([s, R3(), (R3() - 0.5) * 1.4, (R3() - 0.5) * 1.4]); }
+
+      /* ---------- fridge ---------- */
+      const fridge = new THREE.Group(); fridge.position.copy(FRIDGE); scene.add(fridge);
+      const frostTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = "#dff6ff"; g.fillRect(0, 0, w, h); const R = rng(9); for (let i = 0; i < 500; i++) { g.fillStyle = `rgba(255,255,255,${0.2 + R() * 0.6})`; g.fillRect(R() * w, R() * h, 1 + R() * 3, 1 + R() * 3); } });
+      frostTex.wrapS = frostTex.wrapT = THREE.RepeatWrapping; frostTex.repeat.set(2, 2);
+      const box = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 10), new THREE.MeshStandardMaterial({ map: frostTex, color: 0x8cc6ea, side: THREE.BackSide, roughness: 0.9, envMapIntensity: 0.3 })); box.position.set(0, 1.6, -0.5); fridge.add(box);
+      const shelf = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.06, 2.6), new THREE.MeshPhysicalMaterial({ color: 0xe8f8ff, transparent: true, opacity: 0.55, roughness: 0.05, clearcoat: 1 })); shelf.position.y = -0.03; fridge.add(shelf);
+      const coldOnion = new THREE.Mesh(new THREE.SphereGeometry(0.55, 48, 32), skinMat); coldOnion.scale.set(1, 1.08, 1); coldOnion.position.y = 0.6; fridge.add(coldOnion);
+      const coldTip = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 12), skinMat); coldTip.position.y = 0.6 + 0.6; fridge.add(coldTip);
+      const frostTop = new THREE.Mesh(new THREE.SphereGeometry(0.565, 48, 32, 0, Math.PI * 2, 0, 0.95), new THREE.MeshPhysicalMaterial({ color: 0xe8f7ff, transparent: true, opacity: 0, roughness: 0.35, clearcoat: 1, sheen: 1, sheenColor: new THREE.Color(0xbfe9ff), depthWrite: false })); frostTop.scale.set(1, 1.08, 1); frostTop.position.y = 0.6; fridge.add(frostTop);
+      const sparkles = []; { const RS = rng(41); for (let i = 0; i < 34; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+        const th = RS() * 1.4, ph = (RS() - 0.5) * 2.4; s.position.set(Math.sin(th) * Math.sin(ph) * 0.58, 0.6 + Math.cos(th) * 0.62, Math.sin(th) * Math.cos(ph) * 0.58); fridge.add(s); sparkles.push([s, RS() * 6.28, 1.5 + RS() * 2]); } }
+      const coldGas = [];
+      for (let i = 0; i < 40; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0x2fe06a, transparent: true, depthWrite: false, opacity: 0.7 })); fridge.add(s); coldGas.push([s, R3(), R3() * 6.28, 0.6 + R3() * 0.6]); }
+      const snow = [];
+      for (let i = 0; i < 60; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, depthWrite: false, opacity: 0.8 })); fridge.add(s); snow.push([s, (R3() - 0.5) * 3, R3(), (R3() - 0.5) * 2 + 0.5]); }
+
+      /* ---------- per-frame ---------- */
+      const shotAt = (t) => { let i = 0; while (i < D.shots.length - 1 && t >= D.shots[i + 1][0]) i++; return [i, D.shots[i][0], D.shots[i + 1] ? D.shots[i + 1][0] : DUR]; };
+      // knife and onion on the board as a function of board time tb (tb = t for the hook, t - DUR for the outro, so the end flows into frame 1)
+      function boardState(tb) {
+        let ky;
+        if (tb < -0.9) ky = 1.45; else if (tb < 0) ky = lerp(1.45, 0.78, smooth((tb + 0.9) / 0.9)); else if (tb < 0.55) ky = lerp(0.78, 0.0, Math.pow(tb / 0.55, 0.85)); else ky = lerp(0.0, 0.5, smooth((tb - 0.9) / 1.6));
+        knife.position.y = ky;
+        const fall = tb < 0.3 ? 0 : smooth((tb - 0.3) / 0.7); slice.position.x = CUT + 0.06 + 0.35 * fall; slice.position.y = -0.18 * fall; slice.rotation.z = -1.1 * fall;
+        const gasOn = tb > 0.12 ? 1 : 0;
+        gas.forEach(([s, off, ph, sp, sz]) => { const age = tb - 0.12 - off * 0.6; const p = age > 0 ? ((age * 0.32 * sp) % 1) : -1;
+          if (p < 0 || !gasOn) { s.material.opacity = 0; return; } s.position.copy(gasPath(p, ph, sp)); const sc = 0.08 + 0.22 * p * (0.6 + sz); s.scale.set(sc, sc, 1); s.material.opacity = Math.sin(Math.PI * p) * 0.85; });
+      }
+
+      function renderScene(t) {
+        const [i, a, b] = shotAt(t), name = D.shots[i][1], u = (t - a) / (b - a);
+        let pos, tgt, whip = 0;
+        kitchen.visible = name === "board" || name === "outro"; cells.visible = name === "cells"; eyeSet.visible = name === "eye"; fridge.visible = name === "fridge";
+        bgKitchen.visible = kitchen.visible; bgCells.visible = cells.visible; bgEye.visible = eyeSet.visible; bgFridge.visible = fridge.visible;
+
+        if (name === "board" || name === "outro") {
+          const tb = name === "board" ? t : t - DUR; boardState(tb);
+          const k = smooth((tb + 1.6) / 5.0);                   // one continuous slow push across the outro and the hook
+          pos = [lerp(-2.4, -1.7, k), lerp(2.0, 2.3, k), lerp(6.6, 5.6, k)]; tgt = [lerp(0.35, 0.55, k), lerp(1.35, 1.7, k), lerp(-0.8, -1.2, k)];
+          if (name === "outro") whip = bell(t, a - 0.05, a + 0.3);
+        } else if (name === "cells") {
+          const k = smooth(u); pos = [lerp(0.2, 0, k), CELLS.y + lerp(0.6, 0.1, k), lerp(7.5, 4.6, k)]; tgt = [0, CELLS.y + 0.1, 0];
+          whip = bell(t, a - 0.05, a + 0.3);
+          const pop = seg(t, C.pop, C.pop + 0.4), mix = seg(t, C.enzyme, C.gas), gasK = seg(t, C.gas - 0.1, C.gas + 0.4);
+          cellList.forEach(([m, d, p0]) => { const lp = seg(t, C.pop + d * 0.12, C.pop + d * 0.12 + 0.25); m.scale.set(0.62 * (1 + 0.5 * lp), 0.95 * (1 + 0.5 * lp), 0.4); m.material.opacity = 0.55 * (1 - lp * 0.85); });
+          enz.forEach(([e, x, y, ph], k2) => { e.visible = pop > 0.01; e.scale.setScalar(pop * (1 - gasK * 0.9)); e.position.set(lerp(x, x * 0.55, mix) + Math.sin(t * 3 + ph) * 0.05, lerp(y, y * 0.55, mix) + Math.cos(t * 2.6 + ph) * 0.05, 0.25); });
+          amino.forEach(([e, x, y, ph]) => { e.visible = pop > 0.01; e.scale.setScalar(pop * (1 - gasK * 0.9)); e.position.set(lerp(x, x * 0.55 + 0.05, mix) + Math.cos(t * 3.2 + ph) * 0.05, lerp(y, y * 0.55 - 0.05, mix) + Math.sin(t * 2.2 + ph) * 0.05, 0.3); });
+          bubbles.forEach(([bb, x, y, off, sp]) => { const age = t - C.gas - off * 0.5; const p = age > 0 ? clamp(age * sp * 0.6, 0, 1) : 0; bb.material.opacity = age > 0 ? 0.85 * (1 - p * 0.6) : 0;
+            bb.position.set(x + Math.sin(t * 4 + off * 9) * 0.06, y * 0.6 + p * 3.4, 0.4); bb.scale.setScalar(0.6 + p * 1.2); });
+        } else if (name === "eye") {
+          const k = smooth(u); pos = [EYE.x + lerp(-1.6, -0.3, k), lerp(0.5, 0.35, k), lerp(7.2, 5.6, k)]; tgt = [EYE.x + lerp(-0.3, 0.05, k), lerp(0.25, 0.2, k), 0];
+          whip = bell(t, a - 0.05, a + 0.3);
+          if (t > C.panic && t < C.panic + 0.5) { const sh = 0.03 * (1 - (t - C.panic) / 0.5); pos = [pos[0] + Math.sin(t * 70) * sh, pos[1] + Math.cos(t * 63) * sh, pos[2]]; }
+          eye.g.rotation.set(0.04, -0.12 + 0.06 * Math.sin(t * 1.3), 0);
+          const nerveK = seg(t, C.nerve - 0.1, C.nerve + 0.25) * (1 - seg(t, C.tears + 0.8, C.tears + 1.6) * 0.8);
+          nerves.material.opacity = nerveK * (0.65 + 0.35 * Math.abs(Math.sin(t * 8)));
+          eye.cornea.material.opacity = 0.06 + 0.2 * nerveK; eye.cornea.material.emissiveIntensity = nerveK * 0.9 * (0.6 + 0.4 * Math.abs(Math.sin(t * 8)));
+          gland.material.emissiveIntensity = 0.1 + 0.9 * seg(t, C.tears - 0.3, C.tears) * (0.6 + 0.4 * Math.abs(Math.sin(t * 10))); gland.scale.set(1.3 * (1 + 0.08 * Math.sin(t * 12) * seg(t, C.tears - 0.3, C.tears)), 0.7, 0.8);
+          tears.forEach(([d, off, lat, sp]) => { const age = t - C.tears - off * 1.2; const p = age > 0 ? ((age * 0.55 * sp) % 1) : -1; if (p < 0) { d.material.opacity = 0; return; }
+            const th = lerp(0.95, -1.1, p), ph = lerp(0.75, -0.35, p) + lat * 0.35; d.position.set(Math.sin(ph) * Math.cos(th) * 1.08, Math.sin(th) * 1.08, Math.cos(ph) * Math.cos(th) * 1.08); d.material.opacity = Math.min(1, p * 8) * (1 - p * 0.4); });
+          const wash = seg(t, C.tears + 0.4, C.tears + 1.6);
+          eyeGas.forEach(([s, off, x, y]) => { const p = clamp((t - a + off * 0.4) / Math.max(0.1, C.hit - a + 0.3), 0, 1); s.position.set(lerp(-2.6 + x, x * 0.6, p), lerp(0.4 + y, y * 0.6, p), lerp(0.3, 1.08, p)); const sc = 0.3 + 0.1 * Math.sin(t * 3 + off * 9); s.scale.set(sc, sc, 1);
+            s.material.opacity = 0.8 * (1 - wash) * (p > 0.98 ? 0.7 : 1); });
+        } else {   // fridge
+          const k = smooth(u); pos = [lerp(-0.4, 0.1, k) + FRIDGE.x, lerp(1.6, 1.3, k), lerp(4.2, 3.6, k)]; tgt = [FRIDGE.x, 0.65, 0];
+          whip = bell(t, a - 0.05, a + 0.3);
+          const cold = seg(t, a + 0.2, C.slow), shiv = 0.02 * (0.4 + cold);
+          coldOnion.position.x = Math.sin(t * 60) * shiv; coldOnion.rotation.z = Math.sin(t * 47) * shiv * 2; coldTip.position.x = coldOnion.position.x; frostTop.material.opacity = 0.22 * cold;
+          sparkles.forEach(([sp, ph, f]) => { const tw = Math.max(0, Math.sin(t * f * 3 + ph)); sp.material.opacity = cold * tw * 0.95; const sc = 0.05 + 0.06 * tw; sp.scale.set(sc, sc, 1); sp.position.x += 0; });
+          const slow = lerp(1, 0.12, seg(t, C.slow - 0.4, C.slow + 0.4));
+          coldGas.forEach(([s, off, ph, sp]) => { const p = ((t * 0.35 * sp * slow + off) % 1); s.position.set(Math.sin(ph + p * 3) * (0.5 + p * 0.5), 0.6 + p * 1.3, Math.cos(ph + p * 3) * (0.5 + p * 0.5)); const sc = 0.12 + 0.08 * p; s.scale.set(sc, sc, 1); s.material.opacity = 0.75 * Math.sin(Math.PI * p) * lerp(1, 0.6, 1 - slow); });
+          snow.forEach(([s, x, off, z]) => { const p = ((t * 0.12 + off) % 1); s.position.set(x, 2.6 - p * 2.8, z); s.scale.setScalar(0.04); });
+        }
+        camera.position.set(...pos); camera.lookAt(...tgt); if (whip > 0.02) camera.rotateZ(whip * 0.05); camera.updateMatrixWorld();
+        return [name, whip];
+      }
+
+      /* ---------- HUD ---------- */
+      const _v = new THREE.Vector3();
+      const proj = (v) => { _v.copy(v).project(camera); return [(_v.x + 1) / 2 * 1080, (1 - _v.y) / 2 * 1920, _v.z < 1]; };
+      const place = (id, x, y, op, sc = 1) => { const el = $(id), w = el.offsetWidth, h = el.offsetHeight; const cx = clamp(x, 80 + w / 2, 940 - w / 2), cy = clamp(y, 180 + h / 2, 1600 - h / 2);
+        el.style.opacity = op; el.style.transform = `translate(${(cx - w / 2).toFixed(1)}px, ${(cy - h / 2).toFixed(1)}px) scale(${sc.toFixed(3)})`; };
+      const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.05) i++; return i; };
+      const badge = (id, on, t0) => { const el = $(id); el.style.opacity = on; el.style.transform = `translateX(-50%) scale(${on ? (1.3 - 0.3 * backOut((t0) / 0.3, 2.2)).toFixed(3) : 1})`; };
+      function hud(t, name, whip) {
+        const hk = $("hook"), hOn = name === "board" && t < 3.5; hk.style.opacity = hOn ? 1 - seg(t, 3.3, 3.5) : 0; hk.style.transform = `translate(-50%, -50%) scale(${(1.18 - 0.18 * expoOut(t / 0.22)).toFixed(3)})`;
+        // cells
+        const cOn = name === "cells" ? 1 - seg(t, D.shots[2][0] - 0.15, D.shots[2][0]) : 0;
+        badge("bGas", name === "cells" ? seg(t, C.gas - 0.1, C.gas + 0.15) * cOn : 0, t - C.gas + 0.1);
+        place("tEnz", 300, 1000, cOn * seg(t, C.enzyme, C.enzyme + 0.25)); place("tAmino", 760, 1120, cOn * seg(t, C.enzyme + 0.25, C.enzyme + 0.5));
+        place("tGas", 540, 560, cOn * seg(t, C.gas + 0.25, C.gas + 0.5));
+        // eye
+        const eOn = name === "eye" ? 1 - seg(t, D.shots[3][0] - 0.15, D.shots[3][0]) : 0;
+        place("tNerve", 300, 1150, eOn * seg(t, C.nerve, C.nerve + 0.25) * (1 - seg(t, C.panic - 0.2, C.panic)));
+        { const [gx] = proj(new THREE.Vector3(0.72, 0.98, 0.35).add(EYE)); const el = $("tGland"); place("tGland", gx - 60 - el.offsetWidth / 2 - 90, 460, eOn * seg(t, Math.max(13.4, C.tears - 0.3), C.tears + 0.1)); }
+        const al = $("alarm"), aOn = name === "eye" && t >= C.panic ? eOn * (1 - seg(t, 13.1, 13.3)) : 0;
+        al.style.opacity = aOn; al.style.transform = `translateX(-50%) scale(${aOn ? (1.4 - 0.4 * backOut((t - C.panic) / 0.3, 2.4) + 0.04 * Math.sin(t * 20)).toFixed(3) : 1}) rotate(${(Math.sin(t * 30) * 2 * aOn).toFixed(2)}deg)`;
+        // fridge
+        const fOn = name === "fridge" ? 1 : 0, temp = lerp(20, 4, seg(t, D.shots[3][0] + 0.3, C.slow));
+        $("thermo").style.opacity = fOn; $("tFill").style.height = (lerp(20, 95, (temp - 4) / 16)).toFixed(1) + "%"; $("tFill").style.background = temp < 9 ? "#4fc3ff" : "#ff4d4d";
+        $("thermoVal").textContent = Math.round(temp) + "°C"; { const fillTop = 520 + 440 * (1 - lerp(20, 95, (temp - 4) / 16) / 100); place("thermoVal", 700, fillTop, fOn); }
+        badge("bSlow", fOn * seg(t, C.slow, C.slow + 0.2), t - C.slow);
+        $("smear").style.opacity = clamp(whip, 0, 1).toFixed(3);
+        // captions
+        const L = LINES[lineAt(t)], on = t >= L.s - 0.03 && t < L.e;
+        $("cap").style.opacity = on ? 1 : 0;
+        if (on) { const ws = L.words, chunks = [[]];
+          ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
+            if (cur.length && len + w.w.length > 20) { chunks.push([]); cur = chunks[chunks.length - 1]; }
+            cur.push(j); if (/[.,!?:]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
+          let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
+          const ch = chunks.find((c) => c.includes(act)) || chunks[0];
+          $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${ws[j].w}</span>`).join(" ") + "</span>"; }
+      }
+
+      /* ================= behind-the-scenes layer ================= */
+      const SH = B.shots.map((x) => x[0]);
+      function srcTime(t) {         // BTS time -> onion scene time
+        if (t < SH[1]) return t * (3.76 / SH[1]);                                                   // board: knife, gas, watching eye
+        if (t < BC.eyeWipe) return lerp(5.0, 7.7, (t - SH[1]) / (BC.eyeWipe - SH[1]));               // onion cells
+        if (t < SH[2]) return lerp(9.9, 12.4, (t - BC.eyeWipe) / (SH[2] - BC.eyeWipe));              // eyeball, pain nerves
+        if (t < SH[3]) return lerp(13.5, 15.85, (t - SH[2]) / (SH[3] - SH[2]));                      // tear gland floods the eye
+        if (t < BC.loop) return lerp(16.1, 18.45, (t - SH[3]) / (BC.loop - SH[3]));                  // chilled onion in the fridge
+        return DUR - (BD - t);                                                                      // knife coming down: flows into frame 1
+      }
+      const wireOver = new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: 0.85 });
+      const darkBg = new THREE.Color(0x020814);
+      function wipePlane(k) {       // a plane through the camera whose screen trace is a diagonal line; PBR on its positive side
+        const n2 = new THREE.Vector2(-0.55, 1).normalize(), dir = new THREE.Vector2(1, 0.55).normalize(), off = lerp(-1.9, 1.9, k);
+        const c = n2.clone().multiplyScalar(-off), p1 = c.clone().addScaledVector(dir, -3), p2 = c.clone().addScaledVector(dir, 3);
+        const ray = (p) => new THREE.Vector3(p.x, p.y, 0.5).unproject(camera).sub(camera.position);
+        const N = new THREE.Vector3().crossVectors(ray(p1), ray(p2)).normalize(), plane = new THREE.Plane().setFromNormalAndCoplanarPoint(N, camera.position);
+        const q = new THREE.Vector3(c.x - n2.x * 0.5, c.y - n2.y * 0.5, 0.5).unproject(camera); if (plane.distanceToPoint(q) < 0) plane.negate();
+        const px = (p) => [(p.x + 1) / 2 * 1080, (1 - p.y) / 2 * 1920];
+        return [plane, px(p1), px(p2)];
+      }
+      function drawWire(planes) {
+        const hidden = []; scene.traverse((o) => { if (o.isSprite && o.visible) { o.visible = false; hidden.push(o); } });
+        const bg = scene.background; scene.background = null; scene.overrideMaterial = wireOver; renderer.clippingPlanes = planes;
+        renderer.setRenderTarget(null); renderer.autoClear = false; renderer.clearDepth(); renderer.render(scene, camera);
+        renderer.autoClear = true; scene.overrideMaterial = null; renderer.clippingPlanes = []; scene.background = bg; hidden.forEach((o) => (o.visible = true));
+      }
+      function renderAt(t) {
+        const s = srcTime(t); renderScene(s);
+        const whip = Math.max(...SH.slice(1).map((a) => bell(t, a - 0.06, a + 0.22)), bell(t, BC.loop, BD + 0.02));
+        if (t >= BC.loop) { camera.position.x += 1.4 * (1 - seg(t, BC.loop, BD - 0.02)); camera.updateMatrixWorld(); }
+        const w0 = t < BC.eyeWipe ? SH[1] + 0.15 : BC.eyeWipe + 0.15, k = t >= SH[1] && t < SH[2] ? clamp((t - w0) / 1.3, 0, 1) : 1;
+        const wl = $("wipe");
+        if (k < 1) {
+          const [pl, a1, a2] = wipePlane(k);
+          if (k > 0) { renderer.clippingPlanes = [pl]; composer.render(); renderer.clippingPlanes = []; } else { renderer.setRenderTarget(null); renderer.setClearColor(darkBg, 1); renderer.clear(); renderer.setClearColor(0x000000, 0); }
+          drawWire(k > 0 ? [pl.clone().negate()] : []);
+          const cx = (a1[0] + a2[0]) / 2, cy = (a1[1] + a2[1]) / 2, ang = Math.atan2(a2[1] - a1[1], a2[0] - a1[0]);
+          wl.style.opacity = k > 0 ? 1 : 0; wl.style.transform = `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px) rotate(${ang.toFixed(4)}rad)`;
+        } else { composer.render(); wl.style.opacity = 0; }
+        btsHud(t, whip);
+      }
+      { const lv = $("lVoice"); lv.innerHTML = window.BARS.map((h, i) => `<div class="wb" id="wb${i}" style="left:${(i / window.BARS.length * 100).toFixed(2)}%;height:${Math.max(3, h * 46).toFixed(0)}px"></div>`).join("");
+        const MK = [["slice", 0.07], ["gas", 0.3], ["splash", 0.53], ["click", 0.75], ["whip", 0.93]];
+        $("lSfx").innerHTML = MK.map(([n, f], i) => `<div class="mk" id="mk${i}" style="left:${(f * 100).toFixed(1)}%">${n}</div>`).join("");
+        $("lCam").innerHTML = [0.04, 0.22, 0.41, 0.6, 0.82].map((f, i) => `<div class="kf" id="kf${i}" style="left:${(f * 100).toFixed(1)}%"></div>`).join(""); }
+      const MKF = [0.06, 0.3, 0.55, 0.78, 0.95], KFF = [0.04, 0.22, 0.41, 0.6, 0.82];
+      function btsHud(t, whip) {
+        const hk = $("hook"), hOn = t < SH[1] - 0.3; hk.style.opacity = hOn ? 1 - seg(t, SH[1] - 0.55, SH[1] - 0.3) : 0; hk.style.transform = `translate(-50%, -50%) scale(${(1.18 - 0.18 * expoOut(t / 0.22)).toFixed(3)})`;
+        const bs = $("bShader"), bOn = t >= SH[1] + 0.2 && t < SH[2] - 0.1 ? 1 : 0; bs.style.opacity = bOn; bs.style.transform = `translateX(-50%) scale(${bOn ? (1.3 - 0.3 * expoOut((t - SH[1] - 0.2) / 0.3)).toFixed(3) : 1})`;
+        const tOn = t >= SH[2] && t < SH[3] - 0.05 ? seg(t, SH[2], SH[2] + 0.25) : 0, tp = $("tlp"); tp.style.opacity = tOn; tp.style.transform = `translateY(${(30 * (1 - tOn)).toFixed(1)}px)`;
+        const f = clamp((t - SH[2] - 0.1) / (SH[3] - SH[2] - 0.3), 0, 1); $("ph").style.left = (174 + f * (860 - 14 - 174 - 6)).toFixed(1) + "px";
+        window.BARS.forEach((h, i) => { $("wb" + i).style.background = i / window.BARS.length <= f ? "#00E5FF" : "#3d7ab8"; });
+        MKF.forEach((m, i) => $("mk" + i).classList.toggle("on", f >= m)); KFF.forEach((m, i) => $("kf" + i).classList.toggle("on", f >= m));
+        const cOn = t >= BC.cta && t < SH[3] - 0.1 ? 1 : 0, ct = $("cta"); ct.style.opacity = cOn; ct.style.transform = `translate(-50%, -50%) scale(${cOn ? (1.35 - 0.35 * backOut((t - BC.cta) / 0.3, 2.4)).toFixed(3) : 1})`;
+        const tm = $("term"), mOn = t >= SH[3] && t < BC.termOff ? 1 : 0; tm.style.opacity = mOn;
+        if (mOn) { const cmd = "npx hyperframes render", n = Math.floor(clamp((t - SH[3]) / 0.45, 0, 1) * cmd.length);
+          tm.innerHTML = '<span class="p">$</span> ' + cmd.slice(0, n) + (t - SH[3] > 0.5 ? ' → output.mp4 <span class="ok">✓</span>' : "▍"); }
+        $("smear").style.opacity = clamp(whip, 0, 1).toFixed(3);
+        let li = 0; while (li < LINES.length - 1 && t >= LINES[li + 1].s - 0.05) li++;
+        const L = LINES[li], on = t >= L.s - 0.03 && t < L.e; $("cap").style.opacity = on ? 1 : 0;
+        if (on) { const ws = L.words, chunks = [[]];
+          ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
+            if (cur.length && len + w.w.length > 20) { chunks.push([]); cur = chunks[chunks.length - 1]; }
+            cur.push(j); if (/[.,!?:]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
+          let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
+          const ch = chunks.find((c) => c.includes(act)) || chunks[0], show = (w) => w.replace(/^ONION/, '"ONION"');
+          $("cap").innerHTML = '<span class="ch">' + ch.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${show(ws[j].w)}</span>`).join(" ") + "</span>"; }
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+
+      const root = window.__timelines["onion-bts"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>
