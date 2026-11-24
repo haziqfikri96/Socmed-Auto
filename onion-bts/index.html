@@ -58,7 +58,7 @@
         font-weight: 900; font-size: 44px; white-space: nowrap; opacity: 0; }
       #wipe { position: absolute; left: 0; top: 0; width: 3000px; height: 10px; margin: -5px 0 0 -1500px; opacity: 0; transform-origin: 50% 50%;
         background: linear-gradient(90deg, rgba(0,229,255,0), #00E5FF 35%, #d8feff 50%, #00E5FF 65%, rgba(0,229,255,0)); }
-      #tlp { position: absolute; left: 80px; top: 1010px; width: 860px; height: 300px; border-radius: 22px; background: rgba(6,12,24,0.72); border: 2px solid rgba(0,229,255,0.45); opacity: 0; overflow: hidden; }
+      #tlp { position: absolute; left: 80px; top: 930px; width: 860px; height: 300px; border-radius: 22px; background: rgba(6,12,24,0.72); border: 2px solid rgba(0,229,255,0.45); opacity: 0; overflow: hidden; }
       #tlp .hd { height: 40px; padding: 0 18px; display: flex; align-items: center; font: 700 20px 'JetBrains Mono', monospace; color: #8fd8ee; border-bottom: 1px solid rgba(0,229,255,0.25); }
       #tlp .row { position: absolute; left: 14px; right: 14px; height: 72px; }
       #tlp .lab { position: absolute; left: 0; top: 0; bottom: 0; width: 150px; display: flex; align-items: center; font: 800 20px 'JetBrains Mono', monospace; color: #b6f6ff; }
@@ -357,7 +357,7 @@
         if (t < BC.eyeWipe) return lerp(5.0, 7.7, (t - SH[1]) / (BC.eyeWipe - SH[1]));               // onion cells
         if (t < SH[2]) return lerp(9.9, 12.4, (t - BC.eyeWipe) / (SH[2] - BC.eyeWipe));              // eyeball, pain nerves
         if (t < SH[3]) return lerp(13.5, 15.85, (t - SH[2]) / (SH[3] - SH[2]));                      // tear gland floods the eye
-        if (t < BC.loop) return lerp(16.1, 18.45, (t - SH[3]) / (BC.loop - SH[3]));                  // chilled onion in the fridge
+        if (t < BC.cut) return lerp(16.1, 18.45, clamp((t - SH[3]) / (BC.loop - SH[3]), 0, 1));       // chilled onion in the fridge (holds during the pan-out)
         return DUR - (BD - t);                                                                      // knife coming down: flows into frame 1
       }
       const wireOver = new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: 0.85 });
@@ -380,7 +380,8 @@
       function renderAt(t) {
         const s = srcTime(t); renderScene(s);
         const whip = Math.max(...SH.slice(1).map((a) => bell(t, a - 0.06, a + 0.22)), bell(t, BC.loop, BD + 0.02));
-        if (t >= BC.loop) { camera.position.x += 1.4 * (1 - seg(t, BC.loop, BD - 0.02)); camera.updateMatrixWorld(); }
+        if (t >= BC.loop && t < BC.cut) { const e = (t - BC.loop) / (BC.cut - BC.loop); camera.position.x -= 1.6 * e * e; camera.updateMatrixWorld(); }   // fridge whips out to the left
+        if (t >= BC.cut) { const e = 1 - (t - BC.cut) / (BD - 0.02 - BC.cut); camera.position.x += 1.6 * clamp(e, 0, 1) ** 2; camera.updateMatrixWorld(); }   // board whips in, settles on frame 1
         const w0 = t < BC.eyeWipe ? SH[1] + 0.15 : BC.eyeWipe + 0.15, k = t >= SH[1] && t < SH[2] ? clamp((t - w0) / 1.3, 0, 1) : 1;
         const wl = $("wipe");
         if (k < 1) {

@@ -23,13 +23,14 @@ cues = {
     "eyeWipe": r(W(1, "eyeball") - 0.15),     # second wipe: from the cells to the eyeball
     "cta": 10.5,                              # early call to action (brief)
     "termOff": 15.5,                          # terminal pill snaps off
-    "loop": r(DUR - 0.28),                    # whip back to frame 1
+    "loop": 17.80,                            # 0.26 s whip: fridge pans out ...
+    "cut": 17.93,                             # ... and the board pans in, landing on frame 1 at the end
 }
 sfx = [["bts_sub_thud", 0.0, -4], ["ot_veg_slice", 0.0, -6], ["ot_gas_burst", 0.15, -12],
        ["foley_whoosh", r(shots[1][0] + 0.1), -10], ["ob_scan_hum", r(shots[1][0] + 0.05), -16],
        ["foley_whoosh", r(cues["eyeWipe"] + 0.1), -11], ["ob_scan_hum", r(cues["eyeWipe"] + 0.05), -17],
        ["foley_ui_pop", r(W(2, "hyperframes")), -12], ["ot_water_splash", r(shots[2][0] + 0.45), -9], ["foley_ui_pop", cues["cta"], -11],
-       ["ob_key_click", r(shots[3][0] + 0.05), -10], ["bts_air_whip", r(DUR - 0.12), -10]]
+       ["ob_key_click", r(shots[3][0] + 0.05), -10], ["bts_air_whip", 17.93, -10]]   # peak on the cut, 10 dB under the voice peak
 out = {"DUR": DUR, "shots": shots, "cues": cues, "sfx": sfx}
 (HERE / "direction.json").write_text(json.dumps(out, indent=1))
 (HERE / "direction.js").write_text("window.D = " + json.dumps(out) + ";\n")
