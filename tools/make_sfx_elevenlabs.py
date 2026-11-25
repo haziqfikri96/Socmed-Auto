@@ -72,6 +72,10 @@ FOLEY = {
     "bts_sub_thud": (0.7, "Tight warm sub bass thud, soft felt mallet hitting a large padded drum, clean low-end punch, dry close-mic foley, no distortion, no metallic ring, one-shot"),
     "bts_ice_snap": (0.6, "Crisp crystalline ice snap, thin sheet of clear ice breaking cleanly in two, bright brittle transient, dry close-mic foley, no reverb, one-shot"),
     "bts_soft_whoosh": (0.7, "Clean soft air whoosh, a quick gentle gust of wind passing the microphone, smooth and natural, dry foley, no metallic ring, no reverb, one-shot"),
+    # Quill hero moves
+    "qs_jet_whoosh": (0.8, "Small jetpack thruster whoosh, a quick burst of compressed air rushing past, clean and airy, no metallic ring, dry, no reverb, one-shot"),
+    "qs_laser_zap": (0.6, "Short bright laser zap, a quick electric energy blast with a crisp crackle, punchy and clean, dry, no reverb tail, one-shot"),
+    "qs_servo": (0.5, "Tiny robot servo motor whirr, a quick precise mechanical twist, clean and close, dry close-mic foley, no reverb, one-shot"),
     # Claude skills explainer
     "sk_tactile_pop": (0.5, "Crisp tactile pop, a firm plastic button snapping into place, short bright transient, dry close-mic foley, no reverb, one-shot"),
     "sk_scroll_ticks": (0.7, "Rapid soft scroll-wheel ticks, a mouse wheel spun quickly with tiny clean detents, dry close-mic foley, no reverb, one-shot"),

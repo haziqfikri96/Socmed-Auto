@@ -1,8 +1,26 @@
 [
- ["will", "[excited] Stop installing Claude skills manually! One command now finds and installs the exact skill you need automatically."],
- ["will", "[serious] Right now there are thousands of skills on GitHub, and wasting thirty minutes reading README files just to test one is painful."],
- ["will", "[confident] Save this before you forget. It's called Find Skills."],
- ["will", "[fast-paced] Run N-P-X skills add vercel-labs slash skills, then inside Claude Code, just ask: is there a skill for this? It searches, verifies, and installs it straight into your agent."],
- ["will", "[punchy] No browsing. No guessing. The right skill every single time."],
- ["will", "Comment SKILL below and I'll drop the exact install command! Follow Shichi AI for daily Claude workflows."]
+ [
+  "quill",
+  "[excited] Stop installing Claude skills manually! One command now finds and installs the exact skill you need automatically."
+ ],
+ [
+  "quill",
+  "[dramatic] Right now there are thousands of skills on GitHub, and wasting thirty minutes reading README files just to test one is painful!"
+ ],
+ [
+  "quill",
+  "[confident] Save this before you forget. It's called Find Skills."
+ ],
+ [
+  "quill",
+  "[fast-paced] Run N-P-X skills add vercel-labs slash skills, then inside Claude Code, just ask: is there a skill for this? It searches, verifies, and installs it straight into your agent!"
+ ],
+ [
+  "quill",
+  "[playful] No browsing. No guessing. The right skill every single time."
+ ],
+ [
+  "quill",
+  "[excited] Comment SKILL below and I'll drop the exact install command! Follow Shichi AI for daily Claude workflows."
+ ]
 ]

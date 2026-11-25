@@ -32,18 +32,18 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="claude-skills" data-start="0" data-duration="28.13" data-width="1080" data-height="1920" data-fps="30">
-      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="28.13" data-track-index="0"></canvas>
-      <div id="hud" class="clip" data-start="0" data-duration="28.13" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+    <div id="root" data-composition-id="claude-skills" data-start="0" data-duration="29.07" data-width="1080" data-height="1920" data-fps="30">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="29.07" data-track-index="0"></canvas>
+      <div id="hud" class="clip" data-start="0" data-duration="29.07" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
         <div id="smear"></div><div id="flash"></div><div id="cap"></div>
       </div>
-      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="28.13" data-track-index="10" data-volume="1"></audio>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="29.07" data-track-index="10" data-volume="1"></audio>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      tl.to({}, { duration: 28.13 }, 0);
+      tl.to({}, { duration: 29.07 }, 0);
       window.__timelines["claude-skills"] = tl;
       tl.seek(0);
     </script>
@@ -108,6 +108,7 @@
 
       /* ---------- Quill ---------- */
       const bot = createBot(THREE); scene.add(bot.group); bot.group.scale.setScalar(1.9);
+      const trail = Array.from({ length: 16 }, () => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0x00e5ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); scene.add(s); return s; });
 
       /* ---------- holographic panels (canvas-textured glass) ---------- */
       function panel(w, h, px, opts = {}) {
@@ -144,7 +145,7 @@
       const orbGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0x2bff9a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(orbGlow);
       const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1, 8), new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true })); scene.add(beam);
       // shot 5: three neon badges
-      const badges = ["No browsing", "No README files", "Right skill, every time"].map((s) => { const p = panel(2.6, 0.46, 150, { tint: 0x06202a });
+      const badges = ["No browsing", "No guessing", "Right skill, every time"].map((s) => { const p = panel(2.6, 0.46, 150, { tint: 0x06202a });
         const g = p.ct.g, w = p.ct.c.width, h = p.ct.c.height; g.clearRect(0, 0, w, h); g.textBaseline = "middle"; txt(g, "✦", 30, h / 2 + 4, 70, "#00E5FF");
         let fs = 70; g.font = `900 ${fs}px Montserrat`; while (g.measureText(s).width > w - 160 && fs > 40) { fs -= 2; g.font = `900 ${fs}px Montserrat`; } txt(g, s, 120, h / 2 + 4, fs, "#e9feff"); p.ct.tx.needsUpdate = true; return p; });
       // shot 6: CTA card
@@ -193,6 +194,41 @@
         const u = (t - SH[5]) / (C.loop - SH[5]); return [[lerp(0.5, 0.1, u), 1.3, lerp(9.4, 8.8, u)], [0, 1.25, 0]];
       }
 
+      const V = (x, y, z) => new THREE.Vector3(x, y, z), BADGE_Y = [1.62, 0.96, 0.3], BM = V(-0.2, 2.45, 0.3), CON_HIT = V(0.95, 1.35, 0.6);
+      function orbitAt(t) { const a = 0.35 + (t - SH[2] - 0.55) * 2.3; return V(BM.x + 1.3 * Math.cos(a), 2.5 + 0.15 * Math.sin(2 * a), BM.z + 0.95 * Math.sin(a)); }
+      function quillState(t) {      // position, orientation, size, pose and mood of Quill at time t
+        const q = { p: V(1.0, 0.15, 1.0), yaw: -0.35, roll: 0, pitch: 0, s: 1.3, squash: 0, gest: "none", mood: "happy" };
+        const looping = t >= C.loop, shot = looping ? "cta" : shotOf(Math.max(0, t));
+        if (shot === "hook") {                       // rockets in from deep space and banks beside the terminal
+          const k = expoOut((t + 0.12) / 1.25); q.p = V(lerp(-0.4, 1.0, k), lerp(2.9, 0.15, k) + 0.08 * Math.sin(t * 3), lerp(-9, 1.0, k));   // launches from deep behind the terminal toward camera
+          q.roll = 0.7 * (1 - k) * Math.sin(t * 5 + 1); q.pitch = -0.35 * (1 - k); q.gest = t > C.h4 ? "point" : "wave"; q.mood = t < 1.0 ? "wide" : "cheeky";
+        } else if (shot === "github") {             // scrambles under the falling README stack, squashed, stressed
+          const k = expoOut((t - SH[1]) / 0.45), land = seg(t, SH[1] + 0.3, SH[1] + 1.4);
+          q.p = V(lerp(1.0, 0.32 * Math.sin((t - SH[1]) * 4.2), k), lerp(0.15, 0.6, k), lerp(1.0, 0.25, k)); q.s = 1.25;
+          q.squash = 0.16 * land; q.mood = land > 0.4 ? "wince" : "wide"; q.gest = t > C.painful - 0.6 ? "shrug" : (land > 0.4 ? "cover" : "none");
+          q.yaw = -0.3 + 0.5 * Math.sin((t - SH[1]) * 4.2 + 1.2); q.roll = 0.12 * Math.sin(t * 9) * land;
+        } else if (shot === "save") {               // laser-blasts up through the stack, then orbits the bookmark
+          const blast = expoOut((t - SH[2]) / 0.4), o = seg(t, SH[2] + 0.4, SH[2] + 0.75);
+          const up = V(0.1, lerp(0.6, 3.1, blast), lerp(0.25, 0.7, blast)); q.p = up.lerp(orbitAt(t), o); q.s = 1.05;
+          q.pitch = -0.6 * (1 - o) * blast; q.gest = t < SH[2] + 0.45 ? "point" : "cheer"; q.mood = "cheeky"; q.yaw = -0.35 - 1.2 * o * Math.sin(0.35 + (t - SH[2] - 0.55) * 2.3);
+        } else if (shot === "demo") {               // types the command, catches the skill orb, beams it into Claude Code
+          const toTop = expoOut((t - SH[3]) / 0.4), tap = t >= C.cmd0 && t < C.cmd1 ? 0.05 * Math.abs(Math.sin((t - C.cmd0) * 20)) : 0;
+          let p = orbitAt(SH[3]).lerp(V(1.3, 2.35 - tap, 0.75), toTop);
+          if (t >= C.cmd1) { const c = expoOut((t - C.cmd1 - 0.1) / 0.35); p = p.lerp(V(1.15 + 0.22 * Math.sin((t - C.cmd1) * 3), 3.2 + 0.06 * Math.sin(t * 4), 0.6), c); }
+          if (t >= C.search) { const b = expoOut((t - C.search) / 0.4); p = p.lerp(V(1.35, 1.95, 0.85), b); }
+          q.p = p; q.s = 0.95; q.gest = t < C.cmd1 ? "point" : (t < C.search ? "cheer" : "point"); q.mood = t < C.cmd1 ? "happy" : "cheeky"; q.yaw = -0.8 + 0.2 * Math.sin(t * 2);
+        } else if (shot === "checks") {              // zips to each badge as it pops, then a 360 spin
+          let p = V(1.35, 1.95, 0.85); [C.c1, C.c2, C.c3].forEach((t0, i) => { if (t >= t0 - 0.15) p = p.lerp(V(-1.42, BADGE_Y[i] + 0.05, 0.75), expoOut((t - t0 + 0.15) / 0.3)); });
+          q.p = p.add(V(0, 0.05 * Math.sin(t * 4), 0)); q.s = 0.85; q.gest = t > C.c3 ? "cheer" : "point"; q.mood = "happy";
+          q.yaw = 0.5 + Math.PI * 2 * seg(t, C.c3 + 0.25, C.c3 + 1.05);
+        } else {                                    // CTA: flies up beside the card, flips, then dives into the lens
+          const k = expoOut((t - SH[5]) / 0.45); q.p = V(1.35, 1.95, 0.85).lerp(V(1.2, 0.5 + 0.06 * Math.sin(t * 3), 1.25), k); q.s = 1.05;
+          q.pitch = Math.PI * 2 * seg(t, C.cta + 0.3, C.cta + 1.1); q.gest = "wave"; q.mood = "cheeky"; q.yaw = -0.45;
+          if (looping) { const z = Math.pow(seg(t, C.loop, DUR), 1.4); q.p = q.p.lerp(camera.position.clone().add(V(0.05, -0.05, -0.9)), z); q.s = lerp(1.05, 1.6, z); q.pitch = 0; q.yaw = -0.2; q.mood = "wide"; }
+        }
+        return q;
+      }
+
       function renderAt(t) {
         const looping = t >= C.loop, shot = looping ? "hook" : shotOf(t);
         const ht = looping ? t - DUR : t;
@@ -204,17 +240,14 @@
         rings.forEach((r, i) => { r.rotation.z = t * 0.4 * (i ? -1 : 1); r.visible = shot === "hook"; });
         shafts.forEach((m, i) => { m.material.opacity = 0.07 + 0.03 * Math.sin(t * 0.8 + i * 2); });
         gridT.tx.offset.y = -t * 0.08;
-        // Quill
-        const qp = new THREE.Vector3(0.85, -0.55, 0.7); let qyaw = -0.35, gest = "none", mood = "happy", qs = 1.5, squash = 0;
-        if (shot === "hook") { gest = t > C.h4 ? "point" : "wave"; mood = "cheeky"; }
-        else if (shot === "github") { qp.set(0, 0.6, 0.2); qs = 1.3; mood = t > C.thirty ? "worried" : "wide"; squash = 0.12 * seg(t, SH[1] + 0.3, C.thirty); gest = t > C.painful - 0.6 ? "shrug" : "none"; qyaw = -0.6 + (t > C.painful - 0.6 ? 0.5 * Math.sin(t * 16) : 0); }
-        else if (shot === "save") { qp.set(1.15, 1.95, 0.6); qs = 1.0; gest = "point"; mood = "sly"; qyaw = -0.8; }
-        else if (shot === "demo") { qp.set(-1.15, -1.2, 0.9); qs = 1.0; mood = "happy"; qyaw = -0.7; }
-        else if (shot === "checks") { qp.set(0, 2.55, 0); qs = 1.4; gest = "cheer"; mood = "happy"; qyaw = 0.4 + Math.PI * 2 * seg(t, C.c1 - 0.2, C.c1 + 0.8); }
-        else if (shot === "cta") { qp.set(0.95, -0.9, 0.8); qs = 1.1; gest = "wave"; mood = "cheeky"; qyaw = -0.6; }
-        if (looping) { qp.set(0.85, -0.55, 0.7); qs = 1.5; gest = "wave"; mood = "cheeky"; qyaw = -0.35; }
-        bot.group.position.copy(qp); bot.group.scale.set(qs * (1 + squash), qs * (1 - squash), qs * (1 + squash)); bot.group.rotation.set(0, qyaw, 0);
-        bot.face({ mood, blink: (t % 3.1) < 0.12 ? 1 : 0, talk: 0 }); bot.update(t, gest, 1);
+        // Quill: hero animation, thruster trail, mouth synced to the voice
+        const q = quillState(t);
+        bot.group.position.copy(q.p); bot.group.scale.set(q.s * (1 + q.squash), q.s * (1 - q.squash), q.s * (1 + q.squash)); bot.group.rotation.set(q.pitch, q.yaw, q.roll);
+        const word = LINES.some((L) => L.words.some((w) => t >= w.s && t < w.e - 0.03));
+        bot.face({ mood: q.mood, blink: (t % 3.1) < 0.12 ? 1 : 0, talk: word ? 0.35 + 0.4 * Math.abs(Math.sin(t * 23)) : 0 }); bot.update(t, q.gest, 1);
+        const sp = q.p.distanceTo(quillState(t - 0.03).p) / 0.03;
+        trail.forEach((s, k) => { const qq = quillState(t - (k + 1) * 0.028); s.position.copy(qq.p).add(V(0, -0.15 * qq.s, -0.05)); const sz = 0.32 * qq.s * (1 - k / 16); s.scale.set(sz, sz, 1);
+          s.material.opacity = clamp((sp - 0.6) / 4, 0, 1) * 0.55 * (1 - k / 16); });
         // shot 1 panel (also present behind the loop whip, so the cut lands on the same frame)
         const hOn = shot === "hook"; hook.set(hOn ? 1 : 0); if (hOn) drawHook(looping ? -0.1 : t);
         hook.g.position.y = 1.75 + 0.04 * Math.sin(t * 1.5);
@@ -229,7 +262,7 @@
         if (tOn) { const g = timer.ct.g, w = timer.ct.c.width, h = timer.ct.c.height; g.clearRect(0, 0, w, h); g.textAlign = "center"; g.textBaseline = "middle"; let fs = 86; g.font = `900 ${fs}px Montserrat`; while (g.measureText("⏱ 30 MIN WASTED").width > w - 40) { fs -= 2; g.font = `900 ${fs}px Montserrat`; } txt(g, "⏱ 30 MIN WASTED", w / 2, h / 2 + 4, fs, "#ff6b6b"); g.textAlign = "left"; timer.ct.tx.needsUpdate = true; }
         // shot 3: zap + crystal bookmark + save text
         const sOn = shot === "save"; zap.visible = sOn && t < SH[2] + 0.45;
-        if (zap.visible) { const a = new THREE.Vector3(1.15, 2.45, 0.6), b = new THREE.Vector3(0, 3.6, 0); zap.position.copy(a).add(b).multiplyScalar(0.5); zap.scale.set(1 + Math.sin(t * 60), a.distanceTo(b), 1 + Math.sin(t * 60)); zap.lookAt(b); zap.rotateX(Math.PI / 2); }
+        if (zap.visible) { const a = q.p.clone().add(V(0, 0.45 * q.s, 0)), b = new THREE.Vector3(0, 3.6, 0); zap.position.copy(a).add(b).multiplyScalar(0.5); zap.scale.set(1 + Math.sin(t * 60), a.distanceTo(b), 1 + Math.sin(t * 60)); zap.lookAt(b); zap.rotateX(Math.PI / 2); }
         bookmark.visible = bmGlow.visible = sOn; if (sOn) { const k = expoOut((t - SH[2] - 0.2) / 0.5); bookmark.position.set(-0.2, 2.35, 0.3); bookmark.scale.setScalar(Math.max(0.01, k * (1 + 0.08 * bell(t, C.save, C.save + 0.3)))); bookmark.rotation.set(0.15, t * 1.4, 0.08);
           bmGlow.position.copy(bookmark.position); bmGlow.scale.setScalar(2.6 * k); bmGlow.material.opacity = 0.35 + 0.15 * Math.sin(t * 5); }
         saveP.set(sOn ? seg(t, C.save - 0.1, C.save + 0.1) : 0); saveP.g.position.set(0, 0.55, 0.6); if (sOn) drawSave(t);
@@ -240,8 +273,9 @@
         conBot.g.position.set(0, lerp(-0.1, 0.65, dk), 0.35); conBot.g.rotation.set(-0.1, -0.22, 0.02);
         if (dOn) drawConsoles(t);
         const oOn = dOn && t >= C.cmd1 + 0.1, ok = oOn ? backOut((t - C.cmd1 - 0.1) / 0.35) : 0; orb.visible = orbGlow.visible = oOn;
-        orb.position.set(0.85, 3.5 + 0.06 * Math.sin(t * 3), 0.4); orb.scale.setScalar(Math.max(0.01, ok)); orb.rotation.set(t, t * 1.3, 0); orbGlow.position.copy(orb.position); orbGlow.scale.setScalar(1.3 * ok);
-        const bOn = dOn && t >= C.search; beam.visible = bOn; if (bOn) { const a = orb.position.clone(), b = new THREE.Vector3(0.95, 1.35, 0.6), e = expoOut((t - C.search) / 0.25), bb = a.clone().lerp(b, e);
+        { const spawn = V(0.85, 3.5 + 0.06 * Math.sin(t * 3), 0.4), held = q.p.clone().add(V(-0.35, 0.42, 0.15)), caught = expoOut((t - C.cmd1 - 0.25) / 0.3), sent = t >= C.search ? expoOut((t - C.search) / 0.35) : 0;
+          orb.position.copy(spawn.lerp(held, caught).lerp(CON_HIT, sent)); orb.scale.setScalar(Math.max(0.01, ok * (1 - 0.75 * sent))); } orb.rotation.set(t, t * 1.3, 0); orbGlow.position.copy(orb.position); orbGlow.scale.setScalar(1.3 * ok);
+        const bOn = dOn && t >= C.search && t < C.install + 0.6; beam.visible = bOn; if (bOn) { const a = q.p.clone().add(V(-0.2, 0.3 * q.s, 0.1)), b = CON_HIT.clone(), e = expoOut((t - C.search) / 0.25), bb = a.clone().lerp(b, e);
           beam.position.copy(a).add(bb).multiplyScalar(0.5); beam.scale.set(1, Math.max(0.001, a.distanceTo(bb)), 1); beam.lookAt(bb); beam.rotateX(Math.PI / 2); beam.material.opacity = 0.7 + 0.3 * Math.sin(t * 20); }
         // shot 5: badges
         const kOn = shot === "checks";
@@ -251,7 +285,7 @@
         cta.g.scale.setScalar(cOn ? (0.85 + 0.15 * backOut((t - C.cta) / 0.35) + 0.02 * Math.sin(t * 6)) : 1);
         composer.render();
         const sm = Math.max(...SH.slice(1).map((a) => bell(t, a - 0.06, a + 0.24)), bell(t, C.loop, DUR + 0.02));
-        $("smear").style.opacity = sm.toFixed(3); $("flash").style.opacity = (0.7 * bell(t, C.loop + 0.06, DUR - 0.04)).toFixed(3);
+        $("smear").style.opacity = sm.toFixed(3); $("flash").style.opacity = (0.92 * seg(t, DUR - 0.16, DUR - 0.02)).toFixed(3);   // Quill hits the lens: flash, then frame 1
         captions(t, looping);
       }
       const SAY = (w) => w.replace(/^N-P-X/, "npx").replace(/^SKILL/, '"SKILL"');

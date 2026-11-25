@@ -9,9 +9,10 @@ import numpy as np, soundfile as sf
 
 HERE = Path(__file__).resolve().parent
 TOOL = HERE.parent / "tools/make_voiceover_timed.py"
-VOICE = {"will": ("bIHbv24MWmeRgasZH58o", 1.2)}   # Will, fast energetic creator
-GAP = {"will": 0.03}   # seconds from the previous line's last word to this line (tight banter)
-TEMPO = 1.4                           # re-timed for the 3D cut (~28 s); same cached takes, no new voice credits
+VOICE = {"quill": ("FGY2WhTYpPnrIDTdsKH5", 1.2)}   # Quill (Laura voice): bright, playful robot companion
+# earlier Will cut kept its takes in assets/lines/
+GAP = {"quill": 0.03}   # seconds from the previous line's last word to this line (tight banter)
+TEMPO = 1.45                          # Quill reads slower than Will; x1.45 keeps every word at ~29 s
 TAIL = 0.25                           # the video ends this long after the final word, so it loops cleanly
 lines = json.loads((HERE / "script.json").read_text())
 SR, t, chunks, out = 48000, 0.05, [], []

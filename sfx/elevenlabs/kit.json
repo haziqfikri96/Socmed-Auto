@@ -48,6 +48,27 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "qs_jet_whoosh": {
+    "seconds": 0.8,
+    "prompt": "Small jetpack thruster whoosh, a quick burst of compressed air rushing past, clean and airy, no metallic ring, dry, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "qs_laser_zap": {
+    "seconds": 0.6,
+    "prompt": "Short bright laser zap, a quick electric energy blast with a crisp crackle, punchy and clean, dry, no reverb tail, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "qs_servo": {
+    "seconds": 0.5,
+    "prompt": "Tiny robot servo motor whirr, a quick precise mechanical twist, clean and close, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "sk_tactile_pop": {
     "seconds": 0.5,
     "prompt": "Crisp tactile pop, a firm plastic button snapping into place, short bright transient, dry close-mic foley, no reverb, one-shot",

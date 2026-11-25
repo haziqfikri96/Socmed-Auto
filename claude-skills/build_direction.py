@@ -30,15 +30,18 @@ cues = {
     "loop": r(DUR - 0.28),
 }
 # [file, time, dB relative to the voice peak]; whoosh/whip files are aligned by their peak (make_audio.py)
-sfx = [["sk_tactile_pop", cues["h1"], -9], ["ob_key_click", cues["h2"], -10], ["sk_tactile_pop", cues["h3"], -11],
+sfx = [["qs_jet_whoosh", 0.35, -11], ["qs_servo", r(cues["h4"] - 0.1), -14],   # Quill rockets in, banks
+       ["sk_tactile_pop", cues["h1"], -9], ["ob_key_click", cues["h2"], -10], ["sk_tactile_pop", cues["h3"], -11],
        ["foley_whoosh", r(shots[1][0] + 0.15), -11], ["sk_scroll_ticks", cues["wasting"], -11], ["sk_error_thud", cues["readme"], -9],
        ["bts_soft_whoosh", r(shots[2][0] + 0.08), -11], ["sk_mouse_click", cues["save"], -8], ["sk_chime", r(cues["save"] + 0.18), -10],
-       ["bts_sub_thud", r(shots[2][0] + 0.05), -10],   # Quill zaps the README stack away
+       ["qs_laser_zap", r(shots[2][0] + 0.02), -8], ["bts_sub_thud", r(shots[2][0] + 0.08), -12],   # Quill blasts the README stack away
        ["foley_whoosh", r(shots[3][0] + 0.12), -12], ["sk_typing", cues["cmd0"], -13], ["sk_chime", r(cues["cmd1"] + 0.1), -12],   # orb spawns
        ["sk_typing", cues["ask0"], -14], ["foley_ui_pop", cues["search"], -11],
-       ["sk_pops_up", cues["c1"], -11], ["sk_tactile_pop", cues["c2"], -12], ["sk_tactile_pop", cues["c3"], -11],
+       ["qs_servo", r(cues["cmd1"] + 0.35), -13], ["qs_laser_zap", cues["search"], -12],   # Quill catches the orb, beams it in
+       ["sk_pops_up", cues["c1"], -11], ["qs_jet_whoosh", r(cues["c2"] - 0.15), -15], ["qs_jet_whoosh", r(cues["c3"] - 0.15), -15], ["sk_tactile_pop", cues["c2"], -12], ["sk_tactile_pop", cues["c3"], -11],
        ["bts_soft_whoosh", r(shots[5][0] + 0.08), -11], ["sk_tactile_pop", cues["cta"], -10], ["foley_ui_pop", cues["follow"], -12],
-       ["bts_air_whip", r(DUR - 0.12), -10]]
+       ["qs_jet_whoosh", r(cues["cta"] + 0.45), -13],   # 360 flip
+       ["qs_jet_whoosh", r(DUR - 0.15), -10]]   # Quill zooms into the lens (loop)
 out = {"DUR": DUR, "shots": shots, "cues": cues, "sfx": sfx}
 (HERE / "direction.json").write_text(json.dumps(out, indent=1))
 (HERE / "direction.js").write_text("window.D = " + json.dumps(out) + ";\n")
