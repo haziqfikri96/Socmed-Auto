@@ -129,7 +129,7 @@
           g.font = "800 56px JetBrains Mono"; g.fillStyle = name === "README.md" ? "#ffb0b0" : "#c8d2e4"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(name, w / 2, h / 2 + 2); }).tx;
         const side = new THREE.MeshStandardMaterial({ color: 0x232a38, roughness: 0.55, metalness: 0.4 }), front = new THREE.MeshStandardMaterial({ map: lab, roughness: 0.5, metalness: 0.2, emissive: 0xffffff, emissiveMap: lab, emissiveIntensity: 0.35 });
         const m = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.5, 0.9), [side, side, side, side, front, side]); scene.add(m); slabs.push([m, i, (i % 2 ? 1 : -1) * (0.06 + 0.04 * i)]); });
-      const timerRing = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.035, 10, 64), new THREE.MeshBasicMaterial({ color: 0xff3b3b })); scene.add(timerRing);
+      const timerRing = new THREE.Mesh(new THREE.TorusGeometry(1, 0.03, 10, 96), new THREE.MeshBasicMaterial({ color: 0xff3b3b })); slabs[5][0].add(timerRing);   // red oval around the top README.md slab
       const timer = panel(1.9, 0.48, 160, { edge: 0xff3b3b, tint: 0x2a0b0b });
       // shot 3: crystal bookmark + zap beam + text
       const bmShape = new THREE.Shape(); bmShape.moveTo(-0.5, 0.75); bmShape.lineTo(0.5, 0.75); bmShape.lineTo(0.5, -0.75); bmShape.lineTo(0, -0.38); bmShape.lineTo(-0.5, -0.75); bmShape.lineTo(-0.5, 0.75);
@@ -257,8 +257,8 @@
           let y = lerp(base + 6, base, land), x = Math.sin(t * 2 + i) * 0.03, rz = tilt * Math.sin(t * 1.7 + i) * 0.4, rx = 0, z = 0;
           if (shot === "save") { const e = expoOut((t - SH[2] - 0.05) / 0.7); x += (i % 2 ? 1 : -1) * e * (3 + i * 0.4); y += e * (2 + i * 0.3); z -= e * 3; rz += e * (i % 2 ? 2 : -2); rx = e * 2; }
           m.position.set(x, y, z); m.rotation.set(rx, 0.12 * Math.sin(i), rz); });
-        const tOn = shot === "github" && t >= C.thirty; timerRing.visible = tOn; timer.set(tOn ? seg(t, C.thirty, C.thirty + 0.2) : 0);
-        timerRing.position.set(0, 4.85, 0); timerRing.rotation.set(Math.PI / 2 - 0.3, 0, t * 3); timer.g.position.set(0, 4.85 + 0.6, 0.2); timer.g.rotation.y = Math.sin(t * 2) * 0.5;
+        const tOn = shot === "github" && t >= C.thirty, rOn = shot === "github" && t >= C.readme; timerRing.visible = rOn; timer.set(tOn ? seg(t, C.thirty, C.thirty + 0.2) : 0);
+        { const k = backOut((t - C.readme) / 0.3), pu = 1 + 0.05 * Math.sin(t * 9); timerRing.position.set(0, 0, 0.5); timerRing.rotation.set(0, 0, -0.06); timerRing.scale.set(1.32 * k * pu, 0.38 * k * pu, 1); } timer.g.position.set(0, 4.85 + 0.6, 0.2); timer.g.rotation.y = Math.sin(t * 2) * 0.5;
         if (tOn) { const g = timer.ct.g, w = timer.ct.c.width, h = timer.ct.c.height; g.clearRect(0, 0, w, h); g.textAlign = "center"; g.textBaseline = "middle"; let fs = 86; g.font = `900 ${fs}px Montserrat`; while (g.measureText("⏱ 30 MIN WASTED").width > w - 40) { fs -= 2; g.font = `900 ${fs}px Montserrat`; } txt(g, "⏱ 30 MIN WASTED", w / 2, h / 2 + 4, fs, "#ff6b6b"); g.textAlign = "left"; timer.ct.tx.needsUpdate = true; }
         // shot 3: zap + crystal bookmark + save text
         const sOn = shot === "save"; zap.visible = sOn && t < SH[2] + 0.45;
