@@ -62,6 +62,55 @@
     "prompt_influence": 0.7,
     "lufs": -16
   },
+  "gm_gulp_drop": {
+    "seconds": 0.6,
+    "prompt": "Single wet cartoon throat gulp, a soft rubbery gum blob swallowed with a quick downward plop, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "gm_acid_splash": {
+    "seconds": 0.7,
+    "prompt": "Small thick liquid splash, a soft blob dropping into a bubbling pool with a short gloopy plunk, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "gm_fizz": {
+    "seconds": 1.2,
+    "prompt": "Bright effervescent fizz, a sugar tablet dissolving in liquid with tiny crackling bubbles, clean and close, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "gm_boing": {
+    "seconds": 0.5,
+    "prompt": "Short rubbery cartoon boing, a springy elastic ball bouncing once, tight and playful, dry close-mic foley, no reverb, no metallic ring, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "gm_squeeze": {
+    "seconds": 0.8,
+    "prompt": "Soft wet squish, a rubbery tube squeezed by a slow muscle push, squelchy and close, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "gm_stamp": {
+    "seconds": 0.5,
+    "prompt": "Firm rubber stamp slamming onto paper on a desk, a punchy thump with a crisp tap, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
+  "gm_bubble_pop": {
+    "seconds": 0.5,
+    "prompt": "Crisp bubblegum bubble pop, a stretched gum bubble bursting with a bright snap, dry close-mic foley, no reverb, one-shot",
+    "model_id": "eleven_text_to_sound_v3",
+    "prompt_influence": 0.7,
+    "lufs": -16
+  },
   "qs_servo": {
     "seconds": 0.5,
     "prompt": "Tiny robot servo motor whirr, a quick precise mechanical twist, clean and close, dry close-mic foley, no reverb, one-shot",
