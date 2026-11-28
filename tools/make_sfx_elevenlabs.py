@@ -75,6 +75,14 @@ FOLEY = {
     # Quill hero moves
     "qs_jet_whoosh": (0.8, "Small jetpack thruster whoosh, a quick burst of compressed air rushing past, clean and airy, no metallic ring, dry, no reverb, one-shot"),
     "qs_laser_zap": (0.6, "Short bright laser zap, a quick electric energy blast with a crisp crackle, punchy and clean, dry, no reverb tail, one-shot"),
+    # gum myth explainer
+    "gm_gulp_drop": (0.6, "Single wet cartoon throat gulp, a soft rubbery gum blob swallowed with a quick downward plop, dry close-mic foley, no reverb, one-shot"),
+    "gm_acid_splash": (0.7, "Small thick liquid splash, a soft blob dropping into a bubbling pool with a short gloopy plunk, dry close-mic foley, no reverb, one-shot"),
+    "gm_fizz": (1.2, "Bright effervescent fizz, a sugar tablet dissolving in liquid with tiny crackling bubbles, clean and close, dry close-mic foley, no reverb, one-shot"),
+    "gm_boing": (0.5, "Short rubbery cartoon boing, a springy elastic ball bouncing once, tight and playful, dry close-mic foley, no reverb, no metallic ring, one-shot"),
+    "gm_squeeze": (0.8, "Soft wet squish, a rubbery tube squeezed by a slow muscle push, squelchy and close, dry close-mic foley, no reverb, one-shot"),
+    "gm_stamp": (0.5, "Firm rubber stamp slamming onto paper on a desk, a punchy thump with a crisp tap, dry close-mic foley, no reverb, one-shot"),
+    "gm_bubble_pop": (0.5, "Crisp bubblegum bubble pop, a stretched gum bubble bursting with a bright snap, dry close-mic foley, no reverb, one-shot"),
     "qs_servo": (0.5, "Tiny robot servo motor whirr, a quick precise mechanical twist, clean and close, dry close-mic foley, no reverb, one-shot"),
     # Claude skills explainer
     "sk_tactile_pop": (0.5, "Crisp tactile pop, a firm plastic button snapping into place, short bright transient, dry close-mic foley, no reverb, one-shot"),

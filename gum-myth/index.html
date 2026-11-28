@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <script src="lines.js"></script>
+    <script src="direction.js"></script>
+    <script src="render-mode.js"></script>
+    <script type="importmap">
+      { "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.181.2/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.181.2/examples/jsm/"
+      } }
+    </script>
+    <style>
+      /* TikTok safe zone: every label, badge and caption inside x 80–940, y 220–1620 */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: 'Montserrat', Arial, sans-serif; color: #fff; }
+      #three { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+      #hud { position: absolute; inset: 0; pointer-events: none; }
+      .tag { position: absolute; left: 0; top: 0; padding: 8px 18px; border-radius: 14px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 30px; opacity: 0; white-space: nowrap; }
+      .tag.white { background: rgba(255,255,255,0.92); border: 3px solid #fff; color: #3a2a4a; }
+      .tag.yellow { background: rgba(255,246,200,0.94); border: 3px solid #ffd43b; color: #6a4a00; }
+      .tag.ice { background: rgba(220,252,255,0.94); border: 3px solid #36d6f5; color: #04536a; }
+      #hook { position: absolute; left: 50%; top: 420px; transform: translate(-50%, -50%); padding: 16px 34px 18px; border-radius: 28px; background: rgba(255,255,255,0.94); border: 5px solid #ff5fa8;
+        font-weight: 900; font-size: 76px; line-height: 80px; text-align: center; white-space: nowrap; color: #2a1340; opacity: 0; }
+      #hook em { font-style: normal; color: #ff3d96; }
+      .badge { position: absolute; left: 50%; padding: 14px 28px; border-radius: 18px; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 38px; letter-spacing: 0.03em;
+        opacity: 0; white-space: nowrap; transform-origin: 50% 50%; }
+      #bRubber { top: 230px; background: rgba(42,19,64,0.9); border: 4px solid #ff6ec7; color: #ffd0ee; }
+      #bDays { top: 262px; background: #18b65a; border: 5px solid #fff; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 64px; padding: 10px 40px 14px; }
+      #bExit { top: 262px; background: #18b65a; border: 5px solid #fff; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 60px; padding: 10px 36px 14px; }
+      /* the stamp is cut into four shards that fly apart when it shatters */
+      #stamp { position: absolute; left: 540px; top: 300px; width: 0; height: 0; opacity: 0; }
+      #stamp .sh { position: absolute; left: -330px; top: -78px; width: 660px; height: 156px; }
+      #stamp .face { width: 660px; height: 156px; border: 10px solid #ff2d3d; border-radius: 22px; background: rgba(255,255,255,0.9); color: #ff2d3d; text-align: center;
+        font-weight: 900; font-size: 78px; line-height: 134px; letter-spacing: 0.02em; white-space: nowrap; }
+      #stamp .face s { text-decoration-thickness: 9px; }
+      #choice { position: absolute; left: 90px; top: 520px; width: 900px; height: 270px; opacity: 0; transform-origin: 50% 0%; }
+      #choice .q { position: absolute; left: 0; top: 0; width: 900px; height: 66px; text-align: center; font-weight: 900; font-size: 44px; line-height: 66px; color: #fff; letter-spacing: 0.04em; }
+      #choice .opt { position: absolute; top: 76px; width: 430px; height: 150px; border-radius: 28px; text-align: center; font-weight: 900; font-size: 48px; line-height: 150px; white-space: nowrap; transform-origin: 50% 50%; }
+      #oSw { left: 0; background: #ff5fa8; border: 6px solid #fff; color: #fff; }
+      #oSp { left: 470px; background: #22c7e8; border: 6px solid #fff; color: #fff; }
+      #choice .vs { position: absolute; left: 410px; top: 116px; width: 80px; height: 70px; border-radius: 35px; background: #2a1340; color: #fff; font-weight: 900; font-size: 34px; line-height: 70px; text-align: center; }
+      #ptr { position: absolute; left: 0; top: 0; font-size: 96px; line-height: 1; opacity: 0; }
+      #vsmear, #hsmear { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+      #hsmear { background: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 40px, rgba(255,230,245,0.16) 40px 150px, rgba(255,255,255,0) 150px 260px), linear-gradient(90deg, rgba(40,0,30,0.45), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(40,0,30,0.45)); }
+      #vsmear { background: repeating-linear-gradient(0deg, rgba(255,255,255,0) 0 50px, rgba(255,235,250,0.2) 50px 180px, rgba(255,255,255,0) 180px 300px), linear-gradient(0deg, rgba(60,0,40,0.4), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(60,0,40,0.4)); }
+      #flash { position: absolute; inset: 0; background: #fff8fc; opacity: 0; }
+      /* captions: one pill centred on y = 1450 in every shot */
+      #cap { position: absolute; left: 80px; width: 860px; top: 1405px; height: 90px; text-align: center; }
+      #cap .ch { display: inline-block; padding: 8px 26px 12px; border-radius: 22px; background: rgba(24,8,36,0.78); border: 2px solid rgba(255,255,255,0.18); white-space: nowrap;
+        font-size: 58px; line-height: 70px; font-weight: 900; color: #fff; }
+      #cap .on { color: #ff6ec7; }
+      #cap.alt .on { color: #3fe6ff; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="gum-myth" data-start="0" data-duration="20.34" data-width="1080" data-height="1920" data-fps="30">
+      <canvas id="three" class="clip" width="1080" height="1920" data-start="0" data-duration="20.34" data-track-index="0"></canvas>
+      <div id="hud" class="clip" data-start="0" data-duration="20.34" data-track-index="1" data-layout-allow-overlap data-layout-allow-overflow>
+        <div class="tag white" id="tSugar">SUGAR</div>
+        <div class="tag yellow" id="tSweet">SWEETENERS</div>
+        <div class="tag ice" id="tMint">MINT FLAVOR</div>
+        <div class="badge" id="bRubber">RUBBER BASE: INDIGESTIBLE</div>
+        <div id="stamp">
+          <div class="sh" style="clip-path: polygon(0 0, 52% 0, 44% 55%, 0 38%)"><div class="face"><s>7 YEARS</s> MYTH</div></div>
+          <div class="sh" style="clip-path: polygon(52% 0, 100% 0, 100% 46%, 44% 55%)"><div class="face"><s>7 YEARS</s> MYTH</div></div>
+          <div class="sh" style="clip-path: polygon(0 38%, 44% 55%, 58% 100%, 0 100%)"><div class="face"><s>7 YEARS</s> MYTH</div></div>
+          <div class="sh" style="clip-path: polygon(44% 55%, 100% 46%, 100% 100%, 58% 100%)"><div class="face"><s>7 YEARS</s> MYTH</div></div>
+        </div>
+        <div class="badge" id="bDays">1–3 DAYS</div>
+        <div id="choice">
+          <div class="q">BE HONEST… WHICH ONE?</div>
+          <div class="opt" id="oSw">SWALLOW 🫧</div>
+          <div class="opt" id="oSp">SPIT IT OUT 🗑️</div>
+          <div class="vs">VS</div>
+        </div>
+        <div id="ptr">👆</div>
+        <div class="badge" id="bExit">1–3 DAYS EXIT ✓</div>
+        <div id="hook">Does gum stay<br />for <em>7 years?!</em> 🫧</div>
+        <div id="hsmear"></div>
+        <div id="vsmear"></div>
+        <div id="flash"></div>
+        <div id="cap"></div>
+      </div>
+      <audio id="mix" src="assets/mix.wav" data-start="0" data-duration="20.34" data-track-index="10" data-volume="1"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.to({}, { duration: 20.34 }, 0);
+      window.__timelines["gum-myth"] = tl;
+      tl.seek(0);
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+      import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+      const LINES = window.LINES, D = window.D, DUR = D.DUR, C = D.cues, DRAFT = !!window.HF_DRAFT;
+      const $ = (id) => document.getElementById(id);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+      const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const seg = (t, a, b) => smooth((t - a) / (b - a));
+      const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x, 0, 1)));
+      const backOut = (x, c1 = 1.7) => { x = clamp(x, 0, 1); const c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const bell = (t, a, b) => (t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a)));
+      const rng = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+      /* ---------- renderer / post: bright, glossy ---------- */
+      const W = DRAFT ? 540 : 1080, H = DRAFT ? 960 : 1920;
+      const renderer = new THREE.WebGLRenderer({ canvas: $("three"), antialias: !DRAFT, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
+      const scene = new THREE.Scene();
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.7;
+      const camera = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.02, 200);
+      const composer = new EffectComposer(renderer); composer.setSize(W, H);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W / 2, H / 2), 0.35, 0.4, 0.93); composer.addPass(bloom);
+      composer.addPass(new OutputPass());
+      function canvasTex(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx; }
+      const glowTex = canvasTex(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.3, "rgba(255,255,255,0.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); });
+      const starTex = canvasTex(128, 128, (g) => { g.fillStyle = "#fff"; g.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, r = i % 2 ? 14 : 62; g.lineTo(64 + Math.cos(a) * r, 64 + Math.sin(a) * r); } g.closePath(); g.fill(); });
+      scene.add(new THREE.HemisphereLight(0xfff4f8, 0x7a4a8a, 1.25));
+      const key = new THREE.DirectionalLight(0xfff0e6, 2.3); key.position.set(3, 6, 6); scene.add(key);
+      const rim = new THREE.DirectionalLight(0x9fe8ff, 1.3); rim.position.set(-5, 3, -4); scene.add(rim);
+
+      const backdrop = (pos, stops, R0 = 40) => { const tx = canvasTex(64, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([o, c]) => gr.addColorStop(o, c)); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+          const R = rng(5); for (let i = 0; i < 70; i++) { g.fillStyle = `rgba(255,255,255,${0.06 + R() * 0.16})`; g.beginPath(); g.arc(R() * w, R() * h, 1 + R() * 5, 0, 7); g.fill(); } });
+        const m = new THREE.Mesh(new THREE.SphereGeometry(R0, 32, 16), new THREE.MeshBasicMaterial({ map: tx, side: THREE.BackSide, fog: false })); m.position.copy(pos); scene.add(m); return m; };
+
+      /* ---------- the gum: a lumpy chewed blob, studded with sugar, sweetener and mint ---------- */
+      function makeGumMesh(r) {
+        const g = mergeVertices(new THREE.IcosahedronGeometry(r, 5)), p = g.attributes.position, v = new THREE.Vector3();
+        for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const n = v.clone().normalize();
+          const k = 1 + 0.07 * Math.sin(n.x * 5.1 + n.y * 2.3) * Math.cos(n.z * 4.2 - n.y * 1.7) + 0.035 * Math.sin(n.x * 11 + n.z * 9); v.copy(n.multiplyScalar(r * k)); p.setXYZ(i, v.x, v.y, v.z); }
+        g.computeVertexNormals(); return g;
+      }
+      const gumMat = new THREE.MeshPhysicalMaterial({ color: 0xff4f9e, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.12, sheen: 0.6, sheenColor: new THREE.Color(0xffc2e2), emissive: 0x5a0a30, emissiveIntensity: 0.25 });
+      const GUM_PINK = new THREE.Color(0xff4f9e), GUM_RUBBER = new THREE.Color(0xf29ac6);
+      function makeGum(r) { const grp = new THREE.Group(); const body = new THREE.Mesh(makeGumMesh(r), gumMat); grp.add(body); grp.userData.body = body; return grp; }
+      const gumA = makeGum(0.42);                         // hook + stomach
+      const cubeMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.45, clearcoat: 0.6, sheen: 0.5, sheenColor: new THREE.Color(0xfff6fb) });
+      const sweetMat = new THREE.MeshPhysicalMaterial({ color: 0xffe27a, roughness: 0.3, clearcoat: 1, emissive: 0x6a4a00, emissiveIntensity: 0.2 });
+      const mintMat = new THREE.MeshPhysicalMaterial({ color: 0x8ff3ff, roughness: 0.08, clearcoat: 1, transparent: true, opacity: 0.92, emissive: 0x0aa6c9, emissiveIntensity: 0.45 });
+      const R4 = rng(77), bits = [];   // [mesh, group 0 sugar / 1 sweetener / 2 mint, rest position, flight dir, spin, delay]
+      const fib = (i, n) => { const y = 1 - (i + 0.5) / n * 2, rr = Math.sqrt(1 - y * y), th = i * 2.39996; return new THREE.Vector3(Math.cos(th) * rr, y, Math.sin(th) * rr); };
+      for (let i = 0; i < 18; i++) {
+        const grpI = i % 3, geo = grpI === 0 ? new RoundedBoxGeometry(0.15, 0.15, 0.15, 2, 0.03) : grpI === 1 ? new THREE.SphereGeometry(0.06, 14, 10) : new THREE.OctahedronGeometry(0.1, 0);
+        const m = new THREE.Mesh(geo, grpI === 0 ? cubeMat : grpI === 1 ? sweetMat : mintMat);
+        const n = fib(i, 18), rest = n.clone().multiplyScalar(0.43);
+        m.position.copy(rest); m.rotation.set(R4() * 6, R4() * 6, R4() * 6); if (grpI === 2) m.scale.set(0.8, 1.5, 0.8);
+        gumA.add(m); bits.push([m, grpI, rest, n.clone().add(new THREE.Vector3(0, 0.9, 0)).normalize(), R4() * 4 - 2, R4() * 0.25]);
+      }
+      const fizz = []; { const RF = rng(91); for (let i = 0; i < 70; i++) { const s = new THREE.Mesh(new THREE.SphereGeometry(0.025 + RF() * 0.03, 10, 8), new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.05, clearcoat: 1, transparent: true, opacity: 0 }));
+        fizz.push([s, i % 18, RF(), RF() * 6.28, 0.5 + RF()]); } }
+
+      /* ---------- set 1: esophagus + stomach cutaway with an emerald acid pool ---------- */
+      const body1 = new THREE.Group(); scene.add(body1);
+      const bg1 = backdrop(new THREE.Vector3(0, 2, 0), [[0, "#ffe1ec"], [0.45, "#ffb3cf"], [1, "#8f6cff"]]);
+      const SRX = 2.0, SRY = 1.9, SRZ = 1.7, ACID = -0.55, ESO_R = 0.56, ESO_Y0 = 1.72, ESO_Y1 = 9;
+      const rugae = canvasTex(512, 512, (g, w, h) => { g.fillStyle = "#ff9db5"; g.fillRect(0, 0, w, h); const R = rng(3); g.lineCap = "round";
+        for (let i = 0; i < 34; i++) { const x0 = R() * w; g.strokeStyle = `rgba(${R() < 0.5 ? "214,70,110" : "255,214,226"},${0.35 + R() * 0.3})`; g.lineWidth = 6 + R() * 10; g.beginPath(); g.moveTo(x0, 0);
+          for (let y = 0; y <= h; y += 32) g.lineTo(x0 + Math.sin(y * 0.03 + i) * 18, y); g.stroke(); } });
+      const stomach = new THREE.Mesh(new THREE.SphereGeometry(1, 72, 56, Math.PI, Math.PI, 0.3, Math.PI - 0.3),
+        new THREE.MeshPhysicalMaterial({ map: rugae, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.18, side: THREE.DoubleSide, sheen: 0.4, sheenColor: new THREE.Color(0xffd6e4) }));
+      stomach.scale.set(SRX, SRY, SRZ); body1.add(stomach);
+      const rimMat = new THREE.MeshPhysicalMaterial({ color: 0xff5f86, roughness: 0.25, clearcoat: 1 });
+      { const pts = []; for (let i = 0; i <= 80; i++) { const a = Math.PI / 2 + 0.31 + (2 * Math.PI - 0.62) * i / 80; pts.push(new THREE.Vector3(Math.cos(a) * SRX, Math.sin(a) * SRY, 0)); }
+        body1.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.09, 12), rimMat)); }
+      // esophagus: back half of a ribbed tube, bulging where the gum passes
+      const esoGeo = new THREE.CylinderGeometry(1, 1, ESO_Y1 - ESO_Y0, 48, 90, true, Math.PI / 2, Math.PI);
+      const esoBase = esoGeo.attributes.position.array.slice();
+      const esoMat = new THREE.MeshPhysicalMaterial({ color: 0xff7a6b, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.12, side: THREE.DoubleSide, sheen: 0.5, sheenColor: new THREE.Color(0xffc9b8) });
+      const eso = new THREE.Mesh(esoGeo, esoMat); eso.position.y = (ESO_Y0 + ESO_Y1) / 2; body1.add(eso);
+      function shapeEso(gy) { const p = esoGeo.attributes.position, half = (ESO_Y1 - ESO_Y0) / 2;
+        for (let i = 0; i < p.count; i++) { const x = esoBase[i * 3], y = esoBase[i * 3 + 1], z = esoBase[i * 3 + 2], wy = y + half + ESO_Y0;
+          const r = ESO_R * (1 + 0.07 * Math.sin(wy * 13)) + 0.2 * Math.exp(-((wy - gy) ** 2) / 0.35); p.setXYZ(i, x * r, y, z * r); }
+        p.needsUpdate = true; esoGeo.computeVertexNormals(); }
+      for (const sx of [-1, 1]) { const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, ESO_Y1 - ESO_Y0, 12), rimMat); rod.position.set(sx * ESO_R, (ESO_Y0 + ESO_Y1) / 2, 0); body1.add(rod); }
+      // acid: wavy surface (back half) + the cut face of the liquid
+      const surfR = Math.sqrt(1 - (ACID / SRY) ** 2);
+      const surfGeo = new THREE.RingGeometry(0.001, 1, 72, 14, 0, Math.PI); const surfBase = surfGeo.attributes.position.array.slice();
+      const acidMat = new THREE.MeshPhysicalMaterial({ color: 0x10c47c, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.03, emissive: 0x07804c, emissiveIntensity: 0.6, side: THREE.DoubleSide });
+      const surf = new THREE.Mesh(surfGeo, acidMat); surf.rotation.x = -Math.PI / 2; surf.scale.set(SRX * surfR * 0.985, SRZ * surfR * 0.985, 1); surf.position.y = ACID; body1.add(surf);
+      { const sh = new THREE.Shape(), a1 = Math.PI + Math.asin(-ACID / SRY), a2 = 2 * Math.PI - Math.asin(-ACID / SRY);
+        sh.moveTo(Math.cos(a1) * SRX, ACID); for (let i = 0; i <= 60; i++) { const a = lerp(a1, a2, i / 60); sh.lineTo(Math.cos(a) * SRX * 0.99, Math.sin(a) * SRY * 0.99); } sh.lineTo(Math.cos(a1) * SRX, ACID);
+        const faceTex = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#2cf0a0"); gr.addColorStop(0.25, "#0bb874"); gr.addColorStop(1, "#04502f"); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+        const fg = new THREE.ShapeGeometry(sh, 4); const uv = fg.attributes.uv, pp = fg.attributes.position; for (let i = 0; i < pp.count; i++) uv.setXY(i, 0.5, 1 - (ACID - pp.getY(i)) / (SRY + ACID));
+        const face = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({ map: faceTex, transparent: true, opacity: 0.82, depthWrite: false })); face.position.z = 0.01; body1.add(face); }
+      const R5 = rng(55), acidBubbles = [];
+      for (let i = 0; i < 46; i++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.04 + R5() * 0.06, 14, 10), new THREE.MeshPhysicalMaterial({ color: 0xc8ffe6, roughness: 0.04, clearcoat: 1, transparent: true, opacity: 0.85, emissive: 0x30ff9a, emissiveIntensity: 0.35 }));
+        body1.add(b); acidBubbles.push([b, (R5() - 0.5) * 2.6, R5(), 0.35 + R5() * 0.5, -0.05 - R5() * 0.6]); }
+      const drops = []; for (let i = 0; i < 30; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(0.05 + R5() * 0.05, 14, 10), acidMat); d.visible = false; body1.add(d); drops.push([d, (R5() - 0.5) * 2.2, 2.2 + R5() * 2.4, (R5() - 0.2) * 0.9]); }
+      const ripple = new THREE.Mesh(new THREE.TorusGeometry(1, 0.035, 8, 64), new THREE.MeshBasicMaterial({ color: 0xdfffee, transparent: true, opacity: 0 })); ripple.rotation.x = Math.PI / 2; ripple.position.y = ACID + 0.02; body1.add(ripple);
+      body1.add(gumA); fizz.forEach(([s]) => body1.add(s));
+
+      /* ---------- set 2: the intestine tunnel (peristalsis) that opens to the sky ---------- */
+      const I0 = new THREE.Vector3(80, 0, 0), TR = 1.35, TZ0 = 6, TZ1 = -38;
+      const body2 = new THREE.Group(); body2.position.copy(I0); scene.add(body2);
+      const bg2 = backdrop(new THREE.Vector3(I0.x, 0, TZ1), [[0, "#6fdcff"], [0.5, "#ff9ad5"], [1, "#ffae5c"]], 30);
+      const axis = (z) => [0.35 * Math.sin(z * 0.16), 0.25 * Math.sin(z * 0.12 + 1)];
+      const villi = canvasTex(512, 512, (g, w, h) => { g.fillStyle = "#f2707e"; g.fillRect(0, 0, w, h); const R = rng(12);
+        for (let i = 0; i < 900; i++) { const x = R() * w, y = R() * h, r = 3 + R() * 7; const gr = g.createRadialGradient(x - r * 0.3, y - r * 0.3, 0, x, y, r); gr.addColorStop(0, "rgba(255,226,220,0.95)"); gr.addColorStop(1, "rgba(214,72,92,0.6)"); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+        for (let y = 0; y < h; y += 64) { g.fillStyle = "rgba(190,40,70,0.35)"; g.fillRect(0, y, w, 10); } });
+      villi.wrapS = villi.wrapT = THREE.RepeatWrapping; villi.repeat.set(3, 10);
+      const RAD = 48, LEN = 220;
+      const tunGeo = new THREE.CylinderGeometry(1, 1, 1, RAD, LEN, true); const tunBase = tunGeo.attributes.position.array.slice();
+      const tunCol = new Float32Array(tunGeo.attributes.position.count * 3); tunGeo.setAttribute("color", new THREE.BufferAttribute(tunCol, 3));
+      const tunnel = new THREE.Mesh(tunGeo, new THREE.MeshPhysicalMaterial({ map: villi, vertexColors: true, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.2, side: THREE.DoubleSide, sheen: 0.4, sheenColor: new THREE.Color(0xffd0d0) }));
+      body2.add(tunnel);
+      const exitRim = new THREE.Mesh(new THREE.TorusGeometry(TR, 0.14, 16, 64), new THREE.MeshPhysicalMaterial({ color: 0xff6f86, roughness: 0.25, clearcoat: 1 }));
+      { const [ax, ay] = axis(TZ1); exitRim.position.set(ax, ay, TZ1); } body2.add(exitRim);
+      const lamp = new THREE.PointLight(0xfff0f4, 6, 12, 1.4); body2.add(lamp);
+      const exitGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xfff6d8, transparent: true, depthWrite: false, opacity: 0.9 })); { const [ax, ay] = axis(TZ1); exitGlow.position.set(ax, ay, TZ1 - 0.5); exitGlow.scale.set(4.5, 4.5, 1); } body2.add(exitGlow);
+      const gumB = makeGum(0.42); gumB.scale.setScalar(0.8); body2.add(gumB);
+      const gumMatB = gumMat.clone(); gumMatB.color.copy(GUM_RUBBER); gumMatB.roughness = 0.42; gumMatB.emissiveIntensity = 0.1; gumMatB.color.set(0xff6fb3); gumB.userData.body.material = gumMatB;
+      // pulses: each contraction ring passes the gum at time P[k] and shoves it forward
+      const P = [8.25, 9.55, C.muscle, 12.35, 13.9, 15.0, 15.95];
+      const T3 = D.shots[2][0];
+      const shove = (t) => P.reduce((s, pk) => s + 2.0 * smooth((t - pk) / 0.55), 0);
+      const zoom = (t) => 14 * Math.pow(clamp((t - C.comment) / (D.shots[4][0] - C.comment), 0, 1), 2.2);
+      const gumZ = (t) => 2.2 - 0.7 * Math.max(0, t - T3) - shove(t) - zoom(t);
+      const ringZ = (k, t) => gumZ(P[k]) + 0.0 - 7.0 * (t - P[k]);
+      function shapeTunnel(t) { const p = tunGeo.attributes.position; const rings = P.map((pk, k) => ringZ(k, t));
+        for (let i = 0; i < p.count; i++) { const x = tunBase[i * 3], y = tunBase[i * 3 + 1], z0 = tunBase[i * 3 + 2]; const z = lerp(TZ0, TZ1, y + 0.5);
+          let c = 0; for (const rz of rings) c = Math.max(c, Math.exp(-((z - rz) ** 2) / 0.55));
+          const r = TR * (1 - 0.42 * c) * (1 + 0.04 * Math.sin(z * 4.3 + Math.atan2(z0, x) * 3)); const [ax, ay] = axis(z);
+          p.setXYZ(i, ax + x * r, ay + z0 * r, z); tunCol[i * 3] = 1; tunCol[i * 3 + 1] = 1 - 0.45 * c; tunCol[i * 3 + 2] = 1 - 0.35 * c; }
+        p.needsUpdate = true; tunGeo.attributes.color.needsUpdate = true; tunGeo.computeVertexNormals(); }
+      // exit celebration: stars + confetti burst out of the opening
+      const R6 = rng(64), stars = [], confetti = [];
+      const COLS = [0xff5fa8, 0x3fe6ff, 0xffd43b, 0x7cff9a, 0xffffff];
+      for (let i = 0; i < 44; i++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: starTex, color: COLS[i % 5], transparent: true, depthWrite: false, opacity: 0 })); body2.add(s);
+        const th = R6() * 6.28, sp = 0.6 + R6() * 1.6; stars.push([s, new THREE.Vector3(Math.cos(th) * sp, Math.sin(th) * sp * 0.9 + 0.5, -0.4 - R6() * 1.6), R6()]); }
+      for (let i = 0; i < 40; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.05, 0.02), new THREE.MeshStandardMaterial({ color: COLS[i % 4], roughness: 0.4, side: THREE.DoubleSide })); body2.add(m);
+        const th = R6() * 6.28, sp = 1 + R6() * 2.2; confetti.push([m, new THREE.Vector3(Math.cos(th) * sp, Math.sin(th) * sp + 1.5, -0.5 - R6() * 1.8), R6() * 10, R6()]); }
+
+      /* ---------- per-frame ---------- */
+      const shotAt = (t) => { let i = 0; while (i < D.shots.length - 1 && t >= D.shots[i + 1][0]) i++; return [i, D.shots[i][0], D.shots[i + 1] ? D.shots[i + 1][0] : DUR]; };
+      const G_TOP = 5.4, G_REST = ACID + 0.12;
+      function gumAState(t) {   // position / squash of the gum in set 1
+        let y, sx = 1, sy = 1;
+        if (t < C.impact) { const k = t / C.impact; y = lerp(G_TOP, G_REST - 0.15, k * k); sx = 0.86; sy = 1.22; }
+        else { const u = t - C.impact; y = G_REST - 0.32 * Math.exp(-u * 3.2) * Math.cos(u * 7) + 0.04 * Math.sin(t * 2.2);
+          const sq = Math.exp(-u * 6) * Math.cos(u * 18); sx = 1 + 0.3 * sq; sy = 1 - 0.3 * sq; }
+        const hop = C.boing; if (t > hop && t < hop + 0.7) { const u = (t - hop) / 0.7; y += 0.55 * Math.sin(Math.PI * u); const sq = u < 0.12 ? 1 - u / 0.12 : u > 0.88 ? (u - 0.88) / 0.12 : 0; sx *= 1 + 0.25 * sq; sy *= 1 - 0.25 * sq; if (u > 0.2 && u < 0.8) { sy *= 1.12; sx *= 0.92; } }
+        return [y, sx, sy];
+      }
+      const bitStart = [C.sugar - 0.05, C.sweet - 0.05, C.mint - 0.05];
+
+      function renderAt(t) {
+        const [i, a, b] = shotAt(t), name = D.shots[i][1], u = (t - a) / (b - a);
+        let pos, tgt, roll = 0, hs = 0, vs = 0, flash = 0;
+        const set1 = name === "hook" || name === "stomach";
+        body1.visible = bg1.visible = set1; body2.visible = bg2.visible = !set1;
+
+        if (set1) {
+          const [gy, sx, sy] = gumAState(t), gz = -0.5 * seg(t, 0.72, 0.95); gumA.position.set(0, gy, gz); gumA.userData.body.scale.set(sx, sy, sx); gumA.rotation.set(0.25 * Math.sin(t * 0.9), t * 0.6, 0.15 * Math.sin(t * 1.3));
+          shapeEso(gy);
+          const dk = seg(t, C.sugar - 0.2, C.mint + 0.4); gumMat.color.copy(GUM_PINK).lerp(GUM_RUBBER, dk); gumMat.roughness = lerp(0.3, 0.42, dk);
+          bits.forEach(([m, g, rest, dir, spin, delay], j) => { const k = clamp((t - bitStart[g] - delay) / 0.7, 0, 1);
+            m.visible = k < 1; m.position.copy(rest).addScaledVector(dir, k * 0.9); m.scale.setScalar((1 - k) * (g === 2 ? 1 : 1)); if (g === 2) m.scale.set(0.8 * (1 - k), 1.5 * (1 - k), 0.8 * (1 - k)); m.rotation.y += 0; m.rotation.x = j + spin * k * 3; });
+          fizz.forEach(([s, j, off, ph, sp]) => { const [m, g, rest, dir, , delay] = bits[j]; const age = t - bitStart[g] - delay - off * 0.5; const p = clamp(age * sp * 0.9, 0, 1);
+            if (age < 0 || p >= 1) { s.visible = false; return; } s.visible = true; s.position.copy(gumA.position).add(rest.clone().applyEuler(gumA.rotation)).add(new THREE.Vector3(Math.sin(ph + p * 6) * 0.12, p * 1.1, Math.cos(ph) * 0.1)); s.material.opacity = 0.9 * (1 - p); });
+          acidBubbles.forEach(([bb, x, off, sp, z]) => { const p = (t * sp * 0.4 + off) % 1; const yy = lerp(-SRY * 0.92 * Math.sqrt(Math.max(0, 1 - (x / SRX) ** 2)) + 0.1, ACID - 0.02, p); bb.position.set(x * 0.9, yy, z); bb.scale.setScalar(0.7 + 0.5 * p); });
+          { const p = surfGeo.attributes.position; const imp = t > C.impact ? Math.exp(-(t - C.impact) * 1.5) : 0;
+            for (let k = 0; k < p.count; k++) { const x = surfBase[k * 3], y = surfBase[k * 3 + 1], d = Math.hypot(x, y); const wx = x * SRX, wz = -y * SRZ; const dd = Math.hypot(wx - gumA.position.x, wz - gumA.position.z);
+              p.setZ(k, 0.025 * Math.sin(wx * 4 + t * 3) * Math.cos(wz * 3 - t * 2.4) + imp * 0.12 * Math.sin(dd * 9 - (t - C.impact) * 12) * Math.exp(-dd * 1.2) * (d < 0.995 ? 1 : 0)); }
+            p.needsUpdate = true; surfGeo.computeVertexNormals(); }
+          drops.forEach(([d, vx, vy, vz]) => { const u2 = t - C.impact; d.visible = u2 > 0 && u2 < 1.0; if (!d.visible) return; d.position.set(vx * u2, ACID + vy * u2 - 4.9 * u2 * u2, -0.5 + vz * u2 * 0.6); if (d.position.y < ACID - 0.05) d.visible = false; });
+          { const u2 = t - C.impact; ripple.material.opacity = u2 > 0 ? 0.8 * Math.exp(-u2 * 1.6) : 0; const s = 0.3 + u2 * 1.6; ripple.scale.set(Math.min(s, SRX * 0.9), Math.min(s, SRZ * 0.6), 1); ripple.position.z = -0.5; }
+          if (name === "hook") {
+            const follow = 1 - seg(t, 0.55, 1.35);                          // camera rides down with the gum, then settles wide
+            const ty = lerp(0.05, gy - 0.2, follow), k = seg(t, 1.0, a + (b - a));
+            pos = [lerp(0.0, 0.35, k), ty + lerp(0.7, 1.15, 1 - follow), lerp(5.4, 7.6, 1 - follow) - 0.4 * k]; tgt = [0, ty, 0];
+            vs = t < 0.14 ? 0.5 * (1 - t / 0.14) : 0;                   // tail of the loop whip
+            if (t < 0.14) { pos[1] += 1.2 * (1 - t / 0.14) ** 2; tgt[1] += 1.6 * (1 - t / 0.14) ** 2; }
+          } else {
+            const k = smooth(u); pos = [lerp(0.35, 0.55, k), lerp(1.2, 0.55, k), lerp(7.2, 3.6, k)]; tgt = [lerp(0, 0.05, k), lerp(0.05, gy - 0.05, k), gz];
+            if (t > C.boing && t < C.boing + 0.25) pos[1] += 0.02 * Math.sin(t * 80);
+            hs = bell(t, b - 0.12, b + 0.2);                               // whip out to the intestine
+            roll = hs * 0.05;
+          }
+        } else {
+          const tz = gumZ(t); shapeTunnel(t);
+          const [ax, ay] = axis(tz); gumB.position.set(ax, ay - 0.15, tz);
+          let cc = 0; P.forEach((pk, k) => { cc = Math.max(cc, Math.exp(-((tz - ringZ(k, t)) ** 2) / 0.4)); });
+          gumB.userData.body.scale.set(1 - 0.22 * cc, 1 - 0.22 * cc, 1 + 0.35 * cc); gumB.rotation.set(t * 0.8, t * 0.5, 0);
+          if (name === "intestine" || name === "choice") {
+            const back = name === "choice" ? lerp(3.0, 2.4, seg(t, C.comment, b)) : 3.0;
+            const cz = tz + back, [cx, cy] = axis(cz); pos = [cx + 0.05, cy + 0.32, cz]; const [lx, ly] = axis(tz - 3); tgt = [lerp(ax, lx, 0.5), lerp(ay, ly, 0.5) - 0.05, tz - 1.2];
+            lamp.position.set(cx, cy + 0.5, cz - 0.4);
+            if (name === "intestine") { hs = bell(t, a - 0.12, a + 0.2); roll = -hs * 0.05; }
+            flash = name === "choice" ? seg(t, b - 0.28, b) : 0;
+            if (t > C.muscle - 0.05 && t < C.muscle + 0.4) { const sh = 0.025 * (1 - (t - C.muscle) / 0.45); pos[0] += Math.sin(t * 70) * sh; pos[1] += Math.cos(t * 61) * sh; }
+          } else {    // exit: outside the opening, looking back at it
+            const [ex, ey] = axis(TZ1), u2 = t - C.out;
+            pos = [ex + lerp(0.9, 0.5, smooth(u)), ey + lerp(0.6, 0.9, smooth(u)), TZ1 - lerp(5.4, 6.2, smooth(u))]; tgt = [ex, ey + 0.35, TZ1 - 1.4];
+            lamp.position.set(ex, ey + 1.0, TZ1 - 3);
+            if (u2 < 0) gumB.position.set(ex, ey - 0.1, TZ1 + 0.8 + u2 * 3);
+            else { const k = expoOut(u2 / 0.5); gumB.position.set(ex + 0.05 * Math.sin(t * 2), ey + lerp(-0.1, 0.55, k) + 0.06 * Math.sin(t * 2.6), TZ1 + lerp(0.8, -2.4, k)); const sq = Math.exp(-u2 * 5) * Math.cos(u2 * 20); gumB.userData.body.scale.set(1 + 0.25 * sq, 1 - 0.25 * sq, 1 + 0.25 * sq); }
+            gumB.rotation.set(0.3 * Math.sin(t), t * 1.2, 0.2 * Math.sin(t * 1.4));
+            stars.forEach(([s, v, off]) => { const u3 = t - C.out - off * 0.15; if (u3 < 0) { s.material.opacity = 0; return; } const k = expoOut(u3 / 0.9); s.position.set(ex + v.x * 1.6 * k, ey + 0.4 + v.y * 1.4 * k - 0.3 * u3 * u3, TZ1 + v.z * 1.5 * k - 0.5);
+              const sc = 0.32 * (1 - 0.5 * k) * (0.7 + 0.3 * Math.sin(t * 9 + off * 20)); s.scale.set(sc, sc, 1); s.material.opacity = Math.max(0, 1 - u3 / 2.6); s.material.rotation = off * 6 + t * 2; });
+            confetti.forEach(([m, v, spin, off]) => { const u3 = t - C.out - off * 0.1; m.visible = u3 > 0; if (u3 <= 0) return; const k = expoOut(u3 / 0.7); m.position.set(ex + v.x * 1.3 * k, ey + v.y * 0.9 * k - 0.6 * u3 * u3, TZ1 + v.z * k - 0.4); m.rotation.set(spin + t * 5, spin * 2 + t * 3, t * 4); });
+            flash = 1 - seg(t, a, a + 0.22);
+            const lw = seg(t, C.loop, DUR); vs = bell(t, C.loop - 0.02, DUR + 0.12) * 0.6; tgt[1] += 9 * lw * lw; pos[1] += 1.5 * lw * lw;   // upward whip back to frame 1
+          }
+          pos[0] += I0.x; tgt[0] += I0.x;
+          if (name !== "exit") stars.forEach(([s]) => (s.material.opacity = 0)), confetti.forEach(([m]) => (m.visible = false));
+        }
+        camera.position.set(...pos); camera.lookAt(...tgt); if (roll) camera.rotateZ(roll); camera.updateMatrixWorld();
+        composer.render();
+        hud(t, name, hs, vs, flash);
+      }
+
+      /* ---------- HUD ---------- */
+      const _v = new THREE.Vector3();
+      const proj = (v) => { _v.copy(v).project(camera); return [(_v.x + 1) / 2 * 1080, (1 - _v.y) / 2 * 1920]; };
+      const place = (id, x, y, op, sc = 1) => { const el = $(id), w = el.offsetWidth, h = el.offsetHeight; const cx = clamp(x, 80 + w / 2, 940 - w / 2), cy = clamp(y, 240 + h / 2, 1340 - h / 2);
+        el.style.opacity = op; el.style.transform = `translate(${(cx - w / 2).toFixed(1)}px, ${(cy - h / 2).toFixed(1)}px) scale(${sc.toFixed(3)})`; };
+      const lineAt = (t) => { let i = 0; while (i < LINES.length - 1 && t >= LINES[i + 1].s - 0.05) i++; return i; };
+      const pop = (t0) => (1.3 - 0.3 * backOut(t0 / 0.3, 2.2));
+      const badge = (id, on, t0) => { const el = $(id); el.style.opacity = on; el.style.transform = `translateX(-50%) scale(${on ? pop(t0).toFixed(3) : 1})`; };
+      function hud(t, name, hs, vs, flash) {
+        const hk = $("hook"), hOn = name === "hook"; hk.style.opacity = hOn ? 1 - seg(t, D.shots[1][0] - 0.25, D.shots[1][0]) : 0;
+        hk.style.transform = `translate(-50%, -50%) scale(${(1.14 - 0.14 * backOut(t / 0.3, 2.4) + 0.015 * Math.sin(t * 6)).toFixed(3)}) rotate(${(-2 + 2 * expoOut(t / 0.3)).toFixed(2)}deg)`;
+        // stomach: what dissolves
+        const sOn = name === "stomach" ? 1 - seg(t, D.shots[2][0] - 0.15, D.shots[2][0]) : 0;
+        if (sOn > 0) { const gp = gumA.position; const [gx, gy] = proj(gp);
+          place("tSugar", gx - 250, gy - 250, sOn * seg(t, C.sugar, C.sugar + 0.2) * (1 - seg(t, C.sugar + 1.5, C.sugar + 1.8)), pop(t - C.sugar));
+          place("tSweet", gx + 230, gy - 330, sOn * seg(t, C.sweet, C.sweet + 0.2) * (1 - seg(t, C.sweet + 1.6, C.sweet + 1.9)), pop(t - C.sweet));
+          place("tMint", gx, gy + 260, sOn * seg(t, C.mint, C.mint + 0.2), pop(t - C.mint)); }
+        else ["tSugar", "tSweet", "tMint"].forEach((id) => ($(id).style.opacity = 0));
+        badge("bRubber", (t >= C.boing && t < C.stamp - 0.3) ? seg(t, C.boing, C.boing + 0.15) * (1 - seg(t, C.stamp - 0.6, C.stamp - 0.3)) : 0, t - C.boing);
+        // intestine: the myth stamp slams, then shatters into the real answer
+        const st = $("stamp"), shards = st.children;
+        if (t >= C.stamp && t < D.shots[3][0]) { const k = t - C.stamp, sl = backOut(k / 0.22, 1.2), br = t - C.shatter;
+          st.style.opacity = 1; st.style.transform = `scale(${(2.2 - 1.2 * sl).toFixed(3)}) rotate(${(-8 + 2 * sl).toFixed(2)}deg)`;
+          const dirs = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
+          for (let j = 0; j < 4; j++) { const e = br > 0 ? expoOut(br / 0.5) : 0, [dx, dy] = dirs[j];
+            shards[j].style.transform = `translate(${(dx * 260 * e).toFixed(1)}px, ${(dy * 160 * e + 260 * (br > 0 ? br * br : 0)).toFixed(1)}px) rotate(${(dx * 35 * e).toFixed(1)}deg)`; shards[j].style.opacity = br > 0 ? Math.max(0, 1 - br / 0.55) : 1; } }
+        else st.style.opacity = 0;
+        badge("bDays", t >= C.shatter + 0.05 && t < D.shots[3][0] ? seg(t, C.shatter + 0.05, C.shatter + 0.2) * (1 - seg(t, D.shots[3][0] - 0.2, D.shots[3][0])) : 0, t - C.shatter - 0.05);
+        // choice card + bouncing pointer
+        const ch = $("choice"), cOn = name === "choice" ? seg(t, C.card, C.card + 0.15) * (1 - seg(t, D.shots[4][0] - 0.2, D.shots[4][0])) : 0;
+        ch.style.opacity = cOn; ch.style.transform = `scale(${cOn ? pop(t - C.card).toFixed(3) : 1})`;
+        const hiSw = name === "choice" ? bell(t, C.swallow - 0.05, C.swallow + 0.6) : 0, hiSp = name === "choice" ? bell(t, C.spit - 0.05, C.spit + 0.6) : 0;
+        $("oSw").style.transform = `scale(${(1 + 0.12 * hiSw).toFixed(3)})`; $("oSp").style.transform = `scale(${(1 + 0.12 * hiSp).toFixed(3)})`;
+        const side = t < C.swallow ? 0 : t < C.spit ? lerp(0, 1, seg(t, C.spit - 0.3, C.spit)) : lerp(1, 0.5, seg(t, C.comment - 0.2, C.comment + 0.1)), px = lerp(305, 775, side);
+        place("ptr", px, 860 - 28 * Math.abs(Math.sin(t * 7)), cOn);
+        // exit badge
+        const xOn = name === "exit" && t >= C.days ? seg(t, C.days, C.days + 0.15) * (1 - seg(t, C.loop - 0.05, C.loop + 0.1)) : 0; badge("bExit", xOn, t - C.days);
+        $("hsmear").style.opacity = clamp(hs, 0, 1).toFixed(3); $("vsmear").style.opacity = clamp(vs, 0, 1).toFixed(3); $("flash").style.opacity = clamp(flash, 0, 1).toFixed(3);
+        // captions: word by word, active word pink (cyan on alternate lines)
+        const li = lineAt(t), L = LINES[li], on = t >= L.s - 0.03 && t < L.e + 0.15;
+        $("cap").style.opacity = on ? 1 : 0; $("cap").className = li % 2 ? "alt" : "";
+        if (on) { const ws = L.words, chunks = [[]];
+          ws.forEach((w, j) => { let cur = chunks[chunks.length - 1]; const len = cur.reduce((n, i) => n + ws[i].w.length + 1, 0);
+            if (cur.length && len + w.w.length > 19) { chunks.push([]); cur = chunks[chunks.length - 1]; }
+            cur.push(j); if (/[.,!?:—]$/.test(w.w) || cur.length >= 3) chunks.push([]); });
+          let act = ws.findIndex((w) => t < w.e); if (act < 0) act = ws.length - 1;
+          const chn = chunks.find((c) => c.includes(act)) || chunks[0];
+          $("cap").innerHTML = '<span class="ch">' + chn.map((j) => `<span class="${j === act && t >= ws[j].s ? "on" : ""}">${ws[j].w.replace("—", "— ")}</span>`).join(" ") + "</span>"; }
+      }
+
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      const root = window.__timelines["gum-myth"];
+      root.eventCallback("onUpdate", () => renderAt(root.time()));
+      renderAt(window.__hfThreeTime || root.time() || 0);
+    </script>
+  </body>
+</html>
